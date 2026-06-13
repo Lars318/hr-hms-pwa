@@ -179,6 +179,11 @@ export const dashboardRouter = router({
         title: string | null; avatarUrl: string | null; employedAt: Date;
       };
       department: { id: string; name: string } | null;
+      assignments: {
+        id: string; isPrimary: boolean; roleLabel: string | null;
+        location: { id: string; name: string; city: string | null };
+        department: { id: string; name: string } | null;
+      }[];
       counts: {
         openActions: number; overdueActions: number;
         openIncidents: number; pendingLeave: number;
@@ -241,10 +246,20 @@ export const dashboardRouter = router({
 
       employeeDash = { pendingLeave, upcomingApprovedLeave };
 
-      // Hent avdelingsnavn
-      const dept = profile.departmentId
-        ? await db.department.findUnique({ where: { id: profile.departmentId }, select: { id: true, name: true } })
-        : null;
+      // Hent avdelingsnavn og tilhørigheter parallelt
+      const [dept, myAssignments] = await Promise.all([
+        profile.departmentId
+          ? db.department.findUnique({ where: { id: profile.departmentId }, select: { id: true, name: true } })
+          : Promise.resolve(null),
+        db.profileAssignment.findMany({
+          where: { profileId: profile.id, endDate: null },
+          include: {
+            location: { select: { id: true, name: true, city: true } },
+            department: { select: { id: true, name: true } },
+          },
+          orderBy: [{ isPrimary: "desc" }, { startDate: "asc" }],
+        }),
+      ]);
 
       // Bygg todo-lista
       type TodoItem = { type: "action" | "incident" | "document" | "handbook" | "leave"; id: string; title: string; description: string; href: string };
@@ -301,6 +316,7 @@ export const dashboardRouter = router({
           employedAt: profile.employedAt,
         },
         department: dept,
+        assignments: myAssignments,
         counts: {
           openActions: myOpenActions,
           overdueActions: myOverdueActions,

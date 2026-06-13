@@ -21,7 +21,7 @@ export function EmployeeDashboard({ data }: Props) {
   if (!employeeProfileHome) return null;
 
   const {
-    profile, department, counts, handbookStatus,
+    profile, department, assignments, counts, handbookStatus,
     todoItems, recentIncidents, recentActions, recentLeave, unconfirmedDocs,
   } = employeeProfileHome;
 
@@ -72,6 +72,7 @@ export function EmployeeDashboard({ data }: Props) {
         department={department}
         role="EMPLOYEE"
         title={profile.title}
+        assignments={assignments as Parameters<typeof BelongingSection>[0]["assignments"]}
       />
     </div>
   );
