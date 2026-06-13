@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { router, profileProcedure, hrProcedure } from "@/server/trpc/trpc";
-import { createNotification, createNotificationsForRoles, createNotificationsForDepartment } from "@/lib/notifications";
+import { createNotification, createNotificationsForRoles, createNotificationsForDepartment, createNotificationsForLocation } from "@/lib/notifications";
 import type { Prisma } from "@prisma/client";
 
 const severities = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const;
@@ -107,6 +107,7 @@ export const incidentRouter = router({
         occurredAt: z.string().datetime({ offset: true }),
         dueDate: z.string().datetime({ offset: true }).optional(),
         departmentId: z.string().optional(),
+        locationId: z.string().optional(),
         assignedToId: z.string().optional(),
       })
     )
@@ -122,6 +123,16 @@ export const incidentRouter = router({
         throw new TRPCError({ code: "FORBIDDEN", message: "Ansatte kan ikke tildele avvik til andre." });
       }
 
+      // Finn lokasjon: input → primær assignment → profile.departmentId sin lokasjon
+      let resolvedLocationId = input.locationId;
+      if (!resolvedLocationId) {
+        const primary = await db.profileAssignment.findFirst({
+          where: { profileId: profile.id, isPrimary: true, endDate: null },
+          select: { locationId: true },
+        });
+        resolvedLocationId = primary?.locationId;
+      }
+
       const incident = await db.incident.create({
         data: {
           title: input.title,
@@ -130,6 +141,7 @@ export const incidentRouter = router({
           occurredAt: new Date(input.occurredAt),
           dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
           departmentId: input.departmentId ?? profile.departmentId ?? undefined,
+          locationId: resolvedLocationId ?? undefined,
           assignedToId: input.assignedToId ?? undefined,
           reportedById: profile.id,
         },
@@ -157,6 +169,18 @@ export const incidentRouter = router({
         linkUrl: `/avvik/${incident.id}`,
         excludeProfileId: profile.id,
       });
+      // Varsle verneombud og HMS-ansvarlig for lokasjonen
+      if (incident.locationId) {
+        await createNotificationsForLocation({
+          db,
+          locationId: incident.locationId,
+          type: "INCIDENT_CREATED",
+          title: "Nytt avvik på din lokasjon",
+          message: `${profile.fullName} rapporterte: "${incident.title}"`,
+          linkUrl: `/avvik/${incident.id}`,
+          excludeProfileId: profile.id,
+        });
+      }
       // Varsle leder i avdelingen
       if (incident.departmentId) {
         await createNotificationsForDepartment({

@@ -16,7 +16,7 @@ export const departmentRouter = router({
   create: hrProcedure
     .input(z.object({ name: z.string().min(1, "Navn er påkrevd").max(100) }))
     .mutation(async ({ ctx, input }) => {
-      const existing = await ctx.db.department.findUnique({ where: { name: input.name } });
+      const existing = await ctx.db.department.findFirst({ where: { name: input.name } });
       if (existing) {
         throw new TRPCError({ code: "CONFLICT", message: "Avdelingen finnes allerede." });
       }

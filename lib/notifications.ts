@@ -186,6 +186,47 @@ export async function notifyHrAdmins({
   });
 }
 
+// Varsle verneombud og/eller HMS-ansvarlig for en lokasjon.
+// Fallback til HR/ADMIN hvis ingen er satt.
+export async function createNotificationsForLocation({
+  db,
+  locationId,
+  type,
+  title,
+  message,
+  linkUrl,
+  excludeProfileId,
+}: {
+  db: PrismaClient;
+  locationId: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  linkUrl?: string;
+  excludeProfileId?: string;
+}) {
+  const location = await db.location.findUnique({
+    where: { id: locationId },
+    select: { safetyRepresentativeId: true, hseManagerId: true },
+  });
+
+  const recipientIds = new Set<string>();
+  if (location?.safetyRepresentativeId) recipientIds.add(location.safetyRepresentativeId);
+  if (location?.hseManagerId) recipientIds.add(location.hseManagerId);
+  if (excludeProfileId) recipientIds.delete(excludeProfileId);
+
+  if (recipientIds.size > 0) {
+    await Promise.all(
+      Array.from(recipientIds).map((id) =>
+        createNotification({ db, recipientId: id, type, title, message, linkUrl })
+      )
+    );
+  } else {
+    // Ingen verneombud/HMS-ansvarlig satt – varsle HR/ADMIN som fallback
+    await createNotificationsForRoles({ db, roles: ["ADMIN", "HR"], type, title, message, linkUrl, excludeProfileId });
+  }
+}
+
 export async function notifyAllActive({
   db,
   type,

@@ -13,6 +13,8 @@ import { leaveRequestRouter } from "./leaveRequest";
 import { reportRouter } from "./report";
 import { pushRouter } from "./push";
 import { handbookRouter } from "./handbook";
+import { locationRouter } from "./location";
+import { profileAssignmentRouter } from "./profileAssignment";
 
 export const appRouter = router({
   profile: profileRouter,
@@ -29,6 +31,8 @@ export const appRouter = router({
   report: reportRouter,
   push: pushRouter,
   handbook: handbookRouter,
+  location: locationRouter,
+  profileAssignment: profileAssignmentRouter,
 });
 
 export type AppRouter = typeof appRouter;
