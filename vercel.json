@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["arn1"],
+  "functions": {
+    "app/api/**": {
+      "maxDuration": 30
+    }
+  }
+}

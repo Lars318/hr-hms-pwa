@@ -1,0 +1,62 @@
+{
+  "name": "HR/HMS Portalen",
+  "short_name": "HR/HMS",
+  "description": "Intern HR og HMS-løsning for ansatte",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "lang": "nb",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Rapporter avvik",
+      "short_name": "Avvik",
+      "description": "Rapporter et nytt HMS-avvik",
+      "url": "/avvik/ny",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mine tiltak",
+      "short_name": "Tiltak",
+      "description": "Se dine åpne tiltak",
+      "url": "/tiltak",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Dokumenter",
+      "short_name": "Dokumenter",
+      "description": "Åpne dokumentarkivet",
+      "url": "/dokumenter",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["business", "productivity"]
+}
