@@ -15,6 +15,7 @@ import { pushRouter } from "./push";
 import { handbookRouter } from "./handbook";
 import { locationRouter } from "./location";
 import { profileAssignmentRouter } from "./profileAssignment";
+import { overtimeRouter } from "./overtime";
 
 export const appRouter = router({
   profile: profileRouter,
@@ -33,6 +34,7 @@ export const appRouter = router({
   handbook: handbookRouter,
   location: locationRouter,
   profileAssignment: profileAssignmentRouter,
+  overtime: overtimeRouter,
 });
 
 export type AppRouter = typeof appRouter;
