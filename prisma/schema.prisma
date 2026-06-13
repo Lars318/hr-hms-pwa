@@ -110,7 +110,32 @@ enum NotificationType {
   LEAVE_REQUEST_REJECTED
   LEAVE_REQUEST_CANCELLED
   HANDBOOK_PUBLISHED
+  OVERTIME_SUBMITTED
+  OVERTIME_APPROVED
+  OVERTIME_REJECTED
   SYSTEM
+}
+
+enum OvertimeType {
+  OVERTIME       // Utbetalt overtid
+  TIME_OFF       // Avspasering
+  ON_CALL        // Beredskapsvakt
+  TRAVEL_TIME    // Reisetid utenom arbeidstid
+}
+
+enum OvertimeStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum TimeBankAdjustmentReason {
+  CORRECTION
+  PAYOUT
+  RESET
+  MANUAL
 }
 
 enum LeaveRequestType {
@@ -153,6 +178,7 @@ model Location {
   actions          Action[]
   leaveRequests    LeaveRequest[]
   profileAssignments ProfileAssignment[]
+  overtimeEntries  OvertimeEntry[]
 
   @@index([safetyRepresentativeId])
   @@index([hseManagerId])
@@ -196,6 +222,7 @@ model Department {
   actions            Action[]
   leaveRequests      LeaveRequest[]
   profileAssignments ProfileAssignment[]
+  overtimeEntries    OvertimeEntry[]
 
   @@index([locationId])
 }
@@ -236,6 +263,10 @@ model Profile {
   profileAssignments   ProfileAssignment[]
   safetyRepLocations   Location[]           @relation("LocationSafetyRep")
   hseManagerLocations  Location[]           @relation("LocationHseManager")
+  overtimeEntries      OvertimeEntry[]
+  approvedOvertimeEntries OvertimeEntry[]   @relation("OvertimeApprover")
+  timeBankAdjustments  TimeBankAdjustment[] @relation("TimeBankEmployee")
+  timeBankAdjustedBy   TimeBankAdjustment[] @relation("TimeBankAdjuster")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -576,4 +607,53 @@ model HandbookAcknowledgement {
   @@unique([versionId, profileId])
   @@index([versionId])
   @@index([profileId])
+}
+
+// ─── Overtid og timebank ──────────────────────────────────────────────────────
+
+model OvertimeEntry {
+  id          String         @id @default(cuid())
+  date        DateTime       @db.Date
+  hours       Float
+  type        OvertimeType
+  status      OvertimeStatus @default(DRAFT)
+  description String?        @db.Text
+  note        String?        // Lederkommentar ved godkjenning/avslag
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  employee   Profile  @relation(fields: [employeeId], references: [id])
+  employeeId String
+
+  approvedBy   Profile?  @relation("OvertimeApprover", fields: [approvedById], references: [id])
+  approvedById String?
+  approvedAt   DateTime?
+
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String?
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([date])
+  @@index([locationId])
+}
+
+model TimeBankAdjustment {
+  id        String                   @id @default(cuid())
+  hours     Float
+  reason    TimeBankAdjustmentReason
+  note      String?
+  createdAt DateTime                 @default(now())
+
+  employee   Profile @relation("TimeBankEmployee", fields: [employeeId], references: [id])
+  employeeId String
+
+  adjustedBy   Profile @relation("TimeBankAdjuster", fields: [adjustedById], references: [id])
+  adjustedById String
+
+  @@index([employeeId])
+  @@index([createdAt])
 }
