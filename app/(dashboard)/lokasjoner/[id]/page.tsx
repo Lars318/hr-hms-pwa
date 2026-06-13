@@ -46,7 +46,7 @@ export default async function LokasjonDetailPage({ params }: { params: { id: str
         orderBy: { createdAt: "desc" },
         take: 5,
       },
-      _count: { select: { incidents: true, riskAssessments: true, actions: true, profileAssignments: true } },
+      _count: { select: { incidents: true, riskAssessments: true, actions: { where: { status: { notIn: ["DONE", "CANCELLED"] } } }, profileAssignments: true } },
     },
   });
 
@@ -151,6 +151,55 @@ export default async function LokasjonDetailPage({ params }: { params: { id: str
             ))
           )}
         </div>
+      </div>
+
+      {/* HMS-varsling */}
+      {isHrAdmin && (
+        <div className="rounded-2xl border bg-card divide-y">
+          <div className="px-4 py-3">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">HMS-varsling</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Disse mottar varsler ved avvik og risikovurderinger på denne lokasjonen</p>
+          </div>
+          {location.safetyRepresentative ? (
+            <div className="flex items-center gap-3 px-4 py-3.5 min-h-[56px]">
+              <Shield className="h-4 w-4 text-primary shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground">Verneombud</p>
+                <p className="text-sm font-medium">{location.safetyRepresentative.fullName}</p>
+                <p className="text-xs text-muted-foreground">{location.safetyRepresentative.email}</p>
+              </div>
+            </div>
+          ) : null}
+          {location.hseManager ? (
+            <div className="flex items-center gap-3 px-4 py-3.5 min-h-[56px]">
+              <ShieldAlert className="h-4 w-4 text-primary shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground">HMS-ansvarlig</p>
+                <p className="text-sm font-medium">{location.hseManager.fullName}</p>
+                <p className="text-xs text-muted-foreground">{location.hseManager.email}</p>
+              </div>
+            </div>
+          ) : null}
+          {!location.safetyRepresentative && !location.hseManager && (
+            <div className="px-4 py-4 text-sm text-muted-foreground">
+              Ingen verneombud eller HMS-ansvarlig satt – varsler går til HR/Admin.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Statistikk */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Avvik", count: location._count.incidents },
+          { label: "Risikovurderinger", count: location._count.riskAssessments },
+          { label: "Tiltak", count: location._count.actions },
+        ].map(({ label, count }) => (
+          <div key={label} className="rounded-2xl border bg-card px-4 py-3 text-center">
+            <p className="text-2xl font-bold">{count}</p>
+            <p className="text-xs text-muted-foreground">{label}</p>
+          </div>
+        ))}
       </div>
 
       {/* Åpne avvik */}

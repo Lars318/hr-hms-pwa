@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { router, profileProcedure } from "@/server/trpc/trpc";
 import { calcRiskScore, calcRiskLevel } from "@/lib/risk";
-import { createNotificationsForRoles, createNotificationsForDepartment } from "@/lib/notifications";
+import { createNotificationsForRoles, createNotificationsForDepartment, createNotificationsForLocation } from "@/lib/notifications";
 import type { Prisma } from "@prisma/client";
 
 const statuses = ["DRAFT", "ACTIVE", "REVIEW", "CLOSED"] as const;
@@ -104,6 +104,7 @@ export const riskAssessmentRouter = router({
         title: z.string().min(1).max(200),
         description: z.string().max(2000).optional(),
         departmentId: z.string().optional(),
+        locationId: z.string().optional(),
         reviewDate: z.string().optional(),
       })
     )
@@ -113,11 +114,22 @@ export const riskAssessmentRouter = router({
         throw new TRPCError({ code: "FORBIDDEN", message: "Ikke tilgang til å opprette risikovurdering for denne avdelingen." });
       }
 
+      // Resolve locationId from input or primary ProfileAssignment
+      let resolvedLocationId = input.locationId ?? null;
+      if (!resolvedLocationId) {
+        const primary = await db.profileAssignment.findFirst({
+          where: { profileId: profile.id, isPrimary: true, endDate: null },
+          select: { locationId: true },
+        });
+        resolvedLocationId = primary?.locationId ?? null;
+      }
+
       const assessment = await db.riskAssessment.create({
         data: {
           title: input.title,
           description: input.description,
           departmentId: input.departmentId ?? null,
+          locationId: resolvedLocationId,
           ownerId: profile.id,
           status: "DRAFT",
           reviewDate: input.reviewDate ? new Date(input.reviewDate) : null,
@@ -134,16 +146,28 @@ export const riskAssessmentRouter = router({
         },
       });
 
-      // Varsle HR/ADMIN og leder i avdelingen
-      await createNotificationsForRoles({
-        db,
-        roles: ["ADMIN", "HR"],
-        type: "RISK_REVIEW_DUE",
-        title: "Ny risikovurdering opprettet",
-        message: `"${assessment.title}" er opprettet av ${profile.fullName}`,
-        linkUrl: `/risiko/${assessment.id}`,
-        excludeProfileId: profile.id,
-      });
+      // Varsle verneombud/HMS-ansvarlig for lokasjonen, eller HR/ADMIN som fallback
+      if (assessment.locationId) {
+        await createNotificationsForLocation({
+          db,
+          locationId: assessment.locationId,
+          type: "RISK_REVIEW_DUE",
+          title: "Ny risikovurdering opprettet",
+          message: `"${assessment.title}" er opprettet av ${profile.fullName}`,
+          linkUrl: `/risiko/${assessment.id}`,
+          excludeProfileId: profile.id,
+        });
+      } else {
+        await createNotificationsForRoles({
+          db,
+          roles: ["ADMIN", "HR"],
+          type: "RISK_REVIEW_DUE",
+          title: "Ny risikovurdering opprettet",
+          message: `"${assessment.title}" er opprettet av ${profile.fullName}`,
+          linkUrl: `/risiko/${assessment.id}`,
+          excludeProfileId: profile.id,
+        });
+      }
       if (assessment.departmentId) {
         await createNotificationsForDepartment({
           db,
