@@ -23,6 +23,7 @@ interface MoreMenuItem {
 const moreItems: MoreMenuItem[] = [
   { href: "/fravaer",        label: "Fravær",          icon: CalendarDays, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/overtid",        label: "Overtid",          icon: Clock,        roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/overtid/godkjenning", label: "Godkjenn overtid", icon: Clock,   roles: ["ADMIN", "HR", "MANAGER"] },
   { href: "/tiltak",         label: "Tiltak",           icon: Zap,          roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/dokumenter",     label: "Dokumenter",       icon: FolderOpen,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/personalhandbok",label: "Personalhåndbok",  icon: BookOpen,     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },

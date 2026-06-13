@@ -91,6 +91,12 @@ const navItems: NavItem[] = [
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
   {
+    href: "/overtid/godkjenning",
+    label: "Godkjenning overtid",
+    icon: Clock,
+    roles: ["ADMIN", "HR", "MANAGER"],
+  },
+  {
     href: "/rapporter",
     label: "Rapporter",
     icon: BarChart2,
