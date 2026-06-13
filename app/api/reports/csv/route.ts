@@ -5,7 +5,7 @@ import { runReport } from "@/lib/reports/queries";
 import type { ReportType } from "@/lib/reports/queries";
 import { csvExportLimit } from "@/lib/security/rateLimit";
 
-const REPORT_TYPES: ReportType[] = ["incidents", "actions", "risk", "documents", "leave", "handbook"];
+const REPORT_TYPES: ReportType[] = ["incidents", "actions", "risk", "documents", "leave", "handbook", "overtime"];
 
 const FILE_NAMES: Record<ReportType, string> = {
   incidents: "avvik",
@@ -14,6 +14,7 @@ const FILE_NAMES: Record<ReportType, string> = {
   documents: "dokumentlesing",
   leave: "fravaer",
   handbook: "personalhandbok-lesing",
+  overtime: "overtid",
 };
 
 export async function GET(req: Request) {

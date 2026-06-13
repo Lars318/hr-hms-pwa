@@ -334,21 +334,24 @@ export const dashboardRouter = router({
     }
 
     // MANAGER
-    let managerDash: { pendingLeaveInDept: number; deptEmployeeCount: number } | null = null;
+    let managerDash: { pendingLeaveInDept: number; deptEmployeeCount: number; pendingOvertimeInDept: number } | null = null;
     if (isManager && deptId) {
-      const [pendingLeaveInDept, deptEmployeeCount] = await Promise.all([
+      const [pendingLeaveInDept, deptEmployeeCount, pendingOvertimeInDept] = await Promise.all([
         db.leaveRequest.count({ where: { departmentId: deptId, status: "PENDING" } }),
         db.profile.count({ where: { departmentId: deptId, status: "ACTIVE" } }),
+        db.overtimeEntry.count({ where: { employee: { departmentId: deptId }, status: "SUBMITTED" } }),
       ]);
-      managerDash = { pendingLeaveInDept, deptEmployeeCount };
+      managerDash = { pendingLeaveInDept, deptEmployeeCount, pendingOvertimeInDept };
     }
 
     // HR / HMS
-    let hrDash: { pendingLeaveOrgWide: number } | null = null;
+    let hrDash: { pendingLeaveOrgWide: number; pendingOvertimeOrgWide: number } | null = null;
     if (isHrAdmin) {
-      hrDash = {
-        pendingLeaveOrgWide: await db.leaveRequest.count({ where: { status: "PENDING" } }),
-      };
+      const [pendingLeaveOrgWide, pendingOvertimeOrgWide] = await Promise.all([
+        db.leaveRequest.count({ where: { status: "PENDING" } }),
+        db.overtimeEntry.count({ where: { status: "SUBMITTED" } }),
+      ]);
+      hrDash = { pendingLeaveOrgWide, pendingOvertimeOrgWide };
     }
 
     // ADMIN

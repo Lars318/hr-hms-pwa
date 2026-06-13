@@ -356,7 +356,51 @@ export async function queryHandbook(
 
 // ── Dispatcher ────────────────────────────────────────────────────────────────
 
-export type ReportType = "incidents" | "actions" | "risk" | "documents" | "leave" | "handbook";
+export async function queryOvertime(
+  db: PrismaClient,
+  profile: ReportProfile,
+  input: ReportInput
+): Promise<ReportData> {
+  const deptId = resolvedDeptId(profile, input.departmentId);
+  const locId = isHrAdmin(profile) ? input.locationId : undefined;
+
+  const OVERTIME_TYPE_LABELS: Record<string, string> = {
+    OVERTIME: "Overtid", TIME_OFF: "Avspasering", ON_CALL: "Beredskapsvakt", TRAVEL_TIME: "Reisetid",
+  };
+  const STATUS_LABELS: Record<string, string> = {
+    DRAFT: "Utkast", SUBMITTED: "Til godkjenning", APPROVED: "Godkjent", REJECTED: "Avslått", CANCELLED: "Kansellert",
+  };
+
+  const rows = await db.overtimeEntry.findMany({
+    where: {
+      ...dateWhere("date", input.from, input.to),
+      ...(locId ? { locationId: locId } : {}),
+      ...(deptId ? { departmentId: deptId } : {}),
+      ...(!isHrAdmin(profile) && !deptId ? { employeeId: profile.id } : {}),
+    },
+    include: {
+      employee: { select: { fullName: true } },
+      approvedBy: { select: { fullName: true } },
+      location: { select: { name: true } },
+    },
+    orderBy: { date: "desc" },
+  });
+
+  const headers = ["Dato", "Ansatt", "Type", "Timer", "Status", "Lokasjon", "Godkjent av"];
+  const data = rows.map((r) => [
+    fmtDate(r.date),
+    r.employee.fullName,
+    OVERTIME_TYPE_LABELS[r.type] ?? r.type,
+    r.hours,
+    STATUS_LABELS[r.status] ?? r.status,
+    r.location?.name ?? "",
+    r.approvedBy?.fullName ?? "",
+  ] as (string | number | null)[]);
+
+  return { headers, rows: data, total: rows.length };
+}
+
+export type ReportType = "incidents" | "actions" | "risk" | "documents" | "leave" | "handbook" | "overtime";
 
 export async function runReport(
   type: ReportType,
@@ -371,5 +415,6 @@ export async function runReport(
     case "documents": return queryDocuments(db, profile, input);
     case "leave": return queryLeave(db, profile, input);
     case "handbook": return queryHandbook(db, profile, input);
+    case "overtime": return queryOvertime(db, profile, input);
   }
 }
