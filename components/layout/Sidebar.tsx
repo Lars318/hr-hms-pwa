@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Users, Building2, MapPin, ShieldAlert, FolderOpen, ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2, Activity, BookOpen } from "lucide-react";
+import { LayoutDashboard, Users, Building2, MapPin, ShieldAlert, FolderOpen, ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2, Activity, BookOpen, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { clearAllDrafts } from "@/lib/offline/drafts";
@@ -82,6 +82,12 @@ const navItems: NavItem[] = [
     href: "/fravaer/kalender",
     label: "Fraværskalender",
     icon: CalendarRange,
+    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
+  },
+  {
+    href: "/overtid",
+    label: "Overtid",
+    icon: Clock,
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
   {

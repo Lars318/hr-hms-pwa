@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, ShieldAlert, Plus, ShieldCheck, MoreHorizontal,
   Bell, BarChart2, Activity, LogOut, X,
-  CalendarDays, FolderOpen, Zap, BookOpen,
+  CalendarDays, FolderOpen, Zap, BookOpen, Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -22,6 +22,7 @@ interface MoreMenuItem {
 
 const moreItems: MoreMenuItem[] = [
   { href: "/fravaer",        label: "Fravær",          icon: CalendarDays, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/overtid",        label: "Overtid",          icon: Clock,        roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/tiltak",         label: "Tiltak",           icon: Zap,          roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/dokumenter",     label: "Dokumenter",       icon: FolderOpen,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/personalhandbok",label: "Personalhåndbok",  icon: BookOpen,     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
@@ -44,6 +45,7 @@ export function BottomNav({ role }: BottomNavProps) {
 
   const isMoreActive =
     pathname.startsWith("/fravaer") ||
+    pathname.startsWith("/overtid") ||
     pathname.startsWith("/dokumenter") ||
     pathname.startsWith("/tiltak") ||
     pathname.startsWith("/rapporter") ||

@@ -16,18 +16,20 @@ interface SummaryStripProps {
   pendingLeave: number;
   unconfirmedDocs: number;
   handbookStatus: { version: number | null; hasRead: boolean };
+  overtimeBalance?: number | null;
 }
 
 export function SummaryStrip({
-  openActions, openIncidents, pendingLeave, unconfirmedDocs, handbookStatus,
+  openActions, openIncidents, pendingLeave, unconfirmedDocs, handbookStatus, overtimeBalance,
 }: SummaryStripProps) {
+  const otHours = overtimeBalance ?? 0;
   const items: SummaryItem[] = [
     {
       label: "Overtid",
-      value: "Snart",
-      href: "#",
+      value: overtimeBalance === undefined || overtimeBalance === null ? "–" : `${otHours > 0 ? "+" : ""}${otHours}t`,
+      href: "/overtid",
       icon: Clock,
-      highlight: "muted",
+      highlight: otHours > 0 ? "ok" : otHours < 0 ? "warn" : "muted",
     },
     {
       label: "Tiltak",
@@ -81,10 +83,7 @@ export function SummaryStrip({
           <Link
             key={label}
             href={href}
-            className={cn(
-              "flex flex-col items-center gap-1 rounded-2xl border bg-card p-3 text-center hover:bg-accent/50 transition-colors active:scale-[0.97]",
-              href === "#" && "pointer-events-none"
-            )}
+            className="flex flex-col items-center gap-1 rounded-2xl border bg-card p-3 text-center hover:bg-accent/50 transition-colors active:scale-[0.97]"
           >
             <Icon className="h-4 w-4 text-muted-foreground" />
             <span className={cn("text-base font-bold leading-tight", highlightClasses[highlight])}>

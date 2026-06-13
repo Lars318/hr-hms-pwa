@@ -18,7 +18,7 @@ interface SecondaryAction {
 
 const primaryActions: PrimaryAction[] = [
   { href: "/avvik/ny",       label: "Meld avvik",         icon: ShieldAlert,  variant: "warning" },
-  { href: null,              label: "Registrer overtid",  icon: Clock,        variant: "default", comingSoon: true },
+  { href: "/overtid/ny",     label: "Registrer overtid",  icon: Clock,        variant: "default" },
   { href: "/fravaer/ny",     label: "Søk fravær",         icon: CalendarDays, variant: "primary" },
   { href: "/personalhandbok",label: "Les håndbok",        icon: BookOpen,     variant: "default" },
 ];
