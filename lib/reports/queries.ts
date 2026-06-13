@@ -42,6 +42,7 @@ export interface ReportInput {
   from?: string;
   to?: string;
   departmentId?: string;
+  locationId?: string;
 }
 
 export interface ReportData {
@@ -84,10 +85,12 @@ export async function queryIncidents(
   input: ReportInput
 ): Promise<ReportData> {
   const deptId = resolvedDeptId(profile, input.departmentId);
+  const locId = isHrAdmin(profile) ? input.locationId : undefined;
 
   const rows = await db.incident.findMany({
     where: {
       ...dateWhere("createdAt", input.from, input.to),
+      ...(locId ? { locationId: locId } : {}),
       ...(deptId ? { departmentId: deptId } : {}),
       ...(!isHrAdmin(profile) && !deptId
         ? { reportedById: profile.id }
@@ -97,19 +100,21 @@ export async function queryIncidents(
       reportedBy: { select: { fullName: true } },
       assignedTo: { select: { fullName: true } },
       department: { select: { name: true } },
+      location: { select: { name: true } },
     },
     orderBy: { createdAt: "desc" },
   });
 
   const headers = [
     "Dato", "Tittel", "Status", "Alvorlighetsgrad",
-    "Avdeling", "Rapportert av", "Ansvarlig", "Frist",
+    "Lokasjon", "Avdeling", "Rapportert av", "Ansvarlig", "Frist",
   ];
   const data = rows.map((r) => [
     fmtDate(r.createdAt),
     r.title,
     INCIDENT_STATUS_LABELS[r.status] ?? r.status,
     SEVERITY_LABELS[r.severity] ?? r.severity,
+    r.location?.name ?? "",
     r.department?.name ?? "",
     r.reportedBy.fullName,
     r.assignedTo?.fullName ?? "",
@@ -127,10 +132,12 @@ export async function queryActions(
   input: ReportInput
 ): Promise<ReportData> {
   const deptId = resolvedDeptId(profile, input.departmentId);
+  const locId = isHrAdmin(profile) ? input.locationId : undefined;
 
   const rows = await db.action.findMany({
     where: {
       ...dateWhere("createdAt", input.from, input.to),
+      ...(locId ? { locationId: locId } : {}),
       ...(deptId ? { departmentId: deptId } : {}),
       ...(!isHrAdmin(profile) && !deptId
         ? { assignedToId: profile.id }
@@ -139,19 +146,21 @@ export async function queryActions(
     include: {
       assignedTo: { select: { fullName: true } },
       department: { select: { name: true } },
+      location: { select: { name: true } },
     },
     orderBy: { createdAt: "desc" },
   });
 
   const headers = [
     "Dato", "Tittel", "Status", "Prioritet",
-    "Avdeling", "Ansvarlig", "Frist", "Fullført dato",
+    "Lokasjon", "Avdeling", "Ansvarlig", "Frist", "Fullført dato",
   ];
   const data = rows.map((r) => [
     fmtDate(r.createdAt),
     r.title,
     ACTION_STATUS_LABELS[r.status] ?? r.status,
     ACTION_PRIORITY_LABELS[r.priority] ?? r.priority,
+    r.location?.name ?? "",
     r.department?.name ?? "",
     r.assignedTo?.fullName ?? "",
     fmtDate(r.dueDate),
@@ -257,10 +266,12 @@ export async function queryLeave(
   input: ReportInput
 ): Promise<ReportData> {
   const deptId = resolvedDeptId(profile, input.departmentId);
+  const locId = isHrAdmin(profile) ? input.locationId : undefined;
 
   const rows = await db.leaveRequest.findMany({
     where: {
       ...dateWhere("startDate", input.from, input.to),
+      ...(locId ? { locationId: locId } : {}),
       ...(deptId ? { departmentId: deptId } : {}),
       ...(!isHrAdmin(profile) && !deptId
         ? { employeeId: profile.id }
@@ -269,16 +280,18 @@ export async function queryLeave(
     include: {
       employee: { select: { fullName: true } },
       department: { select: { name: true } },
+      location: { select: { name: true } },
     },
     orderBy: { startDate: "desc" },
   });
 
   const headers = [
-    "Ansatt", "Avdeling", "Type", "Status",
+    "Ansatt", "Lokasjon", "Avdeling", "Type", "Status",
     "Fra", "Til", "Dager",
   ];
   const data = rows.map((r) => [
     r.employee.fullName,
+    r.location?.name ?? "",
     r.department?.name ?? "",
     LEAVE_TYPE_LABELS[r.type] ?? r.type,
     LEAVE_STATUS_LABELS[r.status] ?? r.status,

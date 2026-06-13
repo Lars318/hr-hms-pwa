@@ -9,6 +9,7 @@ const reportInput = z.object({
   from: z.string().optional(),
   to: z.string().optional(),
   departmentId: z.string().optional(),
+  locationId: z.string().optional(),
 });
 
 export const reportRouter = router({
@@ -23,6 +24,7 @@ export const reportRouter = router({
         from: input.from,
         to: input.to,
         departmentId: input.departmentId,
+        locationId: input.locationId,
       });
     }),
 });

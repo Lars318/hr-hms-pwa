@@ -94,6 +94,7 @@ export const leaveRequestRouter = router({
         type: z.enum(leaveTypes),
         startDate: z.string().min(1),
         endDate: z.string().min(1),
+        locationId: z.string().optional(),
         reason: z.string().max(1000).optional(),
       }).refine(
         (v) => new Date(v.startDate) <= new Date(v.endDate),
@@ -110,6 +111,16 @@ export const leaveRequestRouter = router({
       const end = new Date(input.endDate);
       const days = Math.round((end.getTime() - start.getTime()) / 86_400_000) + 1;
 
+      // Resolve locationId: input → primary assignment → null
+      let resolvedLocationId = input.locationId ?? null;
+      if (!resolvedLocationId) {
+        const primary = await db.profileAssignment.findFirst({
+          where: { profileId: profile.id, isPrimary: true, endDate: null },
+          select: { locationId: true },
+        });
+        resolvedLocationId = primary?.locationId ?? null;
+      }
+
       const req = await db.leaveRequest.create({
         data: {
           type: input.type,
@@ -120,6 +131,7 @@ export const leaveRequestRouter = router({
           reason: input.reason ?? null,
           employeeId: profile.id,
           departmentId: profile.departmentId ?? null,
+          locationId: resolvedLocationId,
         },
         include: leaveInclude,
       });

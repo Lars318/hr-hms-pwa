@@ -24,6 +24,7 @@ const schema = z.object({
   severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]),
   occurredAt: z.string().min(1, "Dato for hendelse er påkrevd"),
   dueDate: z.string().optional(),
+  locationId: z.string().optional(),
   departmentId: z.string().optional(),
   assignedToId: z.string().optional(),
 });
@@ -43,6 +44,7 @@ interface IncidentFormProps {
   profiles: Pick<Profile, "id" | "fullName">[];
   viewerRole: Role;
   viewerDepartmentId: string | null;
+  viewerPrimaryLocationId?: string | null;
   draftId?: string;
 }
 
@@ -60,6 +62,7 @@ export function IncidentForm({
   profiles,
   viewerRole,
   viewerDepartmentId,
+  viewerPrimaryLocationId,
   draftId = AUTOSAVE_DRAFT_ID,
 }: IncidentFormProps) {
   const router = useRouter();
@@ -68,6 +71,10 @@ export function IncidentForm({
   const { success, error: toastError } = useToast();
   const canAssign =
     viewerRole === "ADMIN" || viewerRole === "HR" || viewerRole === "MANAGER";
+
+  const { data: locations = [] } = trpc.location.list.useQuery(undefined, {
+    staleTime: 300_000,
+  });
 
   const savedDraft = mode === "create" ? getDraft(draftId) : undefined;
 
@@ -88,6 +95,7 @@ export function IncidentForm({
         ? toLocalDatetimeValue(incident.occurredAt)
         : "",
       dueDate: incident?.dueDate ? toLocalDatetimeValue(incident.dueDate) : "",
+      locationId: (incident as (IncidentFull & { locationId?: string | null }) | undefined)?.locationId ?? viewerPrimaryLocationId ?? "",
       departmentId: savedDraft?.departmentId ?? incident?.departmentId ?? viewerDepartmentId ?? "",
       assignedToId: incident?.assignedToId ?? "",
     },
@@ -166,6 +174,7 @@ export function IncidentForm({
       severity: values.severity,
       occurredAt: new Date(values.occurredAt).toISOString(),
       dueDate: toISO(values.dueDate),
+      locationId: values.locationId || undefined,
       departmentId: values.departmentId || undefined,
       assignedToId: values.assignedToId || undefined,
     };
@@ -261,17 +270,17 @@ export function IncidentForm({
           <Input id="dueDate" type="datetime-local" {...register("dueDate")} />
         </div>
 
-        <div className="space-y-1">
-          <Label htmlFor="departmentId">Avdeling</Label>
-          <Select id="departmentId" {...register("departmentId")}>
-            <option value="">Ingen avdeling</option>
-            {departments.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name}
-              </option>
-            ))}
-          </Select>
-        </div>
+        {locations.length > 0 && (
+          <div className="space-y-1">
+            <Label htmlFor="locationId">Lokasjon</Label>
+            <Select id="locationId" {...register("locationId")}>
+              <option value="">Ikke spesifisert</option>
+              {locations.map((l) => (
+                <option key={l.id} value={l.id}>{l.name}</option>
+              ))}
+            </Select>
+          </div>
+        )}
       </div>
 
       {canAssign && (

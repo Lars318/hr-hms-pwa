@@ -16,13 +16,16 @@ export default async function NyttAvvikPage() {
   const profile = await db.profile.findUnique({ where: { supabaseUserId: user.id } });
   if (!profile) redirect("/ingen-tilgang");
 
-  const [departments, profiles] = await Promise.all([
+  const [departments, profiles, primaryAssignment] = await Promise.all([
     db.department.findMany({ orderBy: { name: "asc" } }),
-    // For tildeling – kun aktive profiler
     db.profile.findMany({
       where: { status: "ACTIVE" },
       select: { id: true, fullName: true },
       orderBy: { fullName: "asc" },
+    }),
+    db.profileAssignment.findFirst({
+      where: { profileId: profile.id, isPrimary: true, endDate: null },
+      select: { locationId: true },
     }),
   ]);
 
@@ -46,6 +49,7 @@ export default async function NyttAvvikPage() {
         profiles={profiles}
         viewerRole={profile.role}
         viewerDepartmentId={profile.departmentId}
+        viewerPrimaryLocationId={primaryAssignment?.locationId ?? null}
       />
     </div>
   );

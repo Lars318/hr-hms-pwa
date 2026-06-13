@@ -24,6 +24,7 @@ const schema = z
     ] as const),
     startDate: z.string().min(1, "Startdato er påkrevd"),
     endDate: z.string().min(1, "Sluttdato er påkrevd"),
+    locationId: z.string().optional(),
     reason: z.string().max(1000).optional(),
   })
   .refine((v) => new Date(v.startDate) <= new Date(v.endDate), {
@@ -51,6 +52,8 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
   const utils = trpc.useUtils();
   const { success, error: toastError } = useToast();
 
+  const { data: locations = [] } = trpc.location.list.useQuery(undefined, { staleTime: 300_000 });
+
   const {
     register,
     handleSubmit,
@@ -66,6 +69,7 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
       endDate: existing?.endDate
         ? format(new Date(existing.endDate), "yyyy-MM-dd")
         : "",
+      locationId: "",
       reason: existing?.reason ?? "",
     },
   });
@@ -93,10 +97,11 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
   });
 
   async function onSubmit(values: FormValues) {
+    const payload = { ...values, locationId: values.locationId || undefined };
     if (mode === "create") {
-      await createMutation.mutateAsync(values);
+      await createMutation.mutateAsync(payload);
     } else if (existing) {
-      await updateMutation.mutateAsync({ id: existing.id, ...values });
+      await updateMutation.mutateAsync({ id: existing.id, ...payload });
     }
   }
 
@@ -126,6 +131,22 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
           {errors.endDate && <p className="text-xs text-destructive">{errors.endDate.message}</p>}
         </div>
       </div>
+
+      {locations.length > 0 && (
+        <div className="space-y-1">
+          <Label htmlFor="locationId">Lokasjon (valgfritt)</Label>
+          <select
+            id="locationId"
+            {...register("locationId")}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          >
+            <option value="">Ikke spesifisert</option>
+            {locations.map((l) => (
+              <option key={l.id} value={l.id}>{l.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="space-y-1">
         <Label htmlFor="reason">
