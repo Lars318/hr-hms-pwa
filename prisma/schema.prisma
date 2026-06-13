@@ -132,11 +132,12 @@ enum LeaveRequestStatus {
 // ─── Modeller ─────────────────────────────────────────────────────────────────
 
 model Location {
-  id      String  @id @default(cuid())
-  name    String  @unique
-  address String?
-  city    String?
-  country String  @default("Norge")
+  id               String  @id @default(cuid())
+  name             String  @unique
+  address          String?
+  city             String?
+  country          String  @default("Norge")
+  organizationName String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -159,6 +160,7 @@ model Location {
 
 model ProfileAssignment {
   id        String    @id @default(cuid())
+  roleLabel String?
   isPrimary Boolean   @default(false)
   startDate DateTime  @default(now())
   endDate   DateTime?
@@ -181,7 +183,7 @@ model ProfileAssignment {
 
 model Department {
   id        String   @id @default(cuid())
-  name      String   @unique
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -231,6 +233,9 @@ model Profile {
   pushSubscriptions        PushSubscription[]
   publishedHandbookVersions HandbookVersion[]
   handbookAcknowledgements  HandbookAcknowledgement[]
+  profileAssignments   ProfileAssignment[]
+  safetyRepLocations   Location[]           @relation("LocationSafetyRep")
+  hseManagerLocations  Location[]           @relation("LocationHseManager")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -258,6 +263,9 @@ model Incident {
   department   Department? @relation(fields: [departmentId], references: [id])
   departmentId String?
 
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+
   attachments Attachment[]
   auditLogs   AuditLog[]
 
@@ -266,6 +274,7 @@ model Incident {
   @@index([reportedById])
   @@index([assignedToId])
   @@index([departmentId])
+  @@index([locationId])
 }
 
 model Attachment {
@@ -343,6 +352,9 @@ model RiskAssessment {
   department   Department? @relation(fields: [departmentId], references: [id])
   departmentId String?
 
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+
   owner   Profile @relation("RiskAssessmentOwner", fields: [ownerId], references: [id])
   ownerId String
 
@@ -350,6 +362,7 @@ model RiskAssessment {
 
   @@index([status])
   @@index([departmentId])
+  @@index([locationId])
   @@index([ownerId])
 }
 
@@ -400,6 +413,9 @@ model Action {
   department   Department? @relation(fields: [departmentId], references: [id])
   departmentId String?
 
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+
   riskItem   RiskItem? @relation(fields: [riskItemId], references: [id])
   riskItemId String?
 
@@ -407,6 +423,7 @@ model Action {
   @@index([priority])
   @@index([assignedToId])
   @@index([departmentId])
+  @@index([locationId])
   @@index([riskItemId])
   @@index([dueDate])
 }
@@ -469,11 +486,15 @@ model LeaveRequest {
   department   Department? @relation(fields: [departmentId], references: [id])
   departmentId String?
 
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+
   decidedBy   Profile? @relation("LeaveRequestDecider", fields: [decidedById], references: [id])
   decidedById String?
 
   @@index([employeeId])
   @@index([departmentId])
+  @@index([locationId])
   @@index([status])
   @@index([startDate])
   @@index([endDate])

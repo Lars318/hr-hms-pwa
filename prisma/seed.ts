@@ -14,13 +14,54 @@ const SUPABASE_USER_IDS = {
 async function main() {
   console.log("🌱 Starter seed...");
 
-  // ── Avdeling ──────────────────────────────────────────────────────────────
-  const dept = await db.department.upsert({
-    where: { name: "IT og utvikling" },
+  // ── Lokasjoner ────────────────────────────────────────────────────────────
+  const locationSki = await db.location.upsert({
+    where: { name: "Treningssenter Ski" },
     update: {},
-    create: { name: "IT og utvikling" },
+    create: {
+      name: "Treningssenter Ski",
+      address: "Idrettsveien 1",
+      city: "Ski",
+      organizationName: "PulsFollo AS",
+    },
   });
-  console.log("✓ Avdeling:", dept.name);
+
+  const locationVestby = await db.location.upsert({
+    where: { name: "Treningssenter Vestby" },
+    update: {},
+    create: {
+      name: "Treningssenter Vestby",
+      address: "Sportsgata 5",
+      city: "Vestby",
+      organizationName: "PulsFollo AS",
+    },
+  });
+  console.log("✓ Lokasjoner: Ski, Vestby");
+
+  // ── Avdelinger per lokasjon ───────────────────────────────────────────────
+  const skiDepts: Record<string, Awaited<ReturnType<typeof db.department.create>>> = {};
+  const vestbyDepts: Record<string, Awaited<ReturnType<typeof db.department.create>>> = {};
+  const deptNames = ["Resepsjon", "PT", "Gruppeinstruktør", "Renhold"];
+
+  for (const deptName of deptNames) {
+    skiDepts[deptName] = await db.department.create({
+      data: { name: deptName, locationId: locationSki.id },
+    });
+    vestbyDepts[deptName] = await db.department.create({
+      data: { name: deptName, locationId: locationVestby.id },
+    });
+  }
+
+  // Behold eksisterende avdeling for bakoverkompatibilitet
+  const legacyDept = await db.department.upsert({
+    where: { id: "legacy-it" },
+    update: {},
+    create: { id: "legacy-it", name: "IT og utvikling" },
+  }).catch(() =>
+    db.department.findFirst({ where: { name: "IT og utvikling" } }).then((d) => d!)
+  );
+
+  console.log("✓ Avdelinger: 4 per lokasjon + legacy");
 
   // ── Brukere ───────────────────────────────────────────────────────────────
   const admin = await db.profile.upsert({
@@ -32,7 +73,6 @@ async function main() {
       fullName: "Admin Testesen",
       title: "Systemadministrator",
       role: "ADMIN",
-      departmentId: dept.id,
     },
   });
 
@@ -45,11 +85,10 @@ async function main() {
       fullName: "HR Testesen",
       title: "HR-sjef",
       role: "HR",
-      departmentId: dept.id,
     },
   });
 
-  await db.profile.upsert({
+  const hms = await db.profile.upsert({
     where: { email: "hms@test.no" },
     update: {},
     create: {
@@ -58,7 +97,6 @@ async function main() {
       fullName: "HMS Testesen",
       title: "HMS-ansvarlig",
       role: "HR",
-      departmentId: dept.id,
     },
   });
 
@@ -71,7 +109,7 @@ async function main() {
       fullName: "Manager Testesen",
       title: "Avdelingsleder",
       role: "MANAGER",
-      departmentId: dept.id,
+      departmentId: skiDepts["Resepsjon"].id,
     },
   });
 
@@ -82,9 +120,9 @@ async function main() {
       supabaseUserId: SUPABASE_USER_IDS.employee1,
       email: "employee1@test.no",
       fullName: "Ansatt En Testesen",
-      title: "Utvikler",
+      title: "Resepsjonist",
       role: "EMPLOYEE",
-      departmentId: dept.id,
+      departmentId: skiDepts["Resepsjon"].id,
     },
   });
 
@@ -95,12 +133,87 @@ async function main() {
       supabaseUserId: SUPABASE_USER_IDS.employee2,
       email: "employee2@test.no",
       fullName: "Ansatt To Testesen",
-      title: "Utvikler",
+      title: "Personal Trainer",
       role: "EMPLOYEE",
-      departmentId: dept.id,
+      departmentId: vestbyDepts["PT"].id,
     },
   });
   console.log("✓ Brukere: ADMIN, HR, HMS, MANAGER, EMPLOYEE x2");
+
+  // ── Verneombud og HMS-ansvarlig ───────────────────────────────────────────
+  await db.location.update({
+    where: { id: locationSki.id },
+    data: {
+      safetyRepresentativeId: employee1.id,
+      hseManagerId: hms.id,
+    },
+  });
+
+  await db.location.update({
+    where: { id: locationVestby.id },
+    data: {
+      safetyRepresentativeId: employee2.id,
+      hseManagerId: hms.id,
+    },
+  });
+  console.log("✓ Verneombud: employee1 (Ski), employee2 (Vestby)");
+
+  // ── ProfileAssignments ────────────────────────────────────────────────────
+  await db.profileAssignment.createMany({
+    data: [
+      // employee1: primær Ski/Resepsjon + ekstra Ski/Gruppeinstruktør
+      {
+        profileId: employee1.id,
+        locationId: locationSki.id,
+        departmentId: skiDepts["Resepsjon"].id,
+        roleLabel: "Resepsjonist",
+        isPrimary: true,
+        startDate: new Date("2024-01-15"),
+      },
+      {
+        profileId: employee1.id,
+        locationId: locationSki.id,
+        departmentId: skiDepts["Gruppeinstruktør"].id,
+        roleLabel: "Gruppeinstruktør",
+        isPrimary: false,
+        startDate: new Date("2024-03-01"),
+      },
+      // employee2: primær Vestby/PT
+      {
+        profileId: employee2.id,
+        locationId: locationVestby.id,
+        departmentId: vestbyDepts["PT"].id,
+        roleLabel: "Personal Trainer",
+        isPrimary: true,
+        startDate: new Date("2024-02-01"),
+      },
+      // manager: Ski
+      {
+        profileId: manager.id,
+        locationId: locationSki.id,
+        departmentId: skiDepts["Resepsjon"].id,
+        roleLabel: "Avdelingsleder",
+        isPrimary: true,
+        startDate: new Date("2023-06-01"),
+      },
+      // hms: HMS-ansvarlig begge
+      {
+        profileId: hms.id,
+        locationId: locationSki.id,
+        roleLabel: "HMS-ansvarlig",
+        isPrimary: true,
+        startDate: new Date("2023-01-01"),
+      },
+      {
+        profileId: hms.id,
+        locationId: locationVestby.id,
+        roleLabel: "HMS-ansvarlig",
+        isPrimary: false,
+        startDate: new Date("2023-01-01"),
+      },
+    ],
+  });
+  console.log("✓ ProfileAssignments: opprettet");
 
   // ── Avvik ─────────────────────────────────────────────────────────────────
   const incident1 = await db.incident.create({
@@ -109,25 +222,27 @@ async function main() {
       description: "Gulvet i inngangspartiet var svært glatt etter regn. En ansatt nesten falt.",
       severity: "MEDIUM",
       status: "OPEN",
-      reportedById: employee2.id,
-      departmentId: dept.id,
+      reportedById: employee1.id,
+      departmentId: skiDepts["Resepsjon"].id,
+      locationId: locationSki.id,
       occurredAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
     },
   });
 
   const incident2 = await db.incident.create({
     data: {
-      title: "Serverfeil i produksjon",
-      description: "API-serveren krasjet kl. 09:15. Nedetid i 12 minutter. Rotårsak: OOM-feil.",
+      title: "Defekt tredemølle",
+      description: "Tredemølle nr. 3 har ujevnt belte og stopper plutselig. Fare for fall.",
       severity: "HIGH",
       status: "IN_PROGRESS",
-      reportedById: manager.id,
-      assignedToId: admin.id,
-      departmentId: dept.id,
+      reportedById: employee2.id,
+      assignedToId: manager.id,
+      departmentId: vestbyDepts["PT"].id,
+      locationId: locationVestby.id,
       occurredAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     },
   });
-  console.log("✓ Avvik: 2 stk");
+  console.log("✓ Avvik: 2 stk (ett per lokasjon)");
 
   // ── Tiltak ────────────────────────────────────────────────────────────────
   await db.action.create({
@@ -137,7 +252,8 @@ async function main() {
       status: "OPEN",
       priority: "MEDIUM",
       assignedToId: manager.id,
-      departmentId: dept.id,
+      departmentId: skiDepts["Resepsjon"].id,
+      locationId: locationSki.id,
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       sourceType: "INCIDENT",
       sourceId: incident1.id,
@@ -146,12 +262,13 @@ async function main() {
 
   await db.action.create({
     data: {
-      title: "Øk RAM på produksjonsserver",
-      description: "Bestill oppgradering av server-RAM fra 16 GB til 32 GB",
+      title: "Servicekall tredemølle nr. 3",
+      description: "Kontakt leverandør for umiddelbar service av defekt tredemølle",
       status: "IN_PROGRESS",
       priority: "HIGH",
-      assignedToId: admin.id,
-      departmentId: dept.id,
+      assignedToId: employee2.id,
+      departmentId: vestbyDepts["PT"].id,
+      locationId: locationVestby.id,
       dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
       sourceType: "INCIDENT",
       sourceId: incident2.id,
@@ -179,7 +296,8 @@ async function main() {
   await db.leaveRequest.create({
     data: {
       employeeId: employee1.id,
-      departmentId: dept.id,
+      departmentId: skiDepts["Resepsjon"].id,
+      locationId: locationSki.id,
       type: "VACATION",
       status: "PENDING",
       startDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -191,7 +309,8 @@ async function main() {
   await db.leaveRequest.create({
     data: {
       employeeId: manager.id,
-      departmentId: dept.id,
+      departmentId: skiDepts["Resepsjon"].id,
+      locationId: locationSki.id,
       type: "SICK_LEAVE",
       status: "APPROVED",
       startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
