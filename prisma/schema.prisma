@@ -124,6 +124,8 @@ enum NotificationType {
   OFFBOARDING_TASK_ASSIGNED
   ONBOARDING_COMPLETED
   OFFBOARDING_COMPLETED
+  REVIEW_SCHEDULED
+  REVIEW_COMPLETED
 }
 
 enum OvertimeType {
@@ -301,6 +303,10 @@ model Profile {
   managedOnboardingProcesses OnboardingProcess[]  @relation("OnboardingHr")
   completedOnboardingTasks   OnboardingTask[]     @relation("OnboardingTaskCompleter")
   createdOnboardingTemplates OnboardingTemplate[] @relation("OnboardingTemplateCreator")
+
+  employeeReviews  EmployeeReview[] @relation("ReviewEmployee")
+  managerReviews   EmployeeReview[] @relation("ReviewManager")
+  createdReviews   EmployeeReview[] @relation("ReviewCreator")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -1056,4 +1062,43 @@ model OnboardingTask {
 
   @@index([processId])
   @@index([status])
+}
+
+// ─── Medarbeidersamtaler (28B) ────────────────────────────────────────────────
+
+enum ReviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+model EmployeeReview {
+  id           String       @id @default(cuid())
+  status       ReviewStatus @default(SCHEDULED)
+  scheduledAt  DateTime
+  completedAt  DateTime?
+  location     String?      // rom/sted for samtalen
+
+  // Sensitive innhold – kun synlig for HR, leder og den ansatte
+  agenda       String?      @db.Text
+  managerNotes String?      @db.Text  // kun synlig for HR og leder
+  sharedNotes  String?      @db.Text  // synlig for alle involverte parter
+  goals        String?      @db.Text  // målsettinger etter samtalen
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employee   Profile @relation("ReviewEmployee", fields: [employeeId], references: [id])
+  employeeId String
+
+  manager   Profile @relation("ReviewManager", fields: [managerId], references: [id])
+  managerId String
+
+  createdBy   Profile @relation("ReviewCreator", fields: [createdById], references: [id])
+  createdById String
+
+  @@index([employeeId])
+  @@index([managerId])
+  @@index([status])
+  @@index([scheduledAt])
 }

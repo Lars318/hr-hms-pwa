@@ -37,6 +37,8 @@ const TYPE_ICONS: Record<NotificationType, ElementType> = {
   OFFBOARDING_TASK_ASSIGNED: CheckCircle2,
   ONBOARDING_COMPLETED: CheckCircle2,
   OFFBOARDING_COMPLETED: CheckCircle2,
+  REVIEW_SCHEDULED: CalendarDays,
+  REVIEW_COMPLETED: CheckCircle2,
 };
 
 const TYPE_COLORS: Record<NotificationType, string> = {
@@ -68,6 +70,8 @@ const TYPE_COLORS: Record<NotificationType, string> = {
   OFFBOARDING_TASK_ASSIGNED: "text-slate-600",
   ONBOARDING_COMPLETED: "text-green-600",
   OFFBOARDING_COMPLETED: "text-slate-600",
+  REVIEW_SCHEDULED: "text-blue-600",
+  REVIEW_COMPLETED: "text-green-600",
 };
 
 export interface NotificationData {

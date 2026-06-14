@@ -21,6 +21,7 @@ import { trainingRouter } from "./training";
 import { chemicalRouter } from "./chemical";
 import { dataRequestRouter } from "./dataRequest";
 import { onboardingRouter } from "./onboarding";
+import { reviewRouter } from "./review";
 
 export const appRouter = router({
   profile: profileRouter,
@@ -45,6 +46,7 @@ export const appRouter = router({
   chemical: chemicalRouter,
   dataRequest: dataRequestRouter,
   onboarding: onboardingRouter,
+  review: reviewRouter,
 });
 
 export type AppRouter = typeof appRouter;
