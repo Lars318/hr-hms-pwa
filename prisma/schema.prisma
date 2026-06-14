@@ -114,6 +114,7 @@ enum NotificationType {
   OVERTIME_APPROVED
   OVERTIME_REJECTED
   SYSTEM
+  WHISTLEBLOWING_RECEIVED
 }
 
 enum OvertimeType {
@@ -179,6 +180,7 @@ model Location {
   leaveRequests    LeaveRequest[]
   profileAssignments ProfileAssignment[]
   overtimeEntries  OvertimeEntry[]
+  whistleblowingCases WhistleblowingCase[]
 
   @@index([safetyRepresentativeId])
   @@index([hseManagerId])
@@ -223,6 +225,7 @@ model Department {
   leaveRequests      LeaveRequest[]
   profileAssignments ProfileAssignment[]
   overtimeEntries    OvertimeEntry[]
+  whistleblowingCases WhistleblowingCase[]
 
   @@index([locationId])
 }
@@ -267,6 +270,11 @@ model Profile {
   approvedOvertimeEntries OvertimeEntry[]   @relation("OvertimeApprover")
   timeBankAdjustments  TimeBankAdjustment[] @relation("TimeBankEmployee")
   timeBankAdjustedBy   TimeBankAdjustment[] @relation("TimeBankAdjuster")
+
+  reportedWhistleblowingCases  WhistleblowingCase[]    @relation("WhistleblowingReporter")
+  assignedWhistleblowingCases  WhistleblowingCase[]    @relation("WhistleblowingAssignee")
+  whistleblowingMessages       WhistleblowingMessage[] @relation("WhistleblowingMessageAuthor")
+  whistleblowingAuditLogs      WhistleblowingAuditLog[] @relation("WhistleblowingActor")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -656,4 +664,101 @@ model TimeBankAdjustment {
 
   @@index([employeeId])
   @@index([createdAt])
+}
+
+// ─── Varsling (Whistleblowing) ────────────────────────────────────────────────
+
+enum WhistleblowingCategory {
+  HARASSMENT
+  DISCRIMINATION
+  SAFETY
+  FINANCIAL_MISCONDUCT
+  ETHICS
+  RETALIATION
+  OTHER
+}
+
+enum WhistleblowingStatus {
+  RECEIVED
+  UNDER_REVIEW
+  INVESTIGATING
+  ACTION_REQUIRED
+  CLOSED
+  REJECTED
+}
+
+enum WhistleblowingSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model WhistleblowingCase {
+  id             String                  @id @default(cuid())
+  caseNumber     String                  @unique
+  title          String
+  description    String                  @db.Text
+  category       WhistleblowingCategory
+  status         WhistleblowingStatus    @default(RECEIVED)
+  severity       WhistleblowingSeverity  @default(MEDIUM)
+  isAnonymous    Boolean                 @default(false)
+  isConfidential Boolean                 @default(true)
+  receivedAt     DateTime                @default(now())
+  closedAt       DateTime?
+  createdAt      DateTime                @default(now())
+  updatedAt      DateTime                @updatedAt
+
+  reporter   Profile? @relation("WhistleblowingReporter", fields: [reporterId], references: [id])
+  reporterId String?
+
+  assignedTo   Profile? @relation("WhistleblowingAssignee", fields: [assignedToId], references: [id])
+  assignedToId String?
+
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String?
+
+  messages  WhistleblowingMessage[]
+  auditLogs WhistleblowingAuditLog[]
+
+  @@index([status])
+  @@index([category])
+  @@index([reporterId])
+  @@index([assignedToId])
+  @@index([locationId])
+}
+
+model WhistleblowingMessage {
+  id             String   @id @default(cuid())
+  body           String   @db.Text
+  isInternalNote Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  case   WhistleblowingCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  caseId String
+
+  author   Profile? @relation("WhistleblowingMessageAuthor", fields: [authorId], references: [id])
+  authorId String?
+
+  @@index([caseId])
+  @@index([authorId])
+}
+
+model WhistleblowingAuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  case   WhistleblowingCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  caseId String
+
+  actor   Profile? @relation("WhistleblowingActor", fields: [actorId], references: [id])
+  actorId String?
+
+  @@index([caseId])
 }

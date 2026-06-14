@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import {
   ShieldAlert, Zap, FileText, ShieldCheck, Bell,
-  CheckCircle2, CalendarDays, BookOpen, Clock,
+  CheckCircle2, CalendarDays, BookOpen, Clock, AlertTriangle,
 } from "lucide-react";
 import type { NotificationType } from "@prisma/client";
 
@@ -27,6 +27,7 @@ const TYPE_ICONS: Record<NotificationType, ElementType> = {
   OVERTIME_APPROVED: Clock,
   OVERTIME_REJECTED: Clock,
   SYSTEM: Bell,
+  WHISTLEBLOWING_RECEIVED: AlertTriangle,
 };
 
 const TYPE_COLORS: Record<NotificationType, string> = {
@@ -48,6 +49,7 @@ const TYPE_COLORS: Record<NotificationType, string> = {
   OVERTIME_APPROVED: "text-green-600",
   OVERTIME_REJECTED: "text-red-600",
   SYSTEM: "text-slate-600",
+  WHISTLEBLOWING_RECEIVED: "text-amber-600",
 };
 
 export interface NotificationData {

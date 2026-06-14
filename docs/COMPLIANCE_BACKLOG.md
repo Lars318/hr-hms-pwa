@@ -22,7 +22,7 @@ Disse tiltakene er kritiske for at appen kan tas i bruk i organisasjonen.
 
 | # | Tiltak | Type | Ansvarlig | Status |
 |---|---|---|---|---|
-| P0-1 | Personvernerklæring for ansatte (intern, forenklet) | Dokument + app-side `/personvern` | Daglig leder / HR | ⬜ Ikke startet |
+| P0-1 | Personvernerklæring for ansatte (intern, forenklet) | Dokument + app-side `/personvern` | Daglig leder / HR | ✅ Gjort i 24B |
 | P0-2 | Dokumentere behandlingsgrunnlag per kategori (Aml §15-1, GDPR art. 6) | Dokument | Daglig leder | ⬜ Ikke startet |
 | P0-3 | Dokumentere og inngå databehandleravtaler (Supabase, Vercel, Resend, Sentry) | Juridisk/IT | Daglig leder | ⬜ Ikke startet |
 | P0-4 | Dokumentere hvilke personopplysninger appen behandler | Dokument (se PRIVACY_AND_GDPR.md) | IT/HR | ✅ Utkast i PRIVACY_AND_GDPR.md |
@@ -31,8 +31,8 @@ Disse tiltakene er kritiske for at appen kan tas i bruk i organisasjonen.
 | P0-7 | Tydelig avgrensning i UI: appen er ikke full arbeidstidsregistrering | App (overtid-side) | IT | ✅ Gjort |
 | P0-8 | Dokumentere verneombud og HMS-ansvar per lokasjon | App + dokument | HR | ✅ I lokasjonsmodulen |
 | P0-9 | Sikre at avvik/risiko/tiltak har sporbarhet | App | IT | ✅ Audit-logg finnes |
-| P0-10 | Dokumentere rutine for personvernbrudd (varsling Datatilsynet 72t) | Dokument | Daglig leder | ⬜ Ikke startet |
-| P0-11 | Dokumentere prosess for innsyn, retting og sletting | Dokument + personvernside | HR | ⬜ Ikke startet |
+| P0-10 | Dokumentere rutine for personvernbrudd (varsling Datatilsynet 72t) | Dokument | Daglig leder | ✅ Utkast i 24C – godkjennes av daglig leder |
+| P0-11 | Dokumentere prosess for innsyn, retting og sletting | Dokument + personvernside | HR | ✅ Utkast i 24C – gjennomgås av HR |
 
 ---
 
@@ -40,7 +40,7 @@ Disse tiltakene er kritiske for at appen kan tas i bruk i organisasjonen.
 
 | # | Tiltak | Type | Kommentar |
 |---|---|---|---|
-| P1-1 | **Varslingsmodul** for kritikkverdige forhold (whistleblowing) | Ny modul | Aml §2A. Midlertidig: dedikert e-postadresse. |
+| P1-1 | **Varslingsmodul** for kritikkverdige forhold (whistleblowing) | Ny modul | ✅ **Gjort i 25A** – intern modul. Anonym ekstern kanal gjenstår. |
 | P1-2 | **HMS-opplæringsregister** | Ny modul | Hvem har fått opplæring, når, av hvem. Aml §3-5. |
 | P1-3 | **Stoffkartotek/kjemikalier** | Ny modul | Relevant for renholdsavdeling. Forskrift om utførelse av arbeid. |
 | P1-4 | Eksport/innsyn for ansattes egne personopplysninger | Ny funksjon | GDPR art. 15. «Mine data»-eksport. |

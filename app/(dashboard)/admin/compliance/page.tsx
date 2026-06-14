@@ -21,7 +21,7 @@ const P0_ITEMS = [
 ];
 
 const P1_ITEMS = [
-  { id: "P1-1", text: "Varslingsmodul for kritikkverdige forhold (whistleblowing)" },
+  { id: "P1-1", text: "Varslingsmodul for kritikkverdige forhold (whistleblowing) ✅ Gjort i 25A – intern modul. Ekstern anonym kanal gjenstår." },
   { id: "P1-2", text: "HMS-opplæringsregister" },
   { id: "P1-3", text: "Stoffkartotek/kjemikalier" },
   { id: "P1-4", text: "Eksport/innsyn for ansattes egne personopplysninger" },

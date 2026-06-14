@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldAlert, CalendarDays, BookOpen, FolderOpen, Zap, Bell, Clock } from "lucide-react";
+import { ShieldAlert, CalendarDays, BookOpen, FolderOpen, Zap, Bell, Clock, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PrimaryAction {
@@ -21,6 +21,7 @@ const primaryActions: PrimaryAction[] = [
   { href: "/overtid/ny",     label: "Registrer overtid",  icon: Clock,        variant: "default" },
   { href: "/fravaer/ny",     label: "Søk fravær",         icon: CalendarDays, variant: "primary" },
   { href: "/personalhandbok",label: "Les håndbok",        icon: BookOpen,     variant: "default" },
+  { href: "/varsling/ny",    label: "Varsle kritikkverdig forhold", icon: AlertTriangle, variant: "default" },
 ];
 
 const secondaryActions: SecondaryAction[] = [

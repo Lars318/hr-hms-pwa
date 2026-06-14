@@ -1,4 +1,4 @@
-import { Users, Bell, BarChart2, Activity, Settings, Shield } from "lucide-react";
+import { Users, Bell, BarChart2, Activity, Settings, Shield, AlertTriangle } from "lucide-react";
 import { RoleDashboardHeader } from "./RoleDashboardHeader";
 import { QuickActionGrid, type QuickAction } from "./QuickActionGrid";
 import { MetricCard } from "./MetricCard";
@@ -15,6 +15,7 @@ const quickActions: QuickAction[] = [
   { href: "/ansatte",       label: "Ansatte",        icon: Users,      variant: "default",  description: "Brukere og roller" },
   { href: "/rapporter",     label: "Rapporter",      icon: BarChart2,  variant: "default",  description: "CSV-eksport" },
   { href: "/admin/avdelinger", label: "Avdelinger",  icon: Settings,   variant: "default",  description: "Struktur og oppsett" },
+  { href: "/varsling/admin",  label: "Varslingssaker", icon: AlertTriangle, variant: "default", description: "Konfidensiell behandling" },
 ];
 
 interface Props {
