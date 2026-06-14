@@ -66,7 +66,7 @@ Disse tiltakene er kritiske for at appen kan tas i bruk i organisasjonen.
 | P2-4 | Historikk over verneombudsvalg per lokasjon | Forbedring |
 | P2-5 | HMS-snarvei og -informasjon på ansatt-dashboard | UX |
 | P2-6 | Grensevarsler for overtid (Aml §10-6 max 10t/dag, 300t/år) | App – kun informativt |
-| P2-7 | Teams-varsler | Integrasjon |
+| P2-7 | ~~Teams-varsler~~ → **Ikke i scope** – se «Ikke bygg ennå»-seksjonen | Integrasjon |
 | P2-8 | Kontrakter og e-signering | Ny modul |
 | P2-9 | Avansert compliance-dashboard med KPI-er | Dashboard |
 | P2-10 | DPIA (Data Protection Impact Assessment) | Juridisk/IT |

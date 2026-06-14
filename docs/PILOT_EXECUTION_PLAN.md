@@ -53,7 +53,7 @@ Aktiviteter:
 □ Alle logger inn for første gang — verifiser at innlogging fungerer
 □ Vis navigasjon: dashboard, avvik, varsler, profil
 □ Del UAT-feedback-template.md og forklar rapporteringsprosessen
-□ Sett opp meldingskanal for feilrapportering (Slack, Teams eller e-post)
+□ Sett opp meldingskanal for feilrapportering (e-post eller annet internt alternativ)
 □ Avtal faste innsjekkinger (f.eks. daglig kort standup i Uke 1)
 ```
 
@@ -248,7 +248,7 @@ Registrer følgende gjennom pilotperioden (manuelt eller via Prisma Studio):
 ### Rapporteringsprosess
 
 1. Pilotbruker oppdager problem → fyller ut `UAT-feedback-template.md`
-2. Sender til pilotkoordinator via avtalt kanal (Slack/Teams/e-post)
+2. Sender til pilotkoordinator via avtalt kanal (e-post eller internt system)
 3. Pilotkoordinator klassifiserer prioritet
 4. P0/P1 → direkte kontakt med systemansvarlig/utvikler
 5. P2/P3 → loggføres i GitHub Issues (eller annet sporingsverktøy)
