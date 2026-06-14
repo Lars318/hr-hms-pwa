@@ -11,6 +11,9 @@ interface CalendarLeave {
   startDate: Date;
   endDate: Date;
   days: number;
+  locationId?: string | null;
+  employee?: { id: string; fullName: string };
+  department?: { id: string; name: string } | null;
 }
 
 interface Props {

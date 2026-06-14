@@ -24,7 +24,7 @@ if (typeof setInterval !== "undefined") {
   setInterval(
     () => {
       const now = Date.now();
-      for (const [key, entry] of store) {
+      for (const [key, entry] of Array.from(store)) {
         if (now > entry.resetAt) store.delete(key);
       }
     },

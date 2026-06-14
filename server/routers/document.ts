@@ -398,7 +398,7 @@ export const documentRouter = router({
 
       const confirmedIds = new Set(confirmed.map((c) => c.profileId));
       const notConfirmedProfiles = await ctx.db.profile.findMany({
-        where: { status: "ACTIVE", id: { notIn: [...confirmedIds] } },
+        where: { status: "ACTIVE", id: { notIn: Array.from(confirmedIds) } },
         select: { id: true, fullName: true, email: true },
         orderBy: { fullName: "asc" },
       });

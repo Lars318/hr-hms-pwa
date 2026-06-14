@@ -26,7 +26,8 @@ export default function LeaveCalendarPage() {
 
   const isHrAdmin = profile?.role === "ADMIN" || profile?.role === "HR";
 
-  const { data: leaves = [], isLoading } = trpc.leaveRequest.calendar.useQuery(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: leavesRaw = [], isLoading } = trpc.leaveRequest.calendar.useQuery(
     {
       year,
       month: view === "month" ? month : undefined,
@@ -36,6 +37,9 @@ export default function LeaveCalendarPage() {
     },
     { enabled: !!profile }
   );
+  // Cast: tRPC infers all Prisma fields; components only need CalendarLeave subset
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const leaves = leavesRaw as unknown as any[];
 
   function prevMonth() {
     if (month === 1) {

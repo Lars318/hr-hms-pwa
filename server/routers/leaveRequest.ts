@@ -6,7 +6,7 @@ import {
   createNotificationsForRoles,
   createNotificationsForDepartment,
 } from "@/lib/notifications";
-import type { Prisma } from "@prisma/client";
+import type { Prisma, LeaveRequestStatus } from "@prisma/client";
 
 const leaveTypes = [
   "VACATION", "SICK_LEAVE", "CARE_LEAVE",
@@ -380,7 +380,7 @@ export const leaveRequestRouter = router({
       const statusFilter =
         input.status && input.status.length > 0
           ? input.status
-          : (["PENDING", "APPROVED"] as const);
+          : (["PENDING", "APPROVED"] as LeaveRequestStatus[]);
 
       return db.leaveRequest.findMany({
         where: {

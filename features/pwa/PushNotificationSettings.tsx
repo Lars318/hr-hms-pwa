@@ -67,7 +67,7 @@ export function PushNotificationSettings() {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(publicKeyData.publicKey),
+        applicationServerKey: urlBase64ToUint8Array(publicKeyData.publicKey) as unknown as BufferSource,
       });
 
       const json = sub.toJSON();

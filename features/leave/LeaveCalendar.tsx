@@ -27,6 +27,7 @@ interface CalendarLeave {
   endDate: Date;
   days: number;
   reason: string | null;
+  locationId?: string | null;
   employee: { id: string; fullName: string };
   department: { id: string; name: string } | null;
 }

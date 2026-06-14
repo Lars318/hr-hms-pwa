@@ -24,8 +24,10 @@ export function LeaveListClient({ viewerRole }: LeaveListClientProps) {
   const showEmployee = isHrAdmin || isManager;
 
   const { data: requests = [], isLoading } = trpc.leaveRequest.list.useQuery({
-    status: (filters.status as Parameters<typeof trpc.leaveRequest.list.useQuery>[0]["status"]) || undefined,
-    type: (filters.type as Parameters<typeof trpc.leaveRequest.list.useQuery>[0]["type"]) || undefined,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    status: (filters.status || undefined) as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    type: (filters.type || undefined) as any,
     from: filters.from || undefined,
     to: filters.to || undefined,
   });

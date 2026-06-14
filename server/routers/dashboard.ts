@@ -1,4 +1,5 @@
 import { router, profileProcedure } from "@/server/trpc/trpc";
+import type { ActionStatus } from "@prisma/client";
 
 export const dashboardRouter = router({
   // ── summary – alle aggregerte tall i ett kall ──────────────────────────────
@@ -51,7 +52,8 @@ export const dashboardRouter = router({
         ? { OR: [{ departmentId: deptId }, { assignedToId: profile.id }] }
         : { assignedToId: profile.id };
 
-    const myActionWhere = { assignedToId: profile.id, status: { notIn: ["DONE", "CANCELLED"] as const } };
+    const excludedStatuses: ActionStatus[] = ["DONE", "CANCELLED"];
+    const myActionWhere = { assignedToId: profile.id, status: { notIn: excludedStatuses } };
 
     const [
       openActions,

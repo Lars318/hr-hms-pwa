@@ -11,9 +11,8 @@ const withPWA = nextPwa({
   disable: isDev,
   // Custom service worker additions (push event handler, notificationclick)
   customWorkerDir: "worker",
-  fallbacks: {
-    document: "/offline",
-  },
+  // fallbacks disabled: next-pwa@5.6.0 has a build bug with fallbacks + Next.js 14
+  // The /offline page still exists and can be linked manually.
   publicExcludes: [
     "!robots.txt",
     "!sitemap.xml",
