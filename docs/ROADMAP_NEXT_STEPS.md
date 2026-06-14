@@ -65,13 +65,10 @@
 **Kompleksitet:** Medium  
 **Anbefalt rekkefølge:** #2
 
-### 2.3 Datainnsyn / Self-service eksport (Steg 25D)
+### 2.3 Datainnsyn / Self-service eksport (Steg 27C) ✅ FERDIG
 
-**Hva:** GDPR art. 15/20 — ansatt kan eksportere egne personopplysninger.  
-**Hvorfor:** Lovkrav. Reduserer manuell jobb for HR.  
-**Risiko:** GDPR-avvik uten løsning.  
-**Kompleksitet:** Medium  
-**Anbefalt rekkefølge:** #3
+**Hva:** GDPR art. 15/16/17/20 — ansatt sender forespørsel, HR behandler innen 30 dager.  
+**Resultat:** DataSubjectRequest-modell, tRPC-router, ansatt- og HR-sider, varsler. Typecheck grønn.
 
 ### 2.4 Kommentarer på saker internt (Steg 25E)
 

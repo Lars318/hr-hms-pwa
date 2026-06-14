@@ -150,6 +150,12 @@ const navItems: NavItem[] = [
     icon: Shield,
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
+  {
+    href: "/personvern/foresporsler",
+    label: "GDPR-forespørsler",
+    icon: Shield,
+    roles: ["ADMIN", "HR"],
+  },
 ];
 
 interface SidebarProps {

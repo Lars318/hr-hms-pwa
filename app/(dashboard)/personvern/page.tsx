@@ -1,8 +1,19 @@
-import { Shield, Mail, FileText, Info, Clock, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { Shield, Mail, FileText, Info, Clock, AlertTriangle, ExternalLink } from "lucide-react";
 
 export const metadata = { title: "Personvern – HR/HMS" };
 
-export default function PersonvernPage() {
+export default async function PersonvernPage() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const profile = await db.profile.findUnique({ where: { supabaseUserId: user.id }, select: { role: true } });
+  const isHrAdmin = profile?.role === "ADMIN" || profile?.role === "HR";
+
   return (
     <div className="max-w-3xl space-y-8">
       <div>
@@ -124,6 +135,20 @@ export default function PersonvernPage() {
         <p className="text-sm text-muted-foreground">
           Forespørsler besvares innen 30 dager i henhold til personvernforordningen (GDPR).
         </p>
+        <div className="flex flex-wrap gap-3 pt-1">
+          <Link href="/personvern/mine-foresporsler"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+            <ExternalLink className="h-3.5 w-3.5" />
+            Mine personvernforespørsler
+          </Link>
+          {isHrAdmin && (
+            <Link href="/personvern/foresporsler"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+              <ExternalLink className="h-3.5 w-3.5" />
+              Administrer forespørsler (HR)
+            </Link>
+          )}
+        </div>
         <p className="text-sm text-muted-foreground">
           Du kan også klage til{" "}
           <a

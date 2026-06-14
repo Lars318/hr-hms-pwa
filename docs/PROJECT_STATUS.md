@@ -312,6 +312,28 @@
 
 ---
 
+## 13D. GDPR datainnsyn/self-service eksport
+
+**Status:** ✅ Ferdig (Steg 27C)
+
+- `DataSubjectRequest`-modell med `DataRequestType` (ACCESS, PORTABILITY, RECTIFICATION, ERASURE, OTHER) og `DataRequestStatus` (PENDING, IN_PROGRESS, COMPLETED, REJECTED)
+- tRPC-router `dataRequest` med 5 prosedyrer: `mine`, `list`, `create`, `updateStatus`, `openCount`
+- Ansatt-side: `/personvern/mine-foresporsler` — send og følg forespørsler
+- HR/Admin-side: `/personvern/foresporsler` — liste med statusfilter, klikk for detalj
+- HR/Admin-detaljside: `/personvern/foresporsler/[id]` — oppdater status og legg til merknad
+- Varsler: `DATA_REQUEST_RECEIVED` (til HR/ADMIN), `DATA_REQUEST_COMPLETED` (til ansatt)
+- Personvernsiden oppdatert med lenker til forespørselssider
+- Sidebar: «GDPR-forespørsler» lagt til for HR/ADMIN
+
+**Viktige filer:**
+- `app/(dashboard)/personvern/mine-foresporsler/page.tsx`
+- `app/(dashboard)/personvern/foresporsler/page.tsx`
+- `app/(dashboard)/personvern/foresporsler/[id]/page.tsx`
+- `features/data-requests/`
+- `server/routers/dataRequest.ts`
+
+---
+
 ## 14. Varsler / Notifications
 
 **Status:** ✅ Ferdig
