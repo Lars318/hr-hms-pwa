@@ -1,4 +1,4 @@
-import { Users, CalendarDays, BookOpen, FolderOpen, BarChart2, BookMarked, AlertTriangle } from "lucide-react";
+import { Users, CalendarDays, BookOpen, FolderOpen, BarChart2, BookMarked, AlertTriangle, GraduationCap } from "lucide-react";
 import { RoleDashboardHeader } from "./RoleDashboardHeader";
 import { QuickActionGrid, type QuickAction } from "./QuickActionGrid";
 import { MetricCard } from "./MetricCard";
@@ -15,7 +15,8 @@ const quickActions: QuickAction[] = [
   { href: "/personalhandbok/admin",  label: "Håndbok admin",          icon: BookMarked,   variant: "default",  description: "Kapitler og publisering" },
   { href: "/ansatte",                label: "Ansatte",                 icon: Users,        variant: "default",  description: "Profiler og tilganger" },
   { href: "/rapporter",              label: "Rapporter",               icon: BarChart2,    variant: "default",  description: "CSV-eksport og statistikk" },
-  { href: "/varsling/admin",        label: "Varslingssaker",          icon: AlertTriangle, variant: "default", description: "Konfidensielle varsler" },
+  { href: "/varsling/admin",        label: "Varslingssaker",          icon: AlertTriangle,  variant: "default", description: "Konfidensielle varsler" },
+  { href: "/opplaering/admin",      label: "Opplæringsadmin",         icon: GraduationCap, variant: "default", description: "Gjennomføringer og status" },
 ];
 
 interface Props {

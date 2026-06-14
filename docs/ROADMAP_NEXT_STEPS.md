@@ -52,16 +52,10 @@
 *Mål: Fullstendig HMS-compliance for bredere utrulling*  
 *Estimert rekkefølge: Etter vellykket pilot*
 
-### 2.1 HMS-opplæringsregister (Steg 25B)
+### 2.1 HMS-opplæringsregister (Steg 27A) ✅ FERDIG
 
 **Hva:** Register over hvem som har fått hvilken HMS-opplæring, når og av hvem.  
-**Hvorfor:** Aml §3-5 krever opplæring. IK-HMS krever dokumentasjon.  
-**Risiko:** Manglende dokumentasjon ved tilsyn.  
-**Kompleksitet:** Medium  
-**Anbefalt rekkefølge:** #1 etter fase 1
-
-Prisma-modeller: `HseTraining`, `HseTrainingRecord`  
-Relevante felter: ansatt, opplæringstype, dato, gjennomfører, neste forfall
+**Status:** ✅ Implementert — TrainingCourse, TrainingRecord, TrainingAuditLog. UI, rapport og navigasjon på plass.
 
 ### 2.2 Stoffkartotek / Kjemikalier (Steg 25C)
 
@@ -181,7 +175,7 @@ Disse bør parkeres til separat vurdering og eksplisitt beslutning:
 1. 🔴 **DPA-er signert** (ledelsesbeslutning — blokkerer pilot)
 2. 🔴 **Prod-miljø satt opp** (Supabase prod + Vercel env vars)
 3. ⚠️ **Full smoke-test alle roller**
-4. ⚠️ **HMS-opplæringsregister** (Steg 25B)
+4. ✅ **HMS-opplæringsregister** (Steg 27A — ferdig)
 5. ⚠️ **Stoffkartotek** (Steg 25C)
 6. ⚠️ **Datainnsyn/self-service eksport** (Steg 25D)
 7. 📝 **Kommentarer på saker** (Steg 25E)

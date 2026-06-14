@@ -259,6 +259,35 @@
 
 ---
 
+---
+
+## 13B. HMS-opplæringsregister
+
+**Status:** ✅ Ferdig (Steg 27A)
+
+- `TrainingCourse`, `TrainingRecord`, `TrainingAuditLog`
+- Kategori, obligatorisk/valgfri, gyldighetsperiode, utløpsdato
+- RBAC: HR/ADMIN administrerer kurs, MANAGER registrerer for sine, EMPLOYEE ser egne
+- Ansattvisning: `/opplaering/mine` — egne records + manglende obligatoriske
+- Admin: `/opplaering/admin` — filter på kurs/lokasjon/status, registrer/slett records
+- Kursdetalj: statistikk (gyldige/utløpende/utløpt/totalt) + gjennomføringsliste
+- Rapport: «Opplæring» lagt til i rapportmodulen med CSV-eksport
+- Varsler: `TRAINING_EXPIRING_SOON` og `TRAINING_OVERDUE` i notification-systemet
+- Navigasjon: Sidebar + BottomNav oppdatert
+- Dashboard-snarveier i HR- og Admin-dashboard
+
+**Viktige filer:**
+- `app/(dashboard)/opplaering/`
+- `features/training/`
+- `server/routers/training.ts`
+- `lib/reports/queries.ts` (queryTraining)
+
+**Kjente begrensninger:**
+- Ingen automatisk varslings-cron for utløpende opplæring (P2 — kan legges til med scheduled job)
+- MANAGER ser kun egne ansattes records via adminvisning (ikke via kursdetalj)
+
+---
+
 ## 14. Varsler / Notifications
 
 **Status:** ✅ Ferdig

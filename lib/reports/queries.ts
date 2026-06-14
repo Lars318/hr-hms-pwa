@@ -400,7 +400,52 @@ export async function queryOvertime(
   return { headers, rows: data, total: rows.length };
 }
 
-export type ReportType = "incidents" | "actions" | "risk" | "documents" | "leave" | "handbook" | "overtime";
+export async function queryTraining(
+  db: PrismaClient,
+  profile: ReportProfile,
+  input: ReportInput
+): Promise<ReportData> {
+  const locId = isHrAdmin(profile) ? input.locationId : undefined;
+  const now = new Date();
+
+  const rows = await db.trainingRecord.findMany({
+    where: {
+      ...(input.from || input.to ? { completedAt: {
+        ...(input.from ? { gte: new Date(input.from) } : {}),
+        ...(input.to ? { lte: new Date(input.to) } : {}),
+      }} : {}),
+      ...(locId ? { profile: { profileAssignments: { some: { locationId: locId, isPrimary: true } } } } : {}),
+    },
+    include: {
+      profile: { select: { fullName: true } },
+      course: { select: { name: true, category: true, isRequired: true } },
+      registeredBy: { select: { fullName: true } },
+    },
+    orderBy: [{ course: { name: "asc" } }, { completedAt: "desc" }],
+  });
+
+  const headers = ["Ansatt", "Kurs", "Kategori", "Obligatorisk", "Fullført", "Utløper", "Status"];
+  const data = rows.map((r) => {
+    const isExpired = r.expiresAt ? r.expiresAt < now : false;
+    const isExpiringSoon = r.expiresAt
+      ? r.expiresAt > now && r.expiresAt < new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
+      : false;
+    const status = isExpired ? "Utløpt" : isExpiringSoon ? "Utløper snart" : "Gyldig";
+    return [
+      r.profile.fullName,
+      r.course.name,
+      r.course.category,
+      r.course.isRequired ? "Ja" : "Nei",
+      fmtDate(r.completedAt),
+      r.expiresAt ? fmtDate(r.expiresAt) : "Ingen utløp",
+      status,
+    ] as (string | number | null)[];
+  });
+
+  return { headers, rows: data, total: rows.length };
+}
+
+export type ReportType = "incidents" | "actions" | "risk" | "documents" | "leave" | "handbook" | "overtime" | "training";
 
 export async function runReport(
   type: ReportType,
@@ -416,5 +461,6 @@ export async function runReport(
     case "leave": return queryLeave(db, profile, input);
     case "handbook": return queryHandbook(db, profile, input);
     case "overtime": return queryOvertime(db, profile, input);
+    case "training": return queryTraining(db, profile, input);
   }
 }
