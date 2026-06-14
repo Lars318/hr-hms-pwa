@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Users, Building2, MapPin, ShieldAlert, FolderOpen, ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2, Activity, BookOpen, Clock, Shield, AlertTriangle, GraduationCap, FlaskConical } from "lucide-react";
+import { LayoutDashboard, Users, Building2, MapPin, ShieldAlert, FolderOpen, ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2, Activity, BookOpen, Clock, Shield, AlertTriangle, GraduationCap, FlaskConical, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { clearAllDrafts } from "@/lib/offline/drafts";
@@ -154,6 +154,18 @@ const navItems: NavItem[] = [
     href: "/personvern/foresporsler",
     label: "GDPR-forespørsler",
     icon: Shield,
+    roles: ["ADMIN", "HR"],
+  },
+  {
+    href: "/onboarding",
+    label: "Onboarding",
+    icon: ClipboardList,
+    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
+  },
+  {
+    href: "/admin/onboarding",
+    label: "Onboarding-admin",
+    icon: ClipboardList,
     roles: ["ADMIN", "HR"],
   },
 ];

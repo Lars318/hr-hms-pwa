@@ -118,6 +118,12 @@ enum NotificationType {
   TRAINING_EXPIRING_SOON
   TRAINING_OVERDUE
   CHEMICAL_REVIEW_DUE
+  DATA_REQUEST_RECEIVED
+  DATA_REQUEST_COMPLETED
+  ONBOARDING_TASK_ASSIGNED
+  OFFBOARDING_TASK_ASSIGNED
+  ONBOARDING_COMPLETED
+  OFFBOARDING_COMPLETED
 }
 
 enum OvertimeType {
@@ -186,6 +192,7 @@ model Location {
   whistleblowingCases WhistleblowingCase[]
   trainingCourses     TrainingCourse[]
   chemicals           Chemical[]
+  onboardingTemplates OnboardingTemplate[]
 
   @@index([safetyRepresentativeId])
   @@index([hseManagerId])
@@ -287,6 +294,13 @@ model Profile {
   trainingAuditLogs          TrainingAuditLog[]   @relation("TrainingAuditActor")
   createdChemicals           Chemical[]           @relation("ChemicalCreator")
   chemicalAuditLogs          ChemicalAuditLog[]   @relation("ChemicalAuditActor")
+  dataSubjectRequests        DataSubjectRequest[] @relation("DataSubjectRequester")
+  handledDataRequests        DataSubjectRequest[] @relation("DataSubjectHandler")
+
+  onboardingProcesses        OnboardingProcess[]  @relation("OnboardingEmployee")
+  managedOnboardingProcesses OnboardingProcess[]  @relation("OnboardingHr")
+  completedOnboardingTasks   OnboardingTask[]     @relation("OnboardingTaskCompleter")
+  createdOnboardingTemplates OnboardingTemplate[] @relation("OnboardingTemplateCreator")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -901,4 +915,145 @@ model ChemicalAuditLog {
   actorId String
 
   @@index([chemicalId])
+}
+
+// ─── GDPR datainnsyn ──────────────────────────────────────────────────────────
+
+enum DataRequestType {
+  ACCESS        // Innsyn (art. 15)
+  PORTABILITY   // Dataportabilitet (art. 20)
+  RECTIFICATION // Retting (art. 16)
+  ERASURE       // Sletting (art. 17)
+  OTHER
+}
+
+enum DataRequestStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+model DataSubjectRequest {
+  id          String            @id @default(cuid())
+  type        DataRequestType
+  status      DataRequestStatus @default(PENDING)
+  message     String?
+  adminNote   String?
+  completedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  requester   Profile @relation("DataSubjectRequester", fields: [requesterId], references: [id])
+  requesterId String
+
+  handledBy   Profile? @relation("DataSubjectHandler", fields: [handledById], references: [id])
+  handledById String?
+
+  @@index([requesterId])
+  @@index([status])
+}
+
+// ─── Onboarding / Offboarding (28A) ──────────────────────────────────────────
+
+enum OnboardingProcessType {
+  ONBOARDING
+  OFFBOARDING
+}
+
+enum OnboardingProcessStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum OnboardingTaskStatus {
+  PENDING
+  COMPLETED
+  SKIPPED
+}
+
+model OnboardingTemplate {
+  id          String                @id @default(cuid())
+  name        String
+  description String?
+  type        OnboardingProcessType
+  isActive    Boolean               @default(true)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+
+  createdBy   Profile @relation("OnboardingTemplateCreator", fields: [createdById], references: [id])
+  createdById String
+
+  tasks     OnboardingTemplateTask[]
+  processes OnboardingProcess[]
+
+  @@index([type])
+  @@index([locationId])
+}
+
+model OnboardingTemplateTask {
+  id          String  @id @default(cuid())
+  title       String
+  description String?
+  order       Int     @default(0)
+  isRequired  Boolean @default(true)
+  daysOffset  Int?    // dager relativt til startdato (positivt = etter, negativt = før)
+
+  template   OnboardingTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  templateId String
+
+  @@index([templateId])
+}
+
+model OnboardingProcess {
+  id          String                  @id @default(cuid())
+  type        OnboardingProcessType
+  status      OnboardingProcessStatus @default(ACTIVE)
+  startDate   DateTime
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  employee   Profile @relation("OnboardingEmployee", fields: [employeeId], references: [id])
+  employeeId String
+
+  responsibleHr   Profile? @relation("OnboardingHr", fields: [responsibleHrId], references: [id])
+  responsibleHrId String?
+
+  template   OnboardingTemplate? @relation(fields: [templateId], references: [id])
+  templateId String?
+
+  tasks OnboardingTask[]
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([type])
+}
+
+model OnboardingTask {
+  id          String               @id @default(cuid())
+  title       String
+  description String?
+  order       Int                  @default(0)
+  isRequired  Boolean              @default(true)
+  dueDate     DateTime?
+  status      OnboardingTaskStatus @default(PENDING)
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  process   OnboardingProcess @relation(fields: [processId], references: [id], onDelete: Cascade)
+  processId String
+
+  completedBy   Profile? @relation("OnboardingTaskCompleter", fields: [completedById], references: [id])
+  completedById String?
+
+  @@index([processId])
+  @@index([status])
 }

@@ -31,6 +31,12 @@ const TYPE_ICONS: Record<NotificationType, ElementType> = {
   TRAINING_EXPIRING_SOON: Clock,
   TRAINING_OVERDUE: AlertTriangle,
   CHEMICAL_REVIEW_DUE: AlertTriangle,
+  DATA_REQUEST_RECEIVED: FileText,
+  DATA_REQUEST_COMPLETED: CheckCircle2,
+  ONBOARDING_TASK_ASSIGNED: CheckCircle2,
+  OFFBOARDING_TASK_ASSIGNED: CheckCircle2,
+  ONBOARDING_COMPLETED: CheckCircle2,
+  OFFBOARDING_COMPLETED: CheckCircle2,
 };
 
 const TYPE_COLORS: Record<NotificationType, string> = {
@@ -56,6 +62,12 @@ const TYPE_COLORS: Record<NotificationType, string> = {
   TRAINING_EXPIRING_SOON: "text-yellow-600",
   TRAINING_OVERDUE: "text-red-600",
   CHEMICAL_REVIEW_DUE: "text-orange-600",
+  DATA_REQUEST_RECEIVED: "text-blue-600",
+  DATA_REQUEST_COMPLETED: "text-green-600",
+  ONBOARDING_TASK_ASSIGNED: "text-teal-600",
+  OFFBOARDING_TASK_ASSIGNED: "text-slate-600",
+  ONBOARDING_COMPLETED: "text-green-600",
+  OFFBOARDING_COMPLETED: "text-slate-600",
 };
 
 export interface NotificationData {

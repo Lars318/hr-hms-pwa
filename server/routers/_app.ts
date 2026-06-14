@@ -19,6 +19,8 @@ import { overtimeRouter } from "./overtime";
 import { whistleblowingRouter } from "./whistleblowing";
 import { trainingRouter } from "./training";
 import { chemicalRouter } from "./chemical";
+import { dataRequestRouter } from "./dataRequest";
+import { onboardingRouter } from "./onboarding";
 
 export const appRouter = router({
   profile: profileRouter,
@@ -41,6 +43,8 @@ export const appRouter = router({
   whistleblowing: whistleblowingRouter,
   training: trainingRouter,
   chemical: chemicalRouter,
+  dataRequest: dataRequestRouter,
+  onboarding: onboardingRouter,
 });
 
 export type AppRouter = typeof appRouter;
