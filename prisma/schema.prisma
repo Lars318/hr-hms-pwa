@@ -115,6 +115,8 @@ enum NotificationType {
   OVERTIME_REJECTED
   SYSTEM
   WHISTLEBLOWING_RECEIVED
+  TRAINING_EXPIRING_SOON
+  TRAINING_OVERDUE
 }
 
 enum OvertimeType {
@@ -181,6 +183,7 @@ model Location {
   profileAssignments ProfileAssignment[]
   overtimeEntries  OvertimeEntry[]
   whistleblowingCases WhistleblowingCase[]
+  trainingCourses     TrainingCourse[]
 
   @@index([safetyRepresentativeId])
   @@index([hseManagerId])
@@ -275,6 +278,10 @@ model Profile {
   assignedWhistleblowingCases  WhistleblowingCase[]    @relation("WhistleblowingAssignee")
   whistleblowingMessages       WhistleblowingMessage[] @relation("WhistleblowingMessageAuthor")
   whistleblowingAuditLogs      WhistleblowingAuditLog[] @relation("WhistleblowingActor")
+
+  trainingRecords            TrainingRecord[]     @relation("TrainingRecordEmployee")
+  registeredTrainingRecords  TrainingRecord[]     @relation("TrainingRecordRegistrar")
+  trainingAuditLogs          TrainingAuditLog[]   @relation("TrainingAuditActor")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -761,4 +768,71 @@ model WhistleblowingAuditLog {
   actorId String?
 
   @@index([caseId])
+}
+
+// ─── HMS-opplæringsregister ────────────────────────────────────────────────────
+
+enum TrainingStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model TrainingCourse {
+  id             String         @id @default(cuid())
+  name           String
+  description    String?
+  category       String
+  isRequired     Boolean        @default(false)
+  validityMonths Int?
+  status         TrainingStatus @default(ACTIVE)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId String?
+
+  records TrainingRecord[]
+
+  @@index([locationId])
+  @@index([status])
+}
+
+model TrainingRecord {
+  id          String    @id @default(cuid())
+  completedAt DateTime
+  expiresAt   DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  course   TrainingCourse @relation(fields: [courseId], references: [id])
+  courseId String
+
+  profile   Profile @relation("TrainingRecordEmployee", fields: [profileId], references: [id])
+  profileId String
+
+  registeredBy   Profile @relation("TrainingRecordRegistrar", fields: [registeredById], references: [id])
+  registeredById String
+
+  auditLogs TrainingAuditLog[]
+
+  @@unique([courseId, profileId])
+  @@index([profileId])
+  @@index([courseId])
+  @@index([expiresAt])
+}
+
+model TrainingAuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  record   TrainingRecord? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  recordId String?
+
+  actor   Profile @relation("TrainingAuditActor", fields: [actorId], references: [id])
+  actorId String
+
+  @@index([recordId])
 }
