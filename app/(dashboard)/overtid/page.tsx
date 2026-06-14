@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, Info } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,14 @@ export default async function OvertidPage() {
             Ny registrering
           </Link>
         </Button>
+      </div>
+      {/* Avgrensningsinfo */}
+      <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+        <Info className="h-4 w-4 shrink-0 mt-0.5" />
+        <p>
+          Denne modulen registrerer overtid og avspasering (timebank). Full daglig
+          arbeidstidsregistrering håndteres i separate systemer.
+        </p>
       </div>
       <OvertimeList role={profile.role} />
     </div>

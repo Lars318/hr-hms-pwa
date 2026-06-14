@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, ShieldAlert, Plus, ShieldCheck, MoreHorizontal,
   Bell, BarChart2, Activity, LogOut, X,
-  CalendarDays, FolderOpen, Zap, BookOpen, Clock,
+  CalendarDays, FolderOpen, Zap, BookOpen, Clock, Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -28,8 +28,10 @@ const moreItems: MoreMenuItem[] = [
   { href: "/dokumenter",     label: "Dokumenter",       icon: FolderOpen,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/personalhandbok",label: "Personalhåndbok",  icon: BookOpen,     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/varsler",        label: "Varsler",          icon: Bell,         roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-  { href: "/rapporter",      label: "Rapporter",        icon: BarChart2,    roles: ["ADMIN", "HR", "MANAGER"] },
-  { href: "/admin/system",   label: "Systemstatus",     icon: Activity,     roles: ["ADMIN"] },
+  { href: "/rapporter",         label: "Rapporter",       icon: BarChart2, roles: ["ADMIN", "HR", "MANAGER"] },
+  { href: "/admin/compliance",  label: "Compliance",      icon: Shield,    roles: ["ADMIN", "HR"] },
+  { href: "/personvern",        label: "Personvern",      icon: Shield,    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/admin/system",      label: "Systemstatus",    icon: Activity,  roles: ["ADMIN"] },
 ];
 
 interface BottomNavProps {

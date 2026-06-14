@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Users, Building2, MapPin, ShieldAlert, FolderOpen, ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2, Activity, BookOpen, Clock } from "lucide-react";
+import { LayoutDashboard, Users, Building2, MapPin, ShieldAlert, FolderOpen, ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2, Activity, BookOpen, Clock, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { clearAllDrafts } from "@/lib/offline/drafts";
@@ -103,10 +103,22 @@ const navItems: NavItem[] = [
     roles: ["ADMIN", "HR", "MANAGER"],
   },
   {
+    href: "/admin/compliance",
+    label: "Compliance",
+    icon: Shield,
+    roles: ["ADMIN", "HR"],
+  },
+  {
     href: "/admin/system",
     label: "Systemstatus",
     icon: Activity,
     roles: ["ADMIN"],
+  },
+  {
+    href: "/personvern",
+    label: "Personvern",
+    icon: Shield,
+    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
 ];
 
