@@ -28,6 +28,8 @@ const TYPE_ICONS: Record<NotificationType, ElementType> = {
   OVERTIME_REJECTED: Clock,
   SYSTEM: Bell,
   WHISTLEBLOWING_RECEIVED: AlertTriangle,
+  TRAINING_EXPIRING_SOON: Clock,
+  TRAINING_OVERDUE: AlertTriangle,
 };
 
 const TYPE_COLORS: Record<NotificationType, string> = {
@@ -50,6 +52,8 @@ const TYPE_COLORS: Record<NotificationType, string> = {
   OVERTIME_REJECTED: "text-red-600",
   SYSTEM: "text-slate-600",
   WHISTLEBLOWING_RECEIVED: "text-amber-600",
+  TRAINING_EXPIRING_SOON: "text-yellow-600",
+  TRAINING_OVERDUE: "text-red-600",
 };
 
 export interface NotificationData {
