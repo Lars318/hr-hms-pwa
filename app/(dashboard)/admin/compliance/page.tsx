@@ -16,8 +16,8 @@ const P0_ITEMS = [
   { id: "P0-7", text: "Tydelig avgrensning: appen er ikke full arbeidstidsregistrering", done: true, note: "Synlig i overtid-side og /personvern" },
   { id: "P0-8", text: "Dokumentere verneombud og HMS-ansvar per lokasjon", done: true, note: "Implementert i lokasjonsmodulen" },
   { id: "P0-9", text: "Avvik/risiko/tiltak har sporbarhet (audit-logg)", done: true, note: "Audit-logg implementert" },
-  { id: "P0-10", text: "Rutine for personvernbrudd (72t-varsling Datatilsynet)", done: false, note: "Bør formaliseres av daglig leder" },
-  { id: "P0-11", text: "Prosess for innsyn, retting og sletting dokumentert", done: false, note: "Beskrevet i /personvern – intern prosess mangler" },
+  { id: "P0-10", text: "Rutine for personvernbrudd (72t-varsling Datatilsynet)", done: true, note: "Utkast: docs/pilot/PERSONAL_DATA_BREACH_PROCEDURE.md – godkjennes av daglig leder" },
+  { id: "P0-11", text: "Prosess for innsyn, retting og sletting dokumentert", done: true, note: "Utkast: docs/pilot/DATA_SUBJECT_REQUEST_PROCEDURE.md – gjennomgås av HR" },
 ];
 
 const P1_ITEMS = [
@@ -114,11 +114,51 @@ export default async function CompliancePage() {
         </ul>
       </section>
 
-      {/* Dokumenter */}
+      {/* Juridisk status */}
+      <section className="rounded-xl border border-red-200 bg-red-50 p-4 space-y-1">
+        <p className="text-sm font-semibold text-red-700">⚠️ Ikke juridisk godkjent</p>
+        <p className="text-xs text-red-600">
+          Alle pilot-dokumenter under er tekniske og operative utkast. Behandlingsgrunnlag og
+          DPA-er MÅ gjennomgås og bekreftes av daglig leder og eventuelt juridisk rådgiver
+          før pilot.
+        </p>
+      </section>
+
+      {/* Pilot-dokumenter */}
+      <section className="rounded-xl border p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <FileText className="h-5 w-5 text-green-500" />
+          <h2 className="font-semibold">Pilot Readiness Pack</h2>
+          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">24C</span>
+        </div>
+        <div className="grid gap-2 text-sm">
+          {[
+            { label: "DPA-sjekkliste", path: "docs/pilot/DPA_CHECKLIST.md", desc: "Databehandleravtaler – Supabase, Vercel, Resend, Sentry", done: false },
+            { label: "Behandlingsgrunnlagsregister", path: "docs/pilot/PROCESSING_BASIS_REGISTER.md", desc: "Alle behandlinger, grunnlag og lagringstid – MÅ bekreftes juridisk", done: false },
+            { label: "Retention policy (utkast)", path: "docs/pilot/RETENTION_POLICY_DRAFT.md", desc: "Lagringstid og sletteprosedyrer per datakategori", done: false },
+            { label: "Personvernbrudd-rutine", path: "docs/pilot/PERSONAL_DATA_BREACH_PROCEDURE.md", desc: "72t-varslingsprosess – godkjennes av daglig leder", done: false },
+            { label: "Rettighetsforespørsel-prosedyre", path: "docs/pilot/DATA_SUBJECT_REQUEST_PROCEDURE.md", desc: "Innsyn, retting, sletting og eksport", done: false },
+            { label: "Pilot Readiness Checklist", path: "docs/pilot/PILOT_READINESS_CHECKLIST.md", desc: "Komplett go/no-go-sjekkliste", done: false },
+          ].map(({ label, path, desc, done }) => (
+            <div key={path} className="rounded-lg bg-muted/40 px-4 py-3 flex items-start gap-3">
+              {done
+                ? <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
+                : <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />}
+              <div>
+                <p className="font-medium">{label}</p>
+                <p className="text-muted-foreground text-xs font-mono">{path}</p>
+                <p className="text-muted-foreground text-xs">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Compliance-dokumenter */}
       <section className="rounded-xl border p-5 space-y-3">
         <div className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-blue-500" />
-          <h2 className="font-semibold">Compliance-dokumenter</h2>
+          <h2 className="font-semibold">Compliance-dokumenter (24B)</h2>
         </div>
         <div className="grid gap-2 text-sm">
           {[
@@ -128,7 +168,7 @@ export default async function CompliancePage() {
           ].map(({ label, path, desc }) => (
             <div key={path} className="rounded-lg bg-muted/40 px-4 py-3">
               <p className="font-medium">{label}</p>
-              <p className="text-muted-foreground text-xs">{path}</p>
+              <p className="text-muted-foreground text-xs font-mono">{path}</p>
               <p className="text-muted-foreground text-xs">{desc}</p>
             </div>
           ))}
