@@ -117,6 +117,7 @@ enum NotificationType {
   WHISTLEBLOWING_RECEIVED
   TRAINING_EXPIRING_SOON
   TRAINING_OVERDUE
+  CHEMICAL_REVIEW_DUE
 }
 
 enum OvertimeType {
@@ -184,6 +185,7 @@ model Location {
   overtimeEntries  OvertimeEntry[]
   whistleblowingCases WhistleblowingCase[]
   trainingCourses     TrainingCourse[]
+  chemicals           Chemical[]
 
   @@index([safetyRepresentativeId])
   @@index([hseManagerId])
@@ -229,6 +231,7 @@ model Department {
   profileAssignments ProfileAssignment[]
   overtimeEntries    OvertimeEntry[]
   whistleblowingCases WhistleblowingCase[]
+  chemicals           Chemical[]
 
   @@index([locationId])
 }
@@ -282,6 +285,8 @@ model Profile {
   trainingRecords            TrainingRecord[]     @relation("TrainingRecordEmployee")
   registeredTrainingRecords  TrainingRecord[]     @relation("TrainingRecordRegistrar")
   trainingAuditLogs          TrainingAuditLog[]   @relation("TrainingAuditActor")
+  createdChemicals           Chemical[]           @relation("ChemicalCreator")
+  chemicalAuditLogs          ChemicalAuditLog[]   @relation("ChemicalAuditActor")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -835,4 +840,65 @@ model TrainingAuditLog {
   actorId String
 
   @@index([recordId])
+}
+
+// ─── Stoffkartotek ─────────────────────────────────────────────────────────────
+
+enum ChemicalStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model Chemical {
+  id                   String         @id @default(cuid())
+  name                 String
+  supplier             String?
+  description          String?
+  status               ChemicalStatus @default(ACTIVE)
+
+  // HMS-data
+  hazardSymbols        String[]       // f.eks. ["Brannfarlig", "Helseskadelig"]
+  protectiveEquipment  String?        // verneutstyr
+  riskNote             String?        // kort risikovurdering
+  storageInstructions  String?        // oppbevarings­instruksjoner
+
+  // SDS – versjon 1: lenke/referanse (ikke fil­upload)
+  sdsReference         String?        // URL eller referansetekst til sikkerhetsdatablad
+
+  // Datoer
+  reviewDate           DateTime?      // revisjonsdato
+  expiresAt            DateTime?      // utløps-/kontrolldato
+
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+
+  location   Location?   @relation(fields: [locationId], references: [id])
+  locationId String?
+
+  department   Department? @relation(fields: [departmentId], references: [id])
+  departmentId String?
+
+  createdBy   Profile @relation("ChemicalCreator", fields: [createdById], references: [id])
+  createdById String
+
+  auditLogs ChemicalAuditLog[]
+
+  @@index([locationId])
+  @@index([departmentId])
+  @@index([status])
+}
+
+model ChemicalAuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  chemical   Chemical @relation(fields: [chemicalId], references: [id], onDelete: Cascade)
+  chemicalId String
+
+  actor   Profile @relation("ChemicalAuditActor", fields: [actorId], references: [id])
+  actorId String
+
+  @@index([chemicalId])
 }

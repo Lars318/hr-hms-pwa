@@ -30,6 +30,7 @@ const TYPE_ICONS: Record<NotificationType, ElementType> = {
   WHISTLEBLOWING_RECEIVED: AlertTriangle,
   TRAINING_EXPIRING_SOON: Clock,
   TRAINING_OVERDUE: AlertTriangle,
+  CHEMICAL_REVIEW_DUE: AlertTriangle,
 };
 
 const TYPE_COLORS: Record<NotificationType, string> = {
@@ -54,6 +55,7 @@ const TYPE_COLORS: Record<NotificationType, string> = {
   WHISTLEBLOWING_RECEIVED: "text-amber-600",
   TRAINING_EXPIRING_SOON: "text-yellow-600",
   TRAINING_OVERDUE: "text-red-600",
+  CHEMICAL_REVIEW_DUE: "text-orange-600",
 };
 
 export interface NotificationData {

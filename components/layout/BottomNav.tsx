@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, ShieldAlert, Plus, ShieldCheck, MoreHorizontal,
   Bell, BarChart2, Activity, LogOut, X,
-  CalendarDays, FolderOpen, Zap, BookOpen, Clock, Shield, AlertTriangle, GraduationCap,
+  CalendarDays, FolderOpen, Zap, BookOpen, Clock, Shield, AlertTriangle, GraduationCap, FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -28,7 +28,8 @@ const moreItems: MoreMenuItem[] = [
   { href: "/dokumenter",     label: "Dokumenter",       icon: FolderOpen,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/personalhandbok",label: "Personalhåndbok",  icon: BookOpen,     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/varsler",        label: "Varsler",          icon: Bell,         roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-  { href: "/opplaering",        label: "Opplæring",        icon: GraduationCap, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/opplaering",        label: "Opplæring",        icon: GraduationCap,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/kjemikalier",       label: "Stoffkartotek",    icon: FlaskConical,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/opplaering/admin", label: "Opplæringsadmin",  icon: GraduationCap, roles: ["ADMIN", "HR"] },
   { href: "/varsling",          label: "Varsling",         icon: AlertTriangle, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/varsling/admin",   label: "Varslingssaker",  icon: AlertTriangle, roles: ["ADMIN", "HR"] },
@@ -61,7 +62,8 @@ export function BottomNav({ role }: BottomNavProps) {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/personalhandbok") ||
     pathname.startsWith("/varsling") ||
-    pathname.startsWith("/opplaering");
+    pathname.startsWith("/opplaering") ||
+    pathname.startsWith("/kjemikalier");
 
   async function handleLogout() {
     setOpen(false);

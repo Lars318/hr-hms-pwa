@@ -288,6 +288,30 @@
 
 ---
 
+## 13C. Stoffkartotek/kjemikalier
+
+**Status:** ✅ Ferdig (Steg 27B)
+
+- `Chemical`, `ChemicalAuditLog` — kjemikalie-register med HMS-data, faremerking, verneutstyr, SDS-referanse, datoer
+- RBAC: HR/ADMIN full CRUD, MANAGER/EMPLOYEE leser (lokasjonfiltrert for ikke-HR)
+- Oversiktsside med status-indikatorer (utløpt/utløper snart/OK)
+- Detaljside med faremerking, HMS-info, SDS-lenke, audit-logg
+- Opprett/rediger-skjema med faremerking-velger
+- Rapport «Stoffkartotek» med CSV-eksport
+- Navigasjon: Sidebar + BottomNav oppdatert
+- NotificationType: `CHEMICAL_REVIEW_DUE`
+
+**Viktige filer:**
+- `app/(dashboard)/kjemikalier/`
+- `features/chemicals/`
+- `server/routers/chemical.ts`
+
+**Kjente begrensninger:**
+- SDS-fil-upload ikke implementert (v1 bruker tekst-URL/referanse)
+- Ingen automatisk varslings-cron for utløpende kjemikalier (kan legges til med scheduled job)
+
+---
+
 ## 14. Varsler / Notifications
 
 **Status:** ✅ Ferdig

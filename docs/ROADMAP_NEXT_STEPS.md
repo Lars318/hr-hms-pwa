@@ -57,7 +57,7 @@
 **Hva:** Register over hvem som har fått hvilken HMS-opplæring, når og av hvem.  
 **Status:** ✅ Implementert — TrainingCourse, TrainingRecord, TrainingAuditLog. UI, rapport og navigasjon på plass.
 
-### 2.2 Stoffkartotek / Kjemikalier (Steg 25C)
+### 2.2 Stoffkartotek / Kjemikalier (Steg 27B) ✅ FERDIG
 
 **Hva:** Register over kjemikalier og farlige stoffer (SDS-datablad).  
 **Hvorfor:** Relevant for renholdsavdeling. Forskrift om utførelse av arbeid §5-1.  

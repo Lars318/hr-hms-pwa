@@ -18,6 +18,7 @@ import { profileAssignmentRouter } from "./profileAssignment";
 import { overtimeRouter } from "./overtime";
 import { whistleblowingRouter } from "./whistleblowing";
 import { trainingRouter } from "./training";
+import { chemicalRouter } from "./chemical";
 
 export const appRouter = router({
   profile: profileRouter,
@@ -39,6 +40,7 @@ export const appRouter = router({
   overtime: overtimeRouter,
   whistleblowing: whistleblowingRouter,
   training: trainingRouter,
+  chemical: chemicalRouter,
 });
 
 export type AppRouter = typeof appRouter;

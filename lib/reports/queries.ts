@@ -445,7 +445,49 @@ export async function queryTraining(
   return { headers, rows: data, total: rows.length };
 }
 
-export type ReportType = "incidents" | "actions" | "risk" | "documents" | "leave" | "handbook" | "overtime" | "training";
+export async function queryChemicals(
+  db: PrismaClient,
+  profile: ReportProfile,
+  input: ReportInput
+): Promise<ReportData> {
+  const locId = isHrAdmin(profile) ? input.locationId : undefined;
+  const deptId = resolvedDeptId(profile, input.departmentId);
+  const now = new Date();
+
+  const rows = await db.chemical.findMany({
+    where: {
+      status: "ACTIVE",
+      ...(locId ? { locationId: locId } : {}),
+      ...(deptId ? { departmentId: deptId } : {}),
+    },
+    include: {
+      location: { select: { name: true } },
+      department: { select: { name: true } },
+    },
+    orderBy: { name: "asc" },
+  });
+
+  const headers = ["Produkt", "Leverandør", "Faremerking", "Lokasjon", "Avdeling", "Revisjonsdato", "Utløpsdato", "Status"];
+  const data = rows.map((r) => {
+    const expired = r.expiresAt ? r.expiresAt < now : false;
+    const reviewDue = r.reviewDate ? r.reviewDate < now : false;
+    const status = expired ? "Utløpt" : reviewDue ? "Revisjon forfalt" : "OK";
+    return [
+      r.name,
+      r.supplier ?? "",
+      r.hazardSymbols.join(", "),
+      r.location?.name ?? "",
+      r.department?.name ?? "",
+      r.reviewDate ? fmtDate(r.reviewDate) : "",
+      r.expiresAt ? fmtDate(r.expiresAt) : "",
+      status,
+    ] as (string | number | null)[];
+  });
+
+  return { headers, rows: data, total: rows.length };
+}
+
+export type ReportType = "incidents" | "actions" | "risk" | "documents" | "leave" | "handbook" | "overtime" | "training" | "chemicals";
 
 export async function runReport(
   type: ReportType,
@@ -462,5 +504,6 @@ export async function runReport(
     case "handbook": return queryHandbook(db, profile, input);
     case "overtime": return queryOvertime(db, profile, input);
     case "training": return queryTraining(db, profile, input);
+    case "chemicals": return queryChemicals(db, profile, input);
   }
 }

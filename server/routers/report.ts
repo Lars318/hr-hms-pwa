@@ -5,7 +5,7 @@ import { runReport } from "@/lib/reports/queries";
 import type { ReportType } from "@/lib/reports/queries";
 
 const reportInput = z.object({
-  type: z.enum(["incidents", "actions", "risk", "documents", "leave", "handbook", "overtime", "training"]),
+  type: z.enum(["incidents", "actions", "risk", "documents", "leave", "handbook", "overtime", "training", "chemicals"]),
   from: z.string().optional(),
   to: z.string().optional(),
   departmentId: z.string().optional(),

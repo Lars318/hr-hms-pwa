@@ -16,6 +16,7 @@ const REPORT_TABS: { type: ReportType; label: string }[] = [
   { type: "leave", label: "Fravær" },
   { type: "overtime", label: "Overtid" },
   { type: "training", label: "Opplæring" },
+  { type: "chemicals", label: "Stoffkartotek" },
   { type: "handbook", label: "Personalhåndbok" },
 ];
 

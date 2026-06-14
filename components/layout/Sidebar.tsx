@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, Users, Building2, MapPin, ShieldAlert, FolderOpen, ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2, Activity, BookOpen, Clock, Shield, AlertTriangle, GraduationCap } from "lucide-react";
+import { LayoutDashboard, Users, Building2, MapPin, ShieldAlert, FolderOpen, ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2, Activity, BookOpen, Clock, Shield, AlertTriangle, GraduationCap, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { clearAllDrafts } from "@/lib/offline/drafts";
@@ -106,6 +106,12 @@ const navItems: NavItem[] = [
     href: "/opplaering",
     label: "Opplæring",
     icon: GraduationCap,
+    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
+  },
+  {
+    href: "/kjemikalier",
+    label: "Stoffkartotek",
+    icon: FlaskConical,
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
   {
