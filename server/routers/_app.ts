@@ -23,6 +23,7 @@ import { dataRequestRouter } from "./dataRequest";
 import { onboardingRouter } from "./onboarding";
 import { reviewRouter } from "./review";
 import { personnelCaseRouter } from "./personnelCase";
+import { commentRouter } from "./comment";
 
 export const appRouter = router({
   profile: profileRouter,
@@ -49,6 +50,7 @@ export const appRouter = router({
   onboarding: onboardingRouter,
   review: reviewRouter,
   personnelCase: personnelCaseRouter,
+  comment: commentRouter,
 });
 
 export type AppRouter = typeof appRouter;

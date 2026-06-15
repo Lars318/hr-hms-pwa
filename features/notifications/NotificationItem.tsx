@@ -41,6 +41,7 @@ const TYPE_ICONS: Record<NotificationType, ElementType> = {
   REVIEW_COMPLETED: CheckCircle2,
   PERSONNEL_CASE_OPENED: AlertTriangle,
   PERSONNEL_CASE_CLOSED: CheckCircle2,
+  COMMENT_ADDED: Bell,
 };
 
 const TYPE_COLORS: Record<NotificationType, string> = {
@@ -76,6 +77,7 @@ const TYPE_COLORS: Record<NotificationType, string> = {
   REVIEW_COMPLETED: "text-green-600",
   PERSONNEL_CASE_OPENED: "text-red-600",
   PERSONNEL_CASE_CLOSED: "text-slate-600",
+  COMMENT_ADDED: "text-blue-600",
 };
 
 export interface NotificationData {

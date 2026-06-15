@@ -12,6 +12,7 @@ import { IncidentStatusBadge } from "@/components/shared/IncidentStatusBadge";
 import { StatusChangeForm } from "@/features/incidents/StatusChangeForm";
 import { AuditLogList } from "@/features/incidents/AuditLogList";
 import { AttachmentSection } from "@/features/incidents/AttachmentSection";
+import { CommentThread } from "@/features/comments/CommentThread";
 
 interface Props { params: { id: string } }
 
@@ -156,6 +157,16 @@ export default async function AvvikDetaljPage({ params }: Props) {
           viewerRole={profile.role}
         />
       </div>
+
+      <Separator />
+
+      {/* Kommentarer */}
+      <CommentThread
+        entityType="INCIDENT"
+        entityId={incident.id}
+        currentProfileId={profile.id}
+        role={profile.role}
+      />
 
       <Separator />
 
