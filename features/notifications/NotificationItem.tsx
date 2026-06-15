@@ -43,6 +43,8 @@ const TYPE_ICONS: Record<NotificationType, ElementType> = {
   PERSONNEL_CASE_CLOSED: CheckCircle2,
   COMMENT_ADDED: Bell,
   CONTRACT_SHARED: FileText,
+  SIGNATURE_REQUESTED: FileText,
+  SIGNATURE_COMPLETED: CheckCircle2,
 };
 
 const TYPE_COLORS: Record<NotificationType, string> = {
@@ -80,6 +82,8 @@ const TYPE_COLORS: Record<NotificationType, string> = {
   PERSONNEL_CASE_CLOSED: "text-slate-600",
   COMMENT_ADDED: "text-blue-600",
   CONTRACT_SHARED: "text-teal-600",
+  SIGNATURE_REQUESTED: "text-purple-600",
+  SIGNATURE_COMPLETED: "text-green-600",
 };
 
 export interface NotificationData {

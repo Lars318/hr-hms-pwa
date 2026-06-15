@@ -130,6 +130,8 @@ enum NotificationType {
   PERSONNEL_CASE_CLOSED
   COMMENT_ADDED
   CONTRACT_SHARED
+  SIGNATURE_REQUESTED
+  SIGNATURE_COMPLETED
 }
 
 enum OvertimeType {
@@ -319,8 +321,9 @@ model Profile {
 
   comments Comment[] @relation("CommentAuthor")
 
-  contracts         Contract[] @relation("ContractEmployee")
-  createdContracts  Contract[] @relation("ContractCreator")
+  contracts              Contract[]         @relation("ContractEmployee")
+  createdContracts       Contract[]         @relation("ContractCreator")
+  signatureRequests      SignatureRequest[]  @relation("SignatureRequestSigner")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -1250,7 +1253,45 @@ model Contract {
   createdBy   Profile @relation("ContractCreator", fields: [createdById], references: [id])
   createdById String
 
+  signatureRequests SignatureRequest[]
+
   @@index([employeeId])
   @@index([status])
   @@index([type])
+}
+
+// ─── E-signering (30B) ────────────────────────────────────────────────────────
+
+enum SignatureStatus {
+  PENDING
+  SIGNED
+  REJECTED
+  EXPIRED
+}
+
+enum SignatureProvider {
+  MOCK
+}
+
+model SignatureRequest {
+  id         String           @id @default(cuid())
+  status     SignatureStatus  @default(PENDING)
+  provider   SignatureProvider @default(MOCK)
+  externalId String?
+  signedAt   DateTime?
+  expiresAt  DateTime?
+  rejectedAt DateTime?
+  metadata   Json?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId String
+
+  signer   Profile @relation("SignatureRequestSigner", fields: [signerId], references: [id])
+  signerId String
+
+  @@index([contractId])
+  @@index([signerId])
+  @@index([status])
 }

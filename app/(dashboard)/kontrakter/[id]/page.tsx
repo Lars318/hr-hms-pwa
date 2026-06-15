@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import { ContractFileUpload } from "@/features/contracts/ContractFileUpload";
 import { ContractEditForm } from "@/features/contracts/ContractEditForm";
+import { SignaturePanel } from "@/features/contracts/SignaturePanel";
 import type { ContractType, ContractStatus } from "@prisma/client";
 
 export const metadata = { title: "Kontrakt" };
@@ -50,6 +51,12 @@ export default async function ContractDetailPage({ params }: { params: { id: str
 
   if (!isHrAdmin && profile.role !== "MANAGER" && !isEmployee) redirect("/ingen-tilgang");
   if (isEmployee && !c.sharedWithEmployee) redirect("/ingen-tilgang");
+
+  const signatureRequests = await db.signatureRequest.findMany({
+    where: { contractId: c.id },
+    include: { signer: { select: { fullName: true, email: true } } },
+    orderBy: { createdAt: "desc" },
+  });
 
   const cfg = STATUS_CONFIG[c.status];
 
@@ -123,6 +130,19 @@ export default async function ContractDetailPage({ params }: { params: { id: str
           <p className="text-sm text-muted-foreground">Ingen fil lastet opp.</p>
         )}
       </div>
+
+      {/* Signering */}
+      {(isHrAdmin || isEmployee) && (
+        <div className="rounded-xl border p-4">
+          <SignaturePanel
+            contractId={c.id}
+            employeeId={c.employee.id}
+            role={profile.role}
+            currentProfileId={profile.id}
+            initialRequests={signatureRequests}
+          />
+        </div>
+      )}
 
       {/* HR edit */}
       {isHrAdmin && (
