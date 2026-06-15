@@ -126,6 +126,8 @@ enum NotificationType {
   OFFBOARDING_COMPLETED
   REVIEW_SCHEDULED
   REVIEW_COMPLETED
+  PERSONNEL_CASE_OPENED
+  PERSONNEL_CASE_CLOSED
 }
 
 enum OvertimeType {
@@ -307,6 +309,11 @@ model Profile {
   employeeReviews  EmployeeReview[] @relation("ReviewEmployee")
   managerReviews   EmployeeReview[] @relation("ReviewManager")
   createdReviews   EmployeeReview[] @relation("ReviewCreator")
+
+  personnelCases          PersonnelCase[] @relation("PersonnelCaseEmployee")
+  managedPersonnelCases   PersonnelCase[] @relation("PersonnelCaseManager")
+  createdPersonnelCases   PersonnelCase[] @relation("PersonnelCaseCreator")
+  personnelCaseAuditLogs  PersonnelCaseAuditLog[] @relation("PersonnelCaseActor")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -1101,4 +1108,70 @@ model EmployeeReview {
   @@index([managerId])
   @@index([status])
   @@index([scheduledAt])
+}
+
+// ─── Advarsler / Personalsaker (28C) ─────────────────────────────────────────
+
+enum PersonnelCaseType {
+  WARNING              // Skriftlig advarsel
+  PERFORMANCE_PLAN     // Oppfølgingsplan/PIP
+  TERMINATION_NOTICE   // Varsel om oppsigelse
+  SUSPENSION           // Suspensjon
+  OTHER
+}
+
+enum PersonnelCaseStatus {
+  OPEN
+  CLOSED
+  ARCHIVED
+}
+
+model PersonnelCase {
+  id     String              @id @default(cuid())
+  type   PersonnelCaseType
+  status PersonnelCaseStatus @default(OPEN)
+
+  // Sensitive innhold – kun HR/ADMIN og tildelt leder
+  summary      String  @db.Text       // kort beskrivelse (ikke synlig for ansatt)
+  internalNote String? @db.Text       // intern HR-notat (aldri synlig for ansatt)
+  outcomeNote  String? @db.Text       // utfall/konklusjon
+
+  isAcknowledged    Boolean   @default(false)  // ansatt har mottatt/kvittert
+  acknowledgedAt    DateTime?
+  closedAt          DateTime?
+
+  issuedAt  DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  employee   Profile @relation("PersonnelCaseEmployee", fields: [employeeId], references: [id])
+  employeeId String
+
+  // Leder som er involvert (kan se saken, men ikke internalNote)
+  responsibleManager   Profile? @relation("PersonnelCaseManager", fields: [responsibleManagerId], references: [id])
+  responsibleManagerId String?
+
+  createdBy   Profile @relation("PersonnelCaseCreator", fields: [createdById], references: [id])
+  createdById String
+
+  auditLogs PersonnelCaseAuditLog[]
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([type])
+}
+
+model PersonnelCaseAuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  case   PersonnelCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  caseId String
+
+  actor   Profile @relation("PersonnelCaseActor", fields: [actorId], references: [id])
+  actorId String
+
+  @@index([caseId])
 }
