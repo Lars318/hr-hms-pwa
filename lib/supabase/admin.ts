@@ -16,6 +16,7 @@ export function createAdminClient() {
 
 export const ATTACHMENT_BUCKET = "incident-attachments";
 export const DOCUMENT_BUCKET = "documents";
+export const CONTRACT_BUCKET = "contracts";
 
 export const ALLOWED_MIME_TYPES = [
   "application/pdf",
