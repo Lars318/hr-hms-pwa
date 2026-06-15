@@ -173,11 +173,16 @@ Disse bør parkeres til separat vurdering og eksplisitt beslutning:
 2. 🔴 **Prod-miljø satt opp** (Supabase prod + Vercel env vars)
 3. ⚠️ **Full smoke-test alle roller**
 4. ✅ **HMS-opplæringsregister** (Steg 27A — ferdig)
-5. ⚠️ **Stoffkartotek** (Steg 25C)
-6. ⚠️ **Datainnsyn/self-service eksport** (Steg 25D)
-7. 📝 **Kommentarer på saker** (Steg 25E)
-8. 📝 **Kontrakter** (Fase 3 — etter vellykket pilot)
+5. ✅ **Stoffkartotek** (Steg 27B — ferdig)
+6. ✅ **Datainnsyn/self-service eksport** (Steg 27C — ferdig)
+7. ✅ **Onboarding/offboarding** (Steg 28A — ferdig)
+8. ✅ **Medarbeidersamtaler** (Steg 28B — ferdig)
+9. ✅ **Advarsler/personalsaker** (Steg 28C — ferdig)
+10. ✅ **Kommentarer på saker** (Steg 29A — ferdig)
+11. ✅ **Kontrakter** (Steg 30A — ferdig)
+12. ✅ **E-signering mock** (Steg 30B — ferdig)
+13. 📝 **Lønnsintegrasjon** (Steg 31A — venter på avklaring)
 
 ---
 
-*Sist oppdatert: 2026-06-14*
+*Sist oppdatert: 2026-06-15*
