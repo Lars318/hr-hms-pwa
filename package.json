@@ -12,6 +12,7 @@
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate deploy",
+    "typecheck": "tsc --noEmit",
     "db:migrate:baseline": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
