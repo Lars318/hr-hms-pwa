@@ -9,22 +9,25 @@
 ## Seksjon 1 – Teknisk
 
 ### Bygg og distribusjon
-- [ ] `npm run build` kjører uten feil
-- [ ] `npm run typecheck` gir 0 feil
+- [ ] `npm run build` kjører uten feil ← Verifisert 2026-06-15 (grønn)
+- [ ] `npm run typecheck` gir 0 feil ← Verifisert 2026-06-15 (grønn)
 - [ ] Produksjonsbygg distribuert til Vercel (eller annen prod-hosting)
-- [ ] Miljøvariabler satt i prod (ikke dev-verdier)
+- [ ] Miljøvariabler satt i prod (ikke dev-verdier) – se `docs/PRODUCTION_DEPLOYMENT_CHECKLIST.md`
 - [ ] Supabase prod-prosjekt satt opp (ikke dev-prosjekt)
-- [ ] `npx prisma db push` kjørt mot prod-database
-- [ ] Seed-data fjernet fra prod (eller bekreftet som testdata)
+- [ ] `npx prisma migrate deploy` kjørt mot prod-database (IKKE db:push, IKKE --force-reset)
+- [ ] `npx prisma migrate status` viser «All migrations applied»
+- [ ] Seed-script ALDRI kjørt mot prod – se `docs/PRODUCTION_DATA_SETUP.md`
 
 ### Sikkerhet og infrastruktur
 - [ ] HTTPS aktivert og validert
 - [ ] CSP-headers verifisert i prod
 - [ ] HSTS aktivert i prod
-- [ ] Supabase RLS vurdert (appen bruker Prisma/servicebruker – dokumenter valg)
-- [ ] Storage bucket satt til privat (ikke public)
-- [ ] Signed URLs brukes for alle filnedlastinger
-- [ ] Rate-limiting verifisert på upload-endepunkter
+- [ ] Supabase RLS vurdert (appen bruker Prisma/servicebruker – dokumentert i PROJECT_STATUS.md)
+- [ ] Storage buckets satt til privat: incident-attachments, documents, contracts – se `docs/STORAGE_BUCKETS.md`
+- [ ] Signed URLs brukes for alle filnedlastinger (verifisert server-side)
+- [ ] Rate-limiting verifisert på upload-endepunkter (attachment, document, contract) ← Implementert
+- [ ] Dashboard error boundary finnes (`app/(dashboard)/error.tsx`) ← Implementert
+- [ ] Global error boundary finnes (`app/error.tsx` med Sentry) ← Implementert
 
 ### Overvåking
 - [ ] Sentry feillogging aktivert og validert
@@ -156,11 +159,13 @@
 - [ ] Avviksmodul fungerer end-to-end
 - [ ] Fraværsmodul fungerer end-to-end
 
-### Akseptable mangler ved pilotstart (P1)
-- Varslingsmodul (whistleblowing) – midlertidig: e-post
-- HMS-opplæringsregister – ikke implementert ennå
-- Stoffkartotek – ikke aktuelt for alle avdelinger ennå
-- Self-service datainnsyn – HR håndterer manuelt
+### Akseptable mangler ved pilotstart
+
+- Ekstern anonym varslingskanal – ikke implementert (intern varslingsmodul er tilgjengelig)
+- Automatisk deaktivering av profil ved oppsigelse – manuell prosess
+- Lønnsintegrasjon – eget system, ikke i scope
+- E-signering er mock/testmodus – ingen BankID eller ekte juridisk signatur (tydelig merket i UI)
+- Teams og externe samhandlingsintegrasjoner – ikke i scope
 
 ---
 
@@ -173,4 +178,4 @@
 
 ---
 
-*Sist oppdatert: 2026-06-14*
+*Sist oppdatert: 2026-06-15*

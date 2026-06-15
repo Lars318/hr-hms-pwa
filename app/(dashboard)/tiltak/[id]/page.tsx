@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { ActionStatusBadge } from "@/features/actions/ActionStatusBadge";
 import { ActionPriorityBadge } from "@/features/actions/ActionPriorityBadge";
 import { ActionStatusChanger } from "@/features/actions/ActionStatusChanger";
+import { CommentThread } from "@/features/comments/CommentThread";
 
 interface Props {
   params: { id: string };
@@ -107,6 +108,9 @@ export default async function TiltakDetailPage({ params }: Props) {
           <ActionStatusChanger actionId={action.id} currentStatus={action.status} />
         </>
       )}
+
+      <Separator />
+      <CommentThread entityType="ACTION" entityId={action.id} currentProfileId={profile.id} role={profile.role} />
     </div>
   );
 }

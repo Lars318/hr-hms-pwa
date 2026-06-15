@@ -456,4 +456,84 @@
 
 ---
 
-*Sist oppdatert: 2026-06-14*
+---
+
+## 21. Onboarding/offboarding (Steg 28A)
+
+**Status:** ✅ Ferdig
+
+- `OnboardingTemplate`, `OnboardingTemplateTask`, `OnboardingProcess`, `OnboardingTask`
+- Prosesstyper: ONBOARDING, OFFBOARDING
+- RBAC: HR/ADMIN oppretter maler og prosesser; EMPLOYEE fullfører egne oppgaver
+- Varsler: `ONBOARDING_TASK_ASSIGNED`, `OFFBOARDING_TASK_ASSIGNED`, `ONBOARDING_COMPLETED`, `OFFBOARDING_COMPLETED`
+
+---
+
+## 22. Medarbeidersamtaler (Steg 28B)
+
+**Status:** ✅ Ferdig
+
+- `EmployeeReview` med `managerNotes String? @db.Text` — sensitiv, aldri returnert til EMPLOYEE
+- Status: SCHEDULED, COMPLETED, CANCELLED
+- RBAC: EMPLOYEE kan oppdatere `sharedNotes`; MANAGER/HR kan oppdatere `managerNotes`; kun HR/ADMIN kan endre status
+- Varsler: `REVIEW_SCHEDULED`, `REVIEW_COMPLETED`
+
+**Sensitive felt:** `managerNotes` returneres som `null` for EMPLOYEE i `byId`-prosedyre.
+
+---
+
+## 23. Advarsler / Personalsaker (Steg 28C)
+
+**Status:** ✅ Ferdig
+
+- `PersonnelCase` med `internalNote String? @db.Text` — aldri vist til EMPLOYEE eller MANAGER
+- Typer: WARNING, PERFORMANCE_PLAN, TERMINATION_NOTICE, SUSPENSION, OTHER
+- Status: OPEN, CLOSED, ARCHIVED
+- `PersonnelCaseAuditLog` på alle statusendringer
+- RBAC: EMPLOYEE → FORBIDDEN; MANAGER → ser sak, men `internalNote: null`; HR/ADMIN → full tilgang
+
+**Sensitive felt:** `internalNote` returneres alltid som `null` for MANAGER og EMPLOYEE.
+
+---
+
+## 24. Kommentarer på saker (Steg 29A)
+
+**Status:** ✅ Ferdig
+
+- `Comment` med `isInternal Boolean @default(false)`
+- Entitetstyper: INCIDENT, ACTION, RISK_ASSESSMENT
+- Interne kommentarer (`isInternal: true`) vises kun for ADMIN/HR/MANAGER
+- RBAC: kun privilegerte roller kan sette `isInternal: true`
+- **Ikke lagt til på:** varslingssaker, personalsaker, medarbeidersamtaler
+
+---
+
+## 25. Kontrakter (Steg 30A)
+
+**Status:** ✅ Ferdig
+
+- `Contract` med `fileKey`, `sharedWithEmployee Boolean @default(false)`, `sharedAt`
+- Typer: EMPLOYMENT, AMENDMENT, TERMINATION, OTHER
+- **Lagring:** privat bucket `contracts` — alle filer via signerte URLer (300 sek utløp)
+- Totrinnsdeling: HR laster opp → HR klikker "Del" → EMPLOYEE ser kontrakt
+- RBAC: EMPLOYEE ser KUN kontrakter med `sharedWithEmployee=true`
+
+---
+
+## 26. E-signering mock (Steg 30B)
+
+**Status:** ✅ Ferdig — TESTMODUS / MOCK
+
+> ⚠️ **VIKTIG:** E-signeringen er en mock/simulator. Det finnes INGEN integrasjon med BankID, Signicat, eller andre ekte e-signeringstjenester. Signaturer produsert i dette systemet er IKKE juridisk bindende. Dette er utelukkende en teknisk mock for å vise flyten.
+
+- `SignatureRequest` knyttet til `Contract` og `Profile`
+- Provider-interface `SigningProvider` i `lib/esignering/provider.ts` — kan byttes ut med ekte leverandør
+- `mockAdapter.ts` returnerer dummy `externalId`, aldri ekte signatur
+- UI viser tydelig "(testmodus — ingen ekte signatur)" i alle signeringsvisninger
+- Varsler: `SIGNATURE_REQUESTED`, `SIGNATURE_COMPLETED`
+
+**For å bytte til ekte e-signering:** Implementer `SigningProvider`-interfacet og bytt ut `mockSigningProvider`. Krever ny DPIA og DPA med e-signeringsleverandør.
+
+---
+
+*Sist oppdatert: 2026-06-15*

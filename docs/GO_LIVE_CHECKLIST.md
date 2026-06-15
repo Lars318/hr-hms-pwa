@@ -132,9 +132,11 @@ Ingen punkt merket ❌ skal finnes når Go Live vedtas.
 ```
 □ incident-attachments bucket er privat
 □ documents bucket er privat
+□ contracts bucket er privat (kontrakter og e-signeringsvedlegg)
 □ Direkte URL til fil (uten signert token) returnerer 400/403
 □ Signert nedlastings-URL fungerer: åpner fil i ny fane
-□ Signert URL utløper etter 60 sekunder (test: vente 61 sek → feiler)
+□ Signert URL utløper (kontrakter: 300 sek, vedlegg: 60 sek)
+□ Testmerknad: e-signering er mock — ingen BankID eller ekte signatur
 ```
 
 ---

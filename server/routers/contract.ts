@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { createAdminClient, CONTRACT_BUCKET, ALLOWED_MIME_TYPES, MAX_FILE_SIZE_BYTES } from "@/lib/supabase/admin";
 import { createNotification } from "@/lib/notifications";
 import { createId } from "@paralleldrive/cuid2";
+import { uploadUrlLimit } from "@/lib/security/rateLimit";
 
 const CONTRACT_TYPES = ["EMPLOYMENT", "AMENDMENT", "TERMINATION", "OTHER"] as const;
 const CONTRACT_STATUSES = ["DRAFT", "ACTIVE", "EXPIRED", "TERMINATED"] as const;
@@ -119,7 +120,10 @@ export const contractRouter = router({
       mimeType: z.string(),
       fileSize: z.number(),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      const limit = uploadUrlLimit(ctx.profile.id);
+      if (!limit.allowed) throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "For mange opplastinger. Prøv igjen om litt." });
+
       if (!ALLOWED_MIME_TYPES.includes(input.mimeType as (typeof ALLOWED_MIME_TYPES)[number])) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Filtype ikke tillatt." });
       }

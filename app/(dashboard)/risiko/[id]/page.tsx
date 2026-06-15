@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { RiskItemList } from "@/features/risk/RiskItemList";
 import { ASSESSMENT_STATUS_LABELS } from "@/lib/risk";
+import { CommentThread } from "@/features/comments/CommentThread";
 
 interface Props {
   params: { id: string };
@@ -155,6 +156,9 @@ export default async function RisikovurderingDetailPage({ params }: Props) {
           viewerRole={profile.role}
         />
       </div>
+
+      <Separator />
+      <CommentThread entityType="RISK_ASSESSMENT" entityId={assessment.id} currentProfileId={profile.id} role={profile.role} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 # Pilot Readiness Status – HR/HMS PWA
 
-> **Dato:** 2026-06-14  
+> **Dato:** 2026-06-15  
 > **Status:** Nesten klar – teknisk · Juridisk gjenstår
 
 ---
@@ -22,12 +22,12 @@
 
 | Sjekk | Status | Kommentar |
 |---|---|---|
-| TypeScript: 0 feil | ✅ | Verifisert 2026-06-14 |
-| `npm run build` rent | ✅ | 39 statiske sider + dynamiskes ruter |
+| TypeScript: 0 feil | ✅ | Verifisert 2026-06-15 |
+| `npm run build` rent | ✅ | Alle ruter grønne |
 | Prisma-skjema i sync | ✅ | `prisma db push` kjørt |
 | Prisma Client generert | ✅ | |
-| Alle moduler operasjonelle | ✅ | 15+ moduler |
-| tRPC-routers registrert | ✅ | 19 routers |
+| Alle moduler operasjonelle | ✅ | 26+ moduler (inkl. 28A–30B) |
+| tRPC-routers registrert | ✅ | 26 routers |
 
 ---
 
@@ -39,8 +39,8 @@
 |---|---|---|
 | `.env` i `.gitignore` | ✅ | |
 | Service role key ikke eksponert | ✅ | |
-| Storage bucket privat | ✅ | |
-| Signerte URLer for filer | ✅ | |
+| Storage bucket privat | ✅ | incident-attachments, documents, contracts |
+| Signerte URLer for filer | ✅ | Kontrakter: 300 sek, vedlegg: 60 sek |
 | Rate limiting på upload | ✅ | |
 | RBAC server-side | ✅ | tRPC procedures |
 | HTTPS (Vercel) | ✅ | Automatisk |
@@ -174,26 +174,41 @@
 ## 10. Go / No-Go-vurdering
 
 ### Absolutte krav (blokkerer pilot)
-- [x] TypeScript: 0 feil
-- [x] Build rent
-- [x] Alle ansatte har tilgang (krever produksjonsoppsett)
-- [ ] **DPA inngått med alle leverandører** ← BLOKKERER
+- [x] TypeScript: 0 feil — verifisert 2026-06-15
+- [x] Build rent — verifisert 2026-06-15
+- [x] Rate limiting på alle upload-endepunkter (attachment, document, contract)
+- [x] Dashboard error boundary implementert
+- [x] Private storage buckets: incident-attachments, documents, contracts
+- [x] Signerte URLer for alle filnedlastinger
+- [ ] Produksjonsmiljø satt opp (Vercel + Supabase prod) ← GJENSTÅR
+- [ ] Pilotbrukere opprettet i produksjon ← GJENSTÅR
+- [ ] **DPA inngått med alle leverandører** ← BLOKKERER (ledelsesbeslutning)
 - [x] Avviksmodul fungerer end-to-end
 - [x] Fraværsmodul fungerer end-to-end
 
 ### Akseptable mangler ved pilotstart
-- HMS-opplæringsregister — midlertidig: manuell liste
-- Stoffkartotek — ikke aktuelt for alle avdelinger
-- Self-service datainnsyn — HR håndterer manuelt
-- Varslingsmodul ekstern anonym kanal — ikke implementert
+- Ekstern anonym varslingskanal — ikke implementert (intern varslingsmodul er tilgjengelig)
 - Automatisk deaktivering ved oppsigelse — manuell prosess
+- Lønnsintegrasjon — eget system, ikke i scope
+- E-signering er mock/testmodus — ingen ekte BankID/Signicat (tydelig merket i UI, ikke juridisk bindende)
+- Teams og externe samhandlingsintegrasjoner — ikke i scope
+- Automatiske cron-varsler for utløpende opplæring/kjemikalier — P2
+
+### Gjenstående manuelle oppgaver
+- Sett opp Vercel production-prosjekt — se `docs/PRODUCTION_DEPLOYMENT_CHECKLIST.md`
+- Kjør `npx prisma migrate deploy` mot prod-database
+- Opprett Storage-buckets i Supabase prod (alle private) — se `docs/STORAGE_BUCKETS.md`
+- Konfigurer Sentry DSN, VAPID-nøkler, Resend i Vercel env vars
+- Opprett pilotbrukere manuelt — se `docs/PRODUCTION_DATA_SETUP.md`
+- Signer DPA-er — se `docs/pilot/DPA_CHECKLIST.md`
+- Kjør smoke-test per rolle — se `docs/PILOT_SMOKE_TEST.md`
 
 ### Konklusjon
 
-**⚠️ Teknisk klar — juridisk/operasjonelt blokkert av DPA**
+**⚠️ Teknisk klar — produksjonsoppsett og DPA gjenstår**
 
-Appen er teknisk stabil og funksjonell. Den viktigste blokkeringen er DPA-er med Supabase, Vercel, Resend og Sentry. Dette er en ledelsesbeslutning og kan gjøres uavhengig av teknisk arbeid.
+Koden er stabil. Alle moduler er implementert (28A–30B), typecheck og build er grønne, rate limiting og error boundaries er på plass. Neste steg er produksjonsoppsett og DPA-signering.
 
 ---
 
-*Sist oppdatert: 2026-06-14*
+*Sist oppdatert: 2026-06-15*

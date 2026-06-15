@@ -67,9 +67,20 @@ Disse tiltakene er kritiske for at appen kan tas i bruk i organisasjonen.
 | P2-5 | HMS-snarvei og -informasjon på ansatt-dashboard | UX |
 | P2-6 | Grensevarsler for overtid (Aml §10-6 max 10t/dag, 300t/år) | App – kun informativt |
 | P2-7 | ~~Teams-varsler~~ → **Ikke i scope** – se «Ikke bygg ennå»-seksjonen | Integrasjon |
-| P2-8 | Kontrakter og e-signering | Ny modul |
+| P2-8 | Kontrakter (lagring og deling) | ✅ **Gjort i 30A** — se merknad om e-signering nedenfor |
 | P2-9 | Avansert compliance-dashboard med KPI-er | Dashboard |
 | P2-10 | DPIA (Data Protection Impact Assessment) | Juridisk/IT |
+
+---
+
+## Merknad: E-signering — TESTMODUS, IKKE JURIDISK BINDENDE
+
+> ⚠️ **E-signeringen i systemet er en mock/simulator.**  
+> Det finnes **ingen integrasjon med BankID, Signicat, eller andre ekte e-signeringstjenester**.  
+> Signaturer produsert i dette systemet er **IKKE juridisk bindende**.  
+> UI-et viser tydelig "(testmodus — ingen ekte signatur)" alle steder signering brukes.
+
+For å bytte til ekte e-signering: implementer `SigningProvider`-interfacet og bytt ut `mockSigningProvider`. Krever ny DPIA og DPA med e-signeringsleverandør.
 
 ---
 
@@ -81,8 +92,8 @@ Disse tiltakene er kritiske for at appen kan tas i bruk i organisasjonen.
 | AMU – Arbeidsmiljøutvalg | Ikke aktuelt per i dag. |
 | BHT – Bedriftshelsetjeneste | Ikke aktuelt per i dag. |
 | Lønnsintegrering | Eget system. |
-| E-signering av kontrakter | Fremtidig modul. |
+| Ekte BankID/e-signering | Mock er implementert — ekte integrasjon krever DPIA + DPA. |
 
 ---
 
-*Sist oppdatert: 2026-06-14*
+*Sist oppdatert: 2026-06-15*

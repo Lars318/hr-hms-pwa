@@ -117,11 +117,19 @@
 **Kompleksitet:** Medium  
 **Avhengig av:** e-signering (se under)
 
-### 3.3 E-signering
+### 3.3 E-signering (Steg 30B) ✅ MOCK IMPLEMENTERT
 
-**Hva:** Integrasjon med e-signering (f.eks. Signicat, BankID, DocuSign).  
-**Kompleksitet:** Høy  
-**Merknad:** Krever ny DPIA og DPA med e-signeringsleverandør.
+**Hva:** Mock/simulator av e-signeringsflyt — viser flyten uten ekte integrasjon.  
+**Status:** ✅ Mock ferdig
+
+> ⚠️ **TESTMODUS — INGEN EKTE SIGNATUR:** Den nåværende implementasjonen bruker en mock-adapter. Det er INGEN integrasjon med BankID, Signicat, eller andre e-signeringstjenester. Signaturer produsert i systemet er IKKE juridisk bindende.
+
+**For å bytte til ekte e-signering:**
+1. Implementer `SigningProvider`-interfacet i `lib/esignering/provider.ts`
+2. Bytt ut `mockSigningProvider` i `server/routers/signature.ts`
+3. Gjennomfør ny DPIA
+4. Inngå DPA med e-signeringsleverandør
+5. Kompleksitet: Høy
 
 ### 3.4 Stillingsbeskrivelser
 

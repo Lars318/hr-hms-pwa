@@ -14,8 +14,8 @@
 | **Vercel** | Databehandler | Serverside-kode kjøres her – kan eksponeres for persondata i request/response | ⬜ Ikke inngått | Aktiver Vercel DPA (tilgjengelig under Team Settings → Legal) | Daglig leder / IT | Før pilot |
 | **Resend** | Databehandler | E-postvarsler: mottakers navn og e-postadresse, varselinnhold | ⬜ Ikke inngått | Aksepter DPA i Resend-kontoinnstillinger | Daglig leder / IT | Før pilot |
 | **Sentry** | Databehandler | Feillogging – kan inneholde persondata i stacktraces og request-data | ⬜ Ikke inngått | Inngå DPA via Sentry (tilgjengelig for Business/Enterprise). Vurder å maskere persondata i Sentry-konfigurasjon. | Daglig leder / IT | Før pilot |
-| **Microsoft Teams** | Potensiell databehandler | Varsler dersom Teams-integrasjon bygges | ⏳ Ikke aktuelt nå | Inngå DPA ved integrasjon (Microsoft har standard DPA) | Daglig leder | Før Teams-integrasjon |
-| **E-signeringsleverandør** | Potensiell databehandler | Kontrakter og signaturer | ⏳ Ikke aktuelt nå | Velg leverandør og inngå DPA | Daglig leder | Før e-signeringsmodul |
+| **Teams / externe integrasjoner** | Ikke aktuelt | Teams og externe samhandlingsintegrasjoner er **ikke i scope** | ⛔ Ikke i scope | Ingen tiltak nødvendig | — | Ikke aktuelt |
+| **E-signeringsleverandør** | Ikke aktuelt ennå | E-signering er kun mock/testmodus – ingen ekte leverandør tilkoblet | ⏳ Ikke aktuelt nå | Velg leverandør og inngå DPA når ekte e-signering skal implementeres | Daglig leder | Før ekte e-signering |
 
 ---
 
