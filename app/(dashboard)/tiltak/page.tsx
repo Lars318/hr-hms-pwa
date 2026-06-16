@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { ActionTable } from "@/features/actions/ActionTable";
+import { PageHeader } from "@/components/shared/PageHeader";
 
 export default async function TiltakPage() {
   const supabase = createClient();
@@ -18,10 +19,10 @@ export default async function TiltakPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Tiltak</h1>
-        <p className="text-sm text-muted-foreground mt-1">Oversikt over alle tiltak fra risikovurderinger</p>
-      </div>
+      <PageHeader
+        title="Tiltak"
+        description="Oversikt over alle tiltak fra risikovurderinger"
+      />
 
       <ActionTable viewerRole={profile.role} departments={departments} employees={employees} />
     </div>

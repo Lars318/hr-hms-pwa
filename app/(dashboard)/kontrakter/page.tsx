@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 import { NewContractForm } from "@/features/contracts/NewContractForm";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { EmptyState } from "@/components/shared/EmptyState";
 import type { ContractType, ContractStatus } from "@prisma/client";
 
 export const metadata = { title: "Kontrakter" };
@@ -56,20 +58,19 @@ export default async function KontrakterPage() {
   ]);
 
   return (
-    <div className="max-w-3xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <FileText className="h-6 w-6" />
-          Kontrakter
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {isEmployee ? "Dine kontrakter." : "Alle ansattkontrakter."}
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Kontrakter"
+        description={isEmployee ? "Dine kontrakter." : "Alle ansattkontrakter."}
+      />
 
       <section className="space-y-2">
         {contracts.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Ingen kontrakter registrert.</p>
+          <EmptyState
+            icon={FileText}
+            title="Ingen kontrakter"
+            description={isEmployee ? "Du har ingen kontrakter ennå." : "Ingen kontrakter registrert ennå."}
+          />
         ) : (
           <div className="rounded-xl border divide-y overflow-hidden">
             {contracts.map((c) => {

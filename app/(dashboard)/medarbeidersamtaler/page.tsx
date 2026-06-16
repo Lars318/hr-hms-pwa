@@ -3,6 +3,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { MessageSquare, Plus } from "lucide-react";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -52,20 +54,19 @@ export default async function MedarbeidersamtalerPage() {
     : [];
 
   return (
-    <div className="max-w-3xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <MessageSquare className="h-6 w-6" />
-          Medarbeidersamtaler
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {isHrAdmin ? "Alle samtaler i organisasjonen." : "Dine planlagte og gjennomførte samtaler."}
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Medarbeidersamtaler"
+        description={isHrAdmin ? "Alle samtaler i organisasjonen." : "Dine planlagte og gjennomførte samtaler."}
+      />
 
       <section className="space-y-2">
         {reviews.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Ingen samtaler registrert.</p>
+          <EmptyState
+            icon={MessageSquare}
+            title="Ingen samtaler"
+            description={isHrAdmin ? "Ingen samtaler er registrert ennå." : "Du har ingen planlagte eller gjennomførte samtaler."}
+          />
         ) : (
           <div className="rounded-xl border divide-y overflow-hidden">
             {reviews.map((r) => {
