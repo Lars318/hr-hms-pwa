@@ -7,6 +7,7 @@ const profileUpdateSchema = z.object({
   title: z.string().max(100).optional().nullable(),
   phone: z.string().max(30).optional().nullable(),
   departmentId: z.string().optional().nullable(),
+  managerId: z.string().optional().nullable(),
   role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]).optional(),
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
 });
@@ -41,7 +42,7 @@ export const profileRouter = router({
           ...(status ? { status } : {}),
           ...(departmentId ? { departmentId } : {}),
         },
-        include: { department: true },
+        include: { department: true, manager: { select: { id: true, fullName: true } } },
         orderBy: { fullName: "asc" },
       });
     }),
@@ -52,7 +53,7 @@ export const profileRouter = router({
     .query(async ({ ctx, input }) => {
       const profile = await ctx.db.profile.findUnique({
         where: { id: input.id },
-        include: { department: true },
+        include: { department: true, manager: { select: { id: true, fullName: true } } },
       });
       if (!profile) throw new TRPCError({ code: "NOT_FOUND", message: "Ansatt ikke funnet." });
       return profile;
@@ -91,7 +92,7 @@ export const profileRouter = router({
       return ctx.db.profile.update({
         where: { id },
         data,
-        include: { department: true },
+        include: { department: true, manager: { select: { id: true, fullName: true } } },
       });
     }),
 

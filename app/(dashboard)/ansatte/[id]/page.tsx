@@ -29,7 +29,7 @@ export default async function AnsattDetaljPage({ params }: Props) {
 
   const profile = await db.profile.findUnique({
     where: { id: params.id },
-    include: { department: true },
+    include: { department: true, manager: { select: { id: true, fullName: true } } },
   });
 
   if (!profile) notFound();
@@ -77,6 +77,10 @@ export default async function AnsattDetaljPage({ params }: Props) {
         <div>
           <dt className="text-muted-foreground">Avdeling</dt>
           <dd className="font-medium mt-0.5">{profile.department?.name ?? "—"}</dd>
+        </div>
+        <div>
+          <dt className="text-muted-foreground">Nærmeste leder</dt>
+          <dd className="font-medium mt-0.5">{profile.manager?.fullName ?? "—"}</dd>
         </div>
         <div>
           <dt className="text-muted-foreground">Ansatt dato</dt>

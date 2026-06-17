@@ -19,6 +19,7 @@ const editSchema = z.object({
   role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]),
   status: z.enum(["ACTIVE", "INACTIVE"]),
   departmentId: z.string().optional(),
+  managerId: z.string().optional(),
 });
 
 const createSchema = editSchema.extend({
@@ -29,21 +30,25 @@ const createSchema = editSchema.extend({
 type EditValues = z.infer<typeof editSchema>;
 type CreateValues = z.infer<typeof createSchema>;
 
+interface SimpleProfile { id: string; fullName: string; }
+
 interface EmployeeFormEditProps {
   mode: "edit";
-  profile: Profile & { department: Department | null };
+  profile: Profile & { department: Department | null; manager: SimpleProfile | null };
   departments: Department[];
+  allProfiles: SimpleProfile[];
 }
 
 interface EmployeeFormCreateProps {
   mode: "create";
   profile?: never;
   departments: Department[];
+  allProfiles?: SimpleProfile[];
 }
 
 type EmployeeFormProps = EmployeeFormEditProps | EmployeeFormCreateProps;
 
-export function EmployeeForm({ profile, departments, mode }: EmployeeFormProps) {
+export function EmployeeForm({ profile, departments, allProfiles = [], mode }: EmployeeFormProps) {
   const router = useRouter();
   const utils = trpc.useUtils();
 
@@ -56,6 +61,7 @@ export function EmployeeForm({ profile, departments, mode }: EmployeeFormProps) 
       role: profile?.role ?? "EMPLOYEE",
       status: profile?.status ?? "ACTIVE",
       departmentId: profile?.departmentId ?? "",
+      managerId: profile?.managerId ?? "",
     },
   });
 
@@ -95,6 +101,7 @@ export function EmployeeForm({ profile, departments, mode }: EmployeeFormProps) 
     const clean = {
       ...values,
       departmentId: values.departmentId || undefined,
+      managerId: values.managerId || undefined,
       title: values.title || undefined,
       phone: values.phone || undefined,
     };
@@ -178,6 +185,20 @@ export function EmployeeForm({ profile, departments, mode }: EmployeeFormProps) 
           ))}
         </Select>
       </div>
+
+      {mode === "edit" && (
+        <div className="space-y-1">
+          <Label htmlFor="managerId">Nærmeste leder</Label>
+          <Select id="managerId" {...register("managerId")}>
+            <option value="">Ingen leder satt</option>
+            {allProfiles
+              .filter((p) => p.id !== profile?.id)
+              .map((p) => (
+                <option key={p.id} value={p.id}>{p.fullName}</option>
+              ))}
+          </Select>
+        </div>
+      )}
 
       {serverError && <p className="text-sm text-destructive">{serverError}</p>}
 

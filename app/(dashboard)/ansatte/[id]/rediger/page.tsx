@@ -20,9 +20,10 @@ export default async function RedigerAnsattPage({ params }: Props) {
   const viewer = await db.profile.findUnique({ where: { supabaseUserId: user.id } });
   if (!viewer || (viewer.role !== "ADMIN" && viewer.role !== "HR")) redirect("/ingen-tilgang");
 
-  const [profile, departments] = await Promise.all([
-    db.profile.findUnique({ where: { id: params.id }, include: { department: true } }),
+  const [profile, departments, allProfiles] = await Promise.all([
+    db.profile.findUnique({ where: { id: params.id }, include: { department: true, manager: { select: { id: true, fullName: true } } } }),
     db.department.findMany({ orderBy: { name: "asc" } }),
+    db.profile.findMany({ where: { status: "ACTIVE" }, select: { id: true, fullName: true }, orderBy: { fullName: "asc" } }),
   ]);
 
   if (!profile) notFound();
@@ -41,7 +42,7 @@ export default async function RedigerAnsattPage({ params }: Props) {
         </div>
       </div>
 
-      <EmployeeForm profile={profile} departments={departments} mode="edit" />
+      <EmployeeForm profile={profile} departments={departments} allProfiles={allProfiles} mode="edit" />
     </div>
   );
 }

@@ -269,6 +269,10 @@ model Profile {
   department   Department? @relation(fields: [departmentId], references: [id])
   departmentId String?
 
+  manager      Profile?  @relation("ProfileManager", fields: [managerId], references: [id])
+  managerId    String?
+  subordinates Profile[] @relation("ProfileManager")
+
   reportedIncidents    Incident[]                 @relation("IncidentReporter")
   assignedIncidents    Incident[]                 @relation("IncidentAssignee")
   uploadedAttachments  Attachment[]
