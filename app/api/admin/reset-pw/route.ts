@@ -35,8 +35,11 @@ export async function POST(request: Request) {
   });
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    return Response.json({ error: err.msg ?? err.message ?? `GoTrue error ${res.status}` }, { status: res.status });
+    const errText = await res.text().catch(() => "");
+    console.error("[reset-pw] GoTrue error", res.status, supabaseUrl, supabaseUserId.slice(0, 8), errText);
+    let errMsg = `GoTrue error ${res.status}`;
+    try { const j = JSON.parse(errText); errMsg = j.msg ?? j.message ?? errMsg; } catch {}
+    return Response.json({ error: errMsg, debug: { status: res.status, urlProject: supabaseUrl?.split(".")[0]?.split("//")[1] } }, { status: res.status });
   }
 
   return Response.json({ ok: true });
