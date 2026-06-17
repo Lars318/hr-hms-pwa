@@ -11,7 +11,9 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Building2, Pencil, Trash2, Plus, X, Check } from "lucide-react";
 
-export function DepartmentAdmin() {
+interface SimpleLocation { id: string; name: string; }
+
+export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation[] }) {
   const utils = trpc.useUtils();
   const { data: departments = [], isLoading } = trpc.department.list.useQuery();
 
@@ -39,12 +41,14 @@ export function DepartmentAdmin() {
   const [newName, setNewName] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [editLocationId, setEditLocationId] = useState<string>("");
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  function startEdit(id: string, currentName: string) {
+  function startEdit(id: string, currentName: string, currentLocationId: string | null) {
     setEditId(id);
     setEditName(currentName);
+    setEditLocationId(currentLocationId ?? "");
   }
 
   function handleCreate(e: FormEvent) {
@@ -54,7 +58,7 @@ export function DepartmentAdmin() {
 
   function handleUpdate(e: FormEvent) {
     e.preventDefault();
-    if (editId && editName.trim()) updateMutation.mutate({ id: editId, name: editName.trim() });
+    if (editId && editName.trim()) updateMutation.mutate({ id: editId, name: editName.trim(), locationId: editLocationId || null });
   }
 
   if (isLoading) {
@@ -112,24 +116,40 @@ export function DepartmentAdmin() {
           {departments.map((dept) => (
             <div key={dept.id} className="flex items-center gap-3 px-4 py-3">
               {editId === dept.id ? (
-                <form onSubmit={handleUpdate} className="flex flex-1 items-center gap-2">
-                  <Input
-                    autoFocus
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    className="h-8"
-                  />
-                  <Button type="submit" size="sm" disabled={updateMutation.isPending}>
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button type="button" size="sm" variant="ghost" onClick={() => setEditId(null)}>
-                    <X className="h-4 w-4" />
-                  </Button>
+                <form onSubmit={handleUpdate} className="flex flex-1 flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      autoFocus
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="h-8 flex-1"
+                      placeholder="Avdelingsnavn"
+                    />
+                    <select
+                      value={editLocationId}
+                      onChange={(e) => setEditLocationId(e.target.value)}
+                      className="h-8 rounded-md border border-input bg-background px-2 text-sm flex-1"
+                    >
+                      <option value="">Ingen lokasjon</option>
+                      {locations.map((l) => (
+                        <option key={l.id} value={l.id}>{l.name}</option>
+                      ))}
+                    </select>
+                    <Button type="submit" size="sm" disabled={updateMutation.isPending}>
+                      <Check className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" size="sm" variant="ghost" onClick={() => setEditId(null)}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </form>
               ) : (
                 <>
                   <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <span className="flex-1 text-sm font-medium">{dept.name}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{dept.name}</p>
+                    {dept.location && <p className="text-xs text-muted-foreground">{dept.location.name}</p>}
+                  </div>
                   <Badge variant="secondary" className="text-xs">
                     {dept._count.employees} ansatte
                   </Badge>
@@ -137,7 +157,7 @@ export function DepartmentAdmin() {
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => startEdit(dept.id, dept.name)}
+                    onClick={() => startEdit(dept.id, dept.name, dept.location?.id ?? null)}
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
