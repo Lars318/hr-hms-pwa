@@ -1,4 +1,3 @@
-import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 
@@ -17,10 +16,28 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid input" }, { status: 400 });
   }
 
-  const admin = createAdminClient();
-  const { data, error } = await admin.auth.admin.updateUserById(supabaseUserId, { password });
-  if (error) return Response.json({ error: error.message, code: error.status, details: JSON.stringify(error) }, { status: 500 });
-  if (!data?.user) return Response.json({ error: "no user returned" }, { status: 500 });
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    return Response.json({ error: "missing env vars" }, { status: 500 });
+  }
+
+  // Call GoTrue Admin API directly
+  const res = await fetch(`${supabaseUrl}/auth/v1/admin/users/${supabaseUserId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${serviceRoleKey}`,
+      "apikey": serviceRoleKey,
+    },
+    body: JSON.stringify({ password }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    return Response.json({ error: err.msg ?? err.message ?? `GoTrue error ${res.status}` }, { status: res.status });
+  }
 
   return Response.json({ ok: true });
 }
