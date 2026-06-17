@@ -18,8 +18,9 @@ export async function POST(request: Request) {
   }
 
   const admin = createAdminClient();
-  const { error } = await admin.auth.admin.updateUserById(supabaseUserId, { password });
-  if (error) return Response.json({ error: error.message }, { status: 500 });
+  const { data, error } = await admin.auth.admin.updateUserById(supabaseUserId, { password });
+  if (error) return Response.json({ error: error.message, code: error.status, details: JSON.stringify(error) }, { status: 500 });
+  if (!data?.user) return Response.json({ error: "no user returned" }, { status: 500 });
 
   return Response.json({ ok: true });
 }
