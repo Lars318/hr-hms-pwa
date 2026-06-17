@@ -13,14 +13,25 @@ export default function UpdatePasswordPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Supabase setter session fra hash-fragment automatisk via onAuthStateChange
     const supabase = createClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+
+    // Parse access_token from hash and set session manually
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+
+    if (accessToken && refreshToken) {
+      supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken }).then(() => {
         setReady(true);
-      }
-    });
-    return () => subscription.unsubscribe();
+      });
+    } else {
+      // Fallback: listen for PASSWORD_RECOVERY event
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "PASSWORD_RECOVERY") setReady(true);
+      });
+      return () => subscription.unsubscribe();
+    }
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
