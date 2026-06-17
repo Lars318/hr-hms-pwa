@@ -32,7 +32,7 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Offentlige ruter som ikke krever innlogging
-  const publicPaths = ["/login", "/auth/callback", "/api/health"];
+  const publicPaths = ["/login", "/auth/callback", "/api/health", "/api/debug/public-env"];
   const isPublic = publicPaths.some((p) => pathname.startsWith(p));
 
   if (!user && !isPublic) {
