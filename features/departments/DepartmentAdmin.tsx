@@ -65,7 +65,7 @@ export function DepartmentAdmin() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">{departments.length} avdelinger</p>
-        {!showCreate && (
+        {!showCreate && departments.length > 0 && (
           <Button size="sm" onClick={() => setShowCreate(true)}>
             <Plus className="h-4 w-4 mr-1" /> Ny avdeling
           </Button>
