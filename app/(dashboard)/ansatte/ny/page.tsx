@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
-import { EmployeeForm } from "@/features/employees/EmployeeForm";
+import { EmployeeCreateForm } from "@/features/employees/EmployeeCreateForm";
 
 export const metadata = { title: "Ny ansatt – HR/HMS" };
 
@@ -29,18 +29,12 @@ export default async function NyAnsattPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Ny ansatt</h1>
           <p className="text-sm text-muted-foreground">
-            Opprett profil for en bruker som allerede er opprettet i Supabase Auth.
+            Opprett bruker og profil i ett steg.
           </p>
         </div>
       </div>
 
-      <div className="rounded-md border bg-muted/30 p-4 text-sm text-muted-foreground space-y-1">
-        <p className="font-medium text-foreground">Viktig</p>
-        <p>Brukeren må først opprettes i Supabase Auth (Authentication → Users).</p>
-        <p>Kopier brukerens UUID og e-post herfra og lim inn nedenfor.</p>
-      </div>
-
-      <EmployeeForm departments={departments} mode="create" />
+      <EmployeeCreateForm departments={departments} />
     </div>
   );
 }
