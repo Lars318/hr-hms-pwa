@@ -211,7 +211,7 @@ export function Sidebar({ role }: SidebarProps) {
         <span className="text-sm font-semibold tracking-tight">HR / HMS</span>
       </div>
 
-      <nav className="flex-1 space-y-1 p-3">
+      <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
         {visible.map(({ href, label, icon: Icon }) => {
           const isActive =
             pathname === href ||
