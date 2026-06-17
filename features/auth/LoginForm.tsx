@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +21,14 @@ export function LoginForm() {
   const router = useRouter();
   const supabase = createClient();
   const [serverError, setServerError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const hash = window.location.hash;
+    if (hash.includes("type=recovery")) {
+      router.replace("/auth/update-password" + hash);
+    }
+  }, [router]);
 
   const {
     register,
