@@ -44,7 +44,8 @@ export function ResetPasswordForm({ profiles }: { profiles: Profile[] }) {
       setPassword("");
       setConfirm("");
     } else {
-      setStatus({ ok: false, message: data.error ?? "Noe gikk galt." });
+      const debug = data.debug ? ` [status=${data.debug.status} proj=${data.debug.urlProject}]` : "";
+      setStatus({ ok: false, message: (data.error ?? "Noe gikk galt.") + debug });
     }
   }
 
