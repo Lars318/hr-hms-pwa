@@ -28,10 +28,11 @@ export const profileRouter = router({
         role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]).optional(),
         status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
         departmentId: z.string().optional(),
+        locationId: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { search, role, status, departmentId } = input;
+      const { search, role, status, departmentId, locationId } = input;
       return ctx.db.profile.findMany({
         where: {
           ...(search
@@ -45,8 +46,19 @@ export const profileRouter = router({
           ...(role ? { role } : {}),
           ...(status ? { status } : {}),
           ...(departmentId ? { departmentId } : {}),
+          ...(locationId
+            ? { profileAssignments: { some: { locationId, endDate: null } } }
+            : {}),
         },
-        include: { department: true, manager: { select: { id: true, fullName: true } } },
+        include: {
+          department: true,
+          manager: { select: { id: true, fullName: true } },
+          profileAssignments: {
+            where: { isPrimary: true, endDate: null },
+            include: { location: { select: { id: true, name: true, city: true } } },
+            take: 1,
+          },
+        },
         orderBy: { fullName: "asc" },
       });
     }),

@@ -18,7 +18,10 @@ export default async function AnsattePage() {
     redirect("/ingen-tilgang");
   }
 
-  const departments = await db.department.findMany({ orderBy: { name: "asc" } });
+  const [departments, locations] = await Promise.all([
+    db.department.findMany({ orderBy: { name: "asc" } }),
+    db.location.findMany({ orderBy: { name: "asc" } }),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -35,7 +38,7 @@ export default async function AnsattePage() {
         </Button>
       </div>
 
-      <EmployeeListClient departments={departments} />
+      <EmployeeListClient departments={departments} locations={locations} />
     </div>
   );
 }
