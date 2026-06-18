@@ -29,7 +29,7 @@ export function AnnouncementList() {
 
   return (
     <div className="space-y-3">
-      {announcements.map((a) => (
+      {announcements.map((a: (typeof announcements)[number]) => (
         <div key={a.id} className="rounded-xl border bg-card p-4 space-y-1.5">
           <div className="flex items-start justify-between gap-2">
             <p className="font-semibold text-sm leading-snug">{a.title}</p>
