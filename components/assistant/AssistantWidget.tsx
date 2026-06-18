@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { X, Send, Loader2 } from "lucide-react";
+import { X, Send, Loader2, AlertCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
 import { AssistantMessage } from "./AssistantMessage";
 import { AssistantSources } from "./AssistantSources";
@@ -11,16 +11,16 @@ import { cn } from "@/lib/utils";
 interface Message {
   role: "user" | "assistant";
   content: string;
-  usedAi?: boolean;
-  sources?: { title: string; content: string }[];
-  suggestedLinks?: { label: string; href: string }[];
+  sources?: { title: string; href?: string; type: "route" | "static" | "handbook" | "document" }[];
+  suggestedLinks?: { label: string; href: string; description?: string }[];
+  confidence?: "high" | "medium" | "low";
 }
 
 const STARTER_QUESTIONS = [
-  "Hvor mange egenmeldingsdager har jeg?",
-  "Hvordan søker jeg om ferie?",
-  "Hva gjør jeg ved et HMS-avvik?",
-  "Hva er rutinen for overtid?",
+  "Hvor melder jeg avvik?",
+  "Hvordan registrerer jeg fravær?",
+  "Hvor finner jeg personalhåndboken?",
+  "Hvordan varsler jeg om kritikkverdige forhold?",
 ];
 
 interface AssistantWidgetProps {
@@ -30,30 +30,36 @@ interface AssistantWidgetProps {
 export function AssistantWidget({ onClose }: AssistantWidgetProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const ask = trpc.assistant.ask.useMutation({
-    onSuccess(data, variables) {
+    onSuccess(data) {
+      setError(null);
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
           content: data.answer,
-          usedAi: data.usedAi,
           sources: data.sources,
           suggestedLinks: data.suggestedLinks,
+          confidence: data.confidence,
         },
       ]);
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+    },
+    onError() {
+      setError("Noe gikk galt. Prøv igjen.");
     },
   });
 
   function sendQuestion(q: string) {
     if (!q.trim() || ask.isPending) return;
-    const question = q.trim();
+    const message = q.trim();
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: question }]);
-    ask.mutate({ question });
+    setError(null);
+    setMessages((prev) => [...prev, { role: "user", content: message }]);
+    ask.mutate({ message });
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
   }
 
@@ -65,7 +71,7 @@ export function AssistantWidget({ onClose }: AssistantWidgetProps) {
       <div className="flex items-center justify-between px-4 py-3 border-b bg-card shrink-0">
         <div>
           <p className="font-semibold text-sm">HMS/HR-assistent</p>
-          <p className="text-xs text-muted-foreground">Basert på personalhåndboken</p>
+          <p className="text-xs text-muted-foreground">Veiledning basert på interne rutiner</p>
         </div>
         <button
           onClick={onClose}
@@ -98,28 +104,19 @@ export function AssistantWidget({ onClose }: AssistantWidgetProps) {
         )}
 
         {messages.map((msg, i) => {
-          const isLastAssistant =
-            msg.role === "assistant" && msg === lastAssistantMsg;
+          const isLastAssistant = msg.role === "assistant" && msg === lastAssistantMsg;
           return (
             <div key={i}>
-              <AssistantMessage
-                role={msg.role}
-                content={msg.content}
-                usedAi={msg.usedAi}
-              />
+              <AssistantMessage role={msg.role} content={msg.content} />
               {isLastAssistant && (
-                <>
-                  {msg.sources && msg.sources.length > 0 && (
-                    <div className="ml-9 mt-1">
-                      <AssistantSources sources={msg.sources} />
-                    </div>
-                  )}
+                <div className="ml-9 mt-2 space-y-2">
                   {msg.suggestedLinks && msg.suggestedLinks.length > 0 && (
-                    <div className="ml-9 mt-1">
-                      <AssistantSuggestedLinks links={msg.suggestedLinks} />
-                    </div>
+                    <AssistantSuggestedLinks links={msg.suggestedLinks} />
                   )}
-                </>
+                  {msg.sources && msg.sources.length > 0 && (
+                    <AssistantSources sources={msg.sources} />
+                  )}
+                </div>
               )}
             </div>
           );
@@ -131,8 +128,15 @@ export function AssistantWidget({ onClose }: AssistantWidgetProps) {
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             </div>
             <div className="rounded-2xl rounded-tl-sm bg-muted px-4 py-3 text-sm text-muted-foreground">
-              Tenker…
+              Ser etter svar…
             </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="flex items-center gap-2 rounded-xl bg-destructive/10 px-3 py-2.5 text-sm text-destructive">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {error}
           </div>
         )}
 
@@ -140,7 +144,7 @@ export function AssistantWidget({ onClose }: AssistantWidgetProps) {
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t bg-card shrink-0">
+      <div className="px-4 py-3 border-t bg-card shrink-0 space-y-2">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -170,8 +174,8 @@ export function AssistantWidget({ onClose }: AssistantWidgetProps) {
             <Send className="h-4 w-4" />
           </button>
         </form>
-        <p className="text-[10px] text-muted-foreground text-center mt-2">
-          Kun veiledning — ikke juridisk rådgivning
+        <p className="text-[10px] text-muted-foreground text-center leading-snug">
+          Assistenten er veiledende og basert på interne lenker/rutiner. Kontakt leder eller HR ved usikkerhet.
         </p>
       </div>
     </div>

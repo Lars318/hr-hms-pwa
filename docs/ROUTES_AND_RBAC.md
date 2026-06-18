@@ -104,3 +104,18 @@ Tilsvarende mapping som Sidebar, filtrert per rolle.
 ---
 
 *Sist oppdatert: 2026-06-14*
+
+---
+
+## Assistent – rollebasert rutekart
+
+Assistenten bruker `server/assistant/routeMap.ts` for å filtrere lenkeforslag etter brukerens rolle.
+
+| Rute | Roller |
+|---|---|
+| Dashboard, avvik, fravær, overtid, håndbok, dokumenter, varsling, personvern, kontrakter, opplæring, kjemikalier, risiko | Alle |
+| Ansatte, rapporter, overtid godkjenning, sykefraværsoppfølging | MANAGER, HR, ADMIN |
+| Kontrakter admin, onboarding-admin, compliance, varslingssaker | HR, ADMIN |
+| Systemstatus, avdelinger, håndbok-admin | ADMIN |
+
+Assistenten foreslår aldri lenker brukeren ikke har rolle til.

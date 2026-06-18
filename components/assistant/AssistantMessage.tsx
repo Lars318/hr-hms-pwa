@@ -6,10 +6,21 @@ import { Bot, User } from "lucide-react";
 interface AssistantMessageProps {
   role: "user" | "assistant";
   content: string;
-  usedAi?: boolean;
 }
 
-export function AssistantMessage({ role, content, usedAi }: AssistantMessageProps) {
+function renderMarkdown(text: string) {
+  // Basic bold (**text**) support
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? (
+      <strong key={i}>{part.slice(2, -2)}</strong>
+    ) : (
+      <span key={i}>{part}</span>
+    )
+  );
+}
+
+export function AssistantMessage({ role, content }: AssistantMessageProps) {
   const isUser = role === "user";
 
   return (
@@ -22,16 +33,13 @@ export function AssistantMessage({ role, content, usedAi }: AssistantMessageProp
       </div>
 
       <div className={cn(
-        "max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap",
+        "max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
         isUser
-          ? "bg-primary text-primary-foreground rounded-tr-sm"
+          ? "bg-primary text-primary-foreground rounded-tr-sm whitespace-pre-wrap"
           : "bg-muted text-foreground rounded-tl-sm"
       )}>
-        {content}
-        {!isUser && usedAi === false && (
-          <p className="mt-2 text-[10px] text-muted-foreground opacity-60">
-            Regelbasert svar (AI ikke aktivert)
-          </p>
+        {isUser ? content : (
+          <p className="whitespace-pre-wrap">{renderMarkdown(content)}</p>
         )}
       </div>
     </div>

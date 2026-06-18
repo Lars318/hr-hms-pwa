@@ -1,17 +1,26 @@
 "use client";
 
 import { BookOpen, ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface Source {
   title: string;
-  content: string;
+  href?: string;
+  type: "route" | "static" | "handbook" | "document";
 }
 
 interface AssistantSourcesProps {
   sources: Source[];
 }
+
+const TYPE_LABEL: Record<Source["type"], string> = {
+  route: "Side",
+  static: "Intern info",
+  handbook: "Håndbok",
+  document: "Dokument",
+};
 
 export function AssistantSources({ sources }: AssistantSourcesProps) {
   const [open, setOpen] = useState(false);
@@ -30,13 +39,24 @@ export function AssistantSources({ sources }: AssistantSourcesProps) {
       </button>
 
       {open && (
-        <div className="mt-2 space-y-2">
-          {sources.map((s, i) => (
-            <div key={i} className="rounded-lg border bg-background p-3 text-xs">
-              <p className="font-semibold mb-1">{s.title}</p>
-              <p className="text-muted-foreground line-clamp-3">{s.content}</p>
-            </div>
-          ))}
+        <div className="mt-2 space-y-1.5">
+          {sources.map((s, i) =>
+            s.href ? (
+              <Link
+                key={i}
+                href={s.href}
+                className="flex items-center justify-between rounded-lg border bg-background px-3 py-2 text-xs hover:bg-muted transition-colors"
+              >
+                <span className="font-medium">{s.title}</span>
+                <span className="text-muted-foreground ml-2 shrink-0">{TYPE_LABEL[s.type]}</span>
+              </Link>
+            ) : (
+              <div key={i} className="flex items-center justify-between rounded-lg border bg-background px-3 py-2 text-xs">
+                <span className="font-medium">{s.title}</span>
+                <span className="text-muted-foreground ml-2 shrink-0">{TYPE_LABEL[s.type]}</span>
+              </div>
+            )
+          )}
         </div>
       )}
     </div>

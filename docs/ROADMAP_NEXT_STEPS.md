@@ -194,3 +194,14 @@ Disse bør parkeres til separat vurdering og eksplisitt beslutning:
 ---
 
 *Sist oppdatert: 2026-06-15*
+
+---
+
+## Assistent V2 (fremtidig, ikke planlagt)
+
+Dersom regelbasert V1 viser seg å ha for lav treffsikkerhet, kan V2 vurderes med:
+- RAG (Retrieval-Augmented Generation) mot personalhåndbokens seksjoner
+- OpenAI eller selvhostet LLM (Ollama/Mistral)
+- Krav: ny DPIA, DPA med AI-leverandør, og godkjenning fra ledelsen
+
+**V2 skal IKKE bygges uten:** eksplisitt ledelsesbeslutning, DPIA-vurdering, og at piloten har vist behov.

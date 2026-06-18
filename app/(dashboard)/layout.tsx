@@ -40,8 +40,8 @@ export default async function DashboardLayout({
       {/* BottomNav — kun synlig under lg */}
       <BottomNav role={role} />
 
-      {/* Global AI-assistent */}
-      <AssistantButton />
+      {/* Global assistent — skjult hvis ASSISTANT_ENABLED=false */}
+      {process.env.ASSISTANT_ENABLED !== "false" && <AssistantButton />}
     </div>
   );
 }

@@ -199,3 +199,23 @@ Kontaktpunkt: Datatilsynet – [www.datatilsynet.no](https://www.datatilsynet.no
 ---
 
 *Sist oppdatert: 2026-06-14*
+
+---
+
+## Regelbasert veiledningsassistent – personvernvurdering
+
+**Løsning:** Ren regelbasert assistent (V1) uten ekstern AI-provider.
+
+| Punkt | Status |
+|---|---|
+| Ekstern AI-tjeneste brukes | ❌ Nei |
+| Data sendes til tredjepart | ❌ Nei |
+| Samtaler lagres i database | ❌ Nei |
+| Sensitive moduler brukes som datakilde | ❌ Nei (guard blokkerer) |
+| Brukeren kan stille sensitive spørsmål | Ja, men guard returnerer standardsvar |
+| DPIA-krav | Ikke aktuelt i V1 (ingen databehandler) |
+
+**Sensitive moduler assistenten IKKE kan hente fra:**
+PersonnelCase, EmployeeReview, Contract (innhold), SignatureRequest, WhistleblowingCase, LeaveRequest-detaljer, Overtime-detaljer, Incident fritekst, kommentarer, audit-logg.
+
+**Dataminimering:** Assistenten henter kun rolle fra brukerens profil (for rollefiltrering). Ingen andre personopplysninger behandles i assistentflyten.

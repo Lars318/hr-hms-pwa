@@ -537,3 +537,29 @@
 ---
 
 *Sist oppdatert: 2026-06-15*
+
+---
+
+## 27. Regelbasert veiledningsassistent V1 (Steg 31A)
+
+**Status:** ✅ Ferdig
+
+- Global assistentknapp nederst til høyre på alle innloggede sider
+- Chat-widget med starter-spørsmål, svar, snarveier og kildeliste
+- Ren regelbasert motor — **ingen OpenAI, ingen ekstern AI-tjeneste**
+- Keyword-matching med scoring mot 15+ predefinerte Q&A-par og 30+ ruter
+- Rollebasert filtrering: lenker/svar tilpasses brukerens rolle (EMPLOYEE/MANAGER/HR/ADMIN)
+- Sensitiv-guard: blokkerer spørsmål om personalsaker, kontrakter, varslingssaker m.m.
+- Fallback ved lav confidence: lenker til håndbok, dokumenter og "kontakt HR"
+- Ingen samtaler lagres i database
+- Aktiveres med `ASSISTANT_ENABLED=true` (standard aktivert)
+- `usedAi` er alltid `false` i V1
+
+**Nøkkelfiler:**
+- `server/assistant/routeMap.ts` — rollefiltrert rutekart (30+ ruter)
+- `server/assistant/matcher.ts` — keyword-matcher + predefinerte Q&A
+- `server/assistant/provider.ts` — fasade som kaller matcher
+- `server/routers/assistant.ts` — tRPC `ask`-mutation
+- `components/assistant/` — 5 UI-komponenter
+
+*Sist oppdatert: 2026-06-18*
