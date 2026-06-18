@@ -156,6 +156,12 @@ enum TimeBankAdjustmentReason {
   MANUAL
 }
 
+enum AnnouncementTarget {
+  ALL
+  DEPARTMENT
+  LOCATION
+}
+
 enum LeaveRequestType {
   VACATION
   SICK_LEAVE
@@ -359,6 +365,7 @@ model Profile {
 
   inspectionRecords InspectionRecord[] @relation("InspectionPerformedBy")
 
+  announcements           Announcement[]           @relation("AnnouncementAuthor")
   sickLeaveCases          SickLeaveCase[]          @relation("SickLeaveCaseEmployee")
   sickLeaveStepsCompleted SickLeaveFollowUpStep[]   @relation("StepCompletedBy")
   employmentRecords       EmploymentRecord[]        @relation("EmploymentRecordProfile")
@@ -1492,4 +1499,26 @@ model SentAlert {
 
   @@unique([type, entityId, year])
   @@index([type])
+}
+
+// ─── Kunngjøringer ────────────────────────────────────────────────────────────
+
+model Announcement {
+  id           String               @id @default(cuid())
+  title        String
+  body         String
+  target       AnnouncementTarget   @default(ALL)
+  departmentId String?
+  locationId   String?
+  publishedAt  DateTime             @default(now())
+  expiresAt    DateTime?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  author   Profile @relation("AnnouncementAuthor", fields: [authorId], references: [id])
+  authorId String
+
+  @@index([authorId])
+  @@index([publishedAt])
+  @@index([target])
 }
