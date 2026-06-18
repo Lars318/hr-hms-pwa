@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/lib/toast";
 
 const OVERTIME_TYPE_LABELS: Record<string, string> = {
-  OVERTIME: "Overtid (utbetales)",
-  TIME_OFF: "Avspasering (trekk fra timebank)",
+  OVERTIME: "Overtid",
+  TIME_OFF: "Avspasering",
   ON_CALL: "Beredskapsvakt",
-  TRAVEL_TIME: "Reisetid utenom arbeidstid",
+  TRAVEL_TIME: "Reisetid",
 };
 
 const STATUS_LABELS: Record<string, string> = {

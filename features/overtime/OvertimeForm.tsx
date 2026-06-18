@@ -14,10 +14,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/lib/toast";
 
 const OVERTIME_TYPE_LABELS: Record<string, string> = {
-  OVERTIME: "Overtid (utbetales)",
-  TIME_OFF: "Avspasering (trekk fra timebank)",
+  OVERTIME: "Overtid",
+  TIME_OFF: "Avspasering",
   ON_CALL: "Beredskapsvakt",
-  TRAVEL_TIME: "Reisetid utenom arbeidstid",
+  TRAVEL_TIME: "Reisetid",
 };
 
 const schema = z.object({
@@ -85,23 +85,22 @@ export function OvertimeForm({ mode, existing }: OvertimeFormProps) {
   const serverError = createMutation.error?.message ?? updateMutation.error?.message;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-lg space-y-5">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label htmlFor="date">Dato *</Label>
-          <Input id="date" type="date" {...register("date")} />
-          {errors.date && <p className="text-xs text-destructive">{errors.date.message}</p>}
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="hours">Timer *</Label>
-          <Input id="hours" type="number" step="0.5" min="0.5" max="24" {...register("hours")} />
-          {errors.hours && <p className="text-xs text-destructive">{errors.hours.message}</p>}
-        </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="date">Dato *</Label>
+        <Input id="date" type="date" className="h-12 text-base" {...register("date")} />
+        {errors.date && <p className="text-xs text-destructive">{errors.date.message}</p>}
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-2">
+        <Label htmlFor="hours">Timer *</Label>
+        <Input id="hours" type="number" step="0.5" min="0.5" max="24" className="h-12 text-base" {...register("hours")} />
+        {errors.hours && <p className="text-xs text-destructive">{errors.hours.message}</p>}
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="type">Type *</Label>
-        <Select id="type" {...register("type")}>
+        <Select id="type" className="h-12 text-base" {...register("type")}>
           {Object.entries(OVERTIME_TYPE_LABELS).map(([v, l]) => (
             <option key={v} value={v}>{l}</option>
           ))}
@@ -109,12 +108,13 @@ export function OvertimeForm({ mode, existing }: OvertimeFormProps) {
         {errors.type && <p className="text-xs text-destructive">{errors.type.message}</p>}
       </div>
 
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Label htmlFor="description">Beskrivelse (valgfritt)</Label>
         <Textarea
           id="description"
-          rows={3}
+          rows={4}
           placeholder="Beskriv hva arbeidet gjaldt"
+          className="text-base resize-none"
           {...register("description")}
         />
         {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
@@ -123,10 +123,10 @@ export function OvertimeForm({ mode, existing }: OvertimeFormProps) {
       {serverError && <p className="text-sm text-destructive">{serverError}</p>}
 
       <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Lagrer…" : mode === "create" ? "Lagre utkast" : "Lagre endringer"}
+        <Button type="submit" disabled={isSubmitting} className="flex-1 h-12 text-base">
+          {isSubmitting ? "Lagrer…" : mode === "create" ? "Lagre" : "Lagre endringer"}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.back()}>
+        <Button type="button" variant="outline" className="h-12 px-6" onClick={() => router.back()}>
           Avbryt
         </Button>
       </div>

@@ -109,42 +109,41 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
   const serverError = createMutation.error?.message ?? updateMutation.error?.message;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="max-w-lg space-y-5">
-      <div className="space-y-1">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="space-y-2">
         <Label htmlFor="type">Type fravær *</Label>
-        <Select id="type" {...register("type")}>
+        <Select id="type" className="h-12 text-base" {...register("type")}>
           {(Object.entries(LEAVE_TYPE_LABELS) as [LeaveRequestType, string][]).map(([v, l]) => (
             <option key={v} value={v}>{l}</option>
           ))}
         </Select>
         {errors.type && <p className="text-xs text-destructive">{errors.type.message}</p>}
         {isEgenmelding && (
-          <p className="text-xs text-muted-foreground bg-muted rounded p-2">
+          <p className="text-xs text-muted-foreground bg-muted rounded-lg p-3">
             Egenmelding teller alltid som 3 dager, uavhengig av faktisk varighet. Du har inntil 4 egenmeldinger per kalenderår.
           </p>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label htmlFor="startDate">Fra dato *</Label>
-          <Input id="startDate" type="date" {...register("startDate")} />
-          {errors.startDate && <p className="text-xs text-destructive">{errors.startDate.message}</p>}
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="endDate">Til dato *</Label>
-          <Input id="endDate" type="date" {...register("endDate")} />
-          {errors.endDate && <p className="text-xs text-destructive">{errors.endDate.message}</p>}
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="startDate">Fra dato *</Label>
+        <Input id="startDate" type="date" className="h-12 text-base" {...register("startDate")} />
+        {errors.startDate && <p className="text-xs text-destructive">{errors.startDate.message}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="endDate">Til dato *</Label>
+        <Input id="endDate" type="date" className="h-12 text-base" {...register("endDate")} />
+        {errors.endDate && <p className="text-xs text-destructive">{errors.endDate.message}</p>}
       </div>
 
       {locations.length > 0 && (
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label htmlFor="locationId">Lokasjon (valgfritt)</Label>
           <select
             id="locationId"
             {...register("locationId")}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-base"
           >
             <option value="">Ikke spesifisert</option>
             {locations.map((l) => (
@@ -154,13 +153,14 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
         </div>
       )}
 
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Label htmlFor="reason">
           Begrunnelse {needsReason ? "*" : "(valgfritt)"}
         </Label>
         <Textarea
           id="reason"
-          rows={3}
+          rows={4}
+          className="text-base resize-none"
           placeholder={needsReason ? "Begrunnelse er påkrevd for denne typen fravær" : "Legg til begrunnelse hvis ønskelig"}
           {...register("reason")}
         />
@@ -170,10 +170,10 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
       {serverError && <p className="text-sm text-destructive">{serverError}</p>}
 
       <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className="flex-1 h-12 text-base">
           {isSubmitting ? "Sender…" : mode === "create" ? "Send søknad" : "Lagre endringer"}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.back()}>
+        <Button type="button" variant="outline" className="h-12 px-6" onClick={() => router.back()}>
           Avbryt
         </Button>
       </div>

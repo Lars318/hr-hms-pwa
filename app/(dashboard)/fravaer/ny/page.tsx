@@ -17,16 +17,14 @@ export default async function NyFravaerPage() {
   if (!profile) redirect("/ingen-tilgang");
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/fravaer">
-            <ArrowLeft className="h-4 w-4 mr-1" /> Tilbake
-          </Link>
+    <div className="space-y-6 max-w-lg mx-auto">
+      <div>
+        <Button variant="ghost" size="sm" asChild className="-ml-2">
+          <Link href="/fravaer"><ArrowLeft className="h-4 w-4 mr-1" /> Tilbake</Link>
         </Button>
-        <div>
+        <div className="text-center mt-3">
           <h1 className="text-2xl font-bold tracking-tight">Ny fraværssøknad</h1>
-          <p className="text-sm text-muted-foreground">Fyll ut skjemaet og send søknaden til godkjenning.</p>
+          <p className="text-sm text-muted-foreground mt-1">Fyll ut skjemaet og send søknaden til godkjenning.</p>
         </div>
       </div>
 

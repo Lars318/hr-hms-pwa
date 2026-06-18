@@ -1,49 +1,53 @@
 "use client";
 
 import { trpc } from "@/lib/trpc/client";
-import { CalendarDays, HeartHandshake, ClipboardList } from "lucide-react";
+import { CalendarDays, HeartHandshake, FileCheck } from "lucide-react";
 
 function BalanceCard({
   icon: Icon,
   label,
-  used,
+  remaining,
   total,
   unit,
   subtitle,
-  color,
+  iconBg,
+  iconColor,
+  barColor,
 }: {
   icon: React.ElementType;
   label: string;
-  used: number;
+  remaining: number;
   total: number;
   unit: string;
   subtitle?: string;
-  color: string;
+  iconBg: string;
+  iconColor: string;
+  barColor: string;
 }) {
-  const remaining = Math.max(0, total - used);
-  const pct = total > 0 ? Math.min(100, (used / total) * 100) : 0;
+  const pct = total > 0 ? Math.min(100, ((total - remaining) / total) * 100) : 0;
 
   return (
-    <div className="rounded-lg border bg-card p-4 space-y-3">
-      <div className="flex items-center gap-2">
-        <div className={`rounded-md p-1.5 ${color}`}>
-          <Icon className="h-4 w-4" />
+    <div className="rounded-xl border bg-card p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${iconBg}`}>
+          <Icon className={`h-5 w-5 ${iconColor}`} />
         </div>
-        <p className="text-sm font-medium">{label}</p>
+        <span className="text-xs text-muted-foreground">{label}</span>
       </div>
 
-      <div className="space-y-1">
-        <div className="flex items-end justify-between">
-          <span className="text-2xl font-bold">{remaining}</span>
-          <span className="text-xs text-muted-foreground mb-1">av {total} {unit} igjen</span>
+      <div>
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-3xl font-bold tracking-tight">{remaining}</span>
+          <span className="text-sm text-muted-foreground">av {total} {unit} igjen</span>
         </div>
-        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all ${pct >= 100 ? "bg-destructive" : "bg-primary"}`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-        {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+        {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+      </div>
+
+      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all ${pct >= 100 ? "bg-destructive" : barColor}`}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );
@@ -54,9 +58,9 @@ export function LeaveBalanceCards() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="rounded-lg border bg-card p-4 h-28 animate-pulse bg-muted/40" />
+          <div key={i} className="rounded-xl border bg-card p-4 h-32 animate-pulse bg-muted/40" />
         ))}
       </div>
     );
@@ -65,31 +69,37 @@ export function LeaveBalanceCards() {
   if (!data) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div className="grid grid-cols-3 gap-3">
       <BalanceCard
-        icon={ClipboardList}
+        icon={FileCheck}
         label="Egenmelding"
-        used={data.egenmelding.instancesUsed}
+        remaining={data.egenmelding.instancesRemaining}
         total={data.egenmelding.maxInstances}
-        unit="instanser"
-        subtitle={`${data.egenmelding.daysUsed} av ${data.egenmelding.maxInstances * data.egenmelding.daysPerInstance} dager brukt`}
-        color="bg-teal-100 text-teal-700"
+        unit="egenmeldinger"
+        subtitle={`${data.egenmelding.daysUsed} av ${data.egenmelding.maxInstances * data.egenmelding.daysPerInstance} dager`}
+        iconBg="bg-teal-500/20"
+        iconColor="text-teal-400"
+        barColor="bg-teal-500"
       />
       <BalanceCard
         icon={HeartHandshake}
         label="Omsorgsfravær"
-        used={data.omsorgsfravær.daysUsed}
+        remaining={data.omsorgsfravær.daysRemaining}
         total={data.omsorgsfravær.quota}
         unit="dager"
-        color="bg-purple-100 text-purple-700"
+        iconBg="bg-purple-500/20"
+        iconColor="text-purple-400"
+        barColor="bg-purple-500"
       />
       <BalanceCard
         icon={CalendarDays}
         label="Ferie"
-        used={data.ferie.daysUsed}
+        remaining={data.ferie.daysRemaining}
         total={data.ferie.quota}
         unit="dager"
-        color="bg-blue-100 text-blue-700"
+        iconBg="bg-blue-500/20"
+        iconColor="text-blue-400"
+        barColor="bg-blue-500"
       />
     </div>
   );
