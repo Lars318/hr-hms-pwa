@@ -130,10 +130,13 @@ export const leaveRequestRouter = router({
         resolvedLocationId = primary?.locationId ?? null;
       }
 
+      // Egenmelding auto-godkjennes — ingen godkjenning kreves juridisk
+      const isEgenmelding = input.type === "EGENMELDING";
+
       const req = await db.leaveRequest.create({
         data: {
           type: input.type,
-          status: "PENDING",
+          status: isEgenmelding ? "APPROVED" : "PENDING",
           startDate: start,
           endDate: end,
           days,
@@ -149,13 +152,39 @@ export const leaveRequestRouter = router({
         data: {
           entityType: "LeaveRequest",
           entityId: req.id,
-          action: "LEAVE_REQUEST_CREATED",
+          action: isEgenmelding ? "LEAVE_REQUEST_AUTO_APPROVED" : "LEAVE_REQUEST_CREATED",
           actorId: profile.id,
           metadata: { type: req.type, startDate: req.startDate, endDate: req.endDate, days },
         },
       });
 
-      // Varsle leder for avdelingen; fall back til HR/ADMIN
+      // Egenmelding: varsle kun leder/HR for info — ingen godkjenning kreves
+      if (isEgenmelding) {
+        const target = req.departmentId
+          ? createNotificationsForDepartment({
+              db,
+              departmentId: req.departmentId,
+              roles: ["MANAGER"],
+              type: "LEAVE_REQUEST_CREATED",
+              title: "Egenmelding registrert",
+              message: `${profile.fullName} er syk i dag (egenmelding, automatisk godkjent).`,
+              linkUrl: `/fravaer/${req.id}`,
+              excludeProfileId: profile.id,
+            })
+          : createNotificationsForRoles({
+              db,
+              roles: ["ADMIN", "HR"],
+              type: "LEAVE_REQUEST_CREATED",
+              title: "Egenmelding registrert",
+              message: `${profile.fullName} er syk i dag (egenmelding, automatisk godkjent).`,
+              linkUrl: `/fravaer/${req.id}`,
+              excludeProfileId: profile.id,
+            });
+        await target;
+        return req;
+      }
+
+      // Andre fraværstyper: varsle leder/HR om godkjenning
       if (req.departmentId) {
         await createNotificationsForDepartment({
           db,

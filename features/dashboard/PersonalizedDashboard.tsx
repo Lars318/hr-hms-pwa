@@ -8,6 +8,7 @@ import { MyTasksList } from "./MyTasksList";
 import { AnnouncementList } from "@/features/announcements/AnnouncementList";
 import { AnnouncementForm } from "@/features/announcements/AnnouncementForm";
 import { QuickEgenmelding } from "./QuickEgenmelding";
+import { NextVacation } from "./NextVacation";
 import { LeaveBalanceCards } from "@/features/leave/LeaveBalanceCards";
 import type { Role } from "@prisma/client";
 
@@ -54,6 +55,7 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms }: Persona
       {tab === "hjem" && (
         <div className="space-y-5">
           <QuickEgenmelding />
+          <NextVacation />
           <LeaveBalanceCards />
           <DashboardClient viewerRole={viewerRole} viewerName={viewerName} isHms={isHms} />
         </div>
