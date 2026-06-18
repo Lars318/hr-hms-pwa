@@ -214,7 +214,7 @@ export function Sidebar({ role }: SidebarProps) {
   return (
     <aside className="hidden lg:flex h-full w-56 flex-col border-r bg-card">
       <div className="flex h-14 items-center border-b px-4">
-        <span className="text-sm font-semibold tracking-tight">HR / HMS</span>
+        <span className="text-sm font-bold tracking-tight text-primary">Pulsfollo</span>
       </div>
 
       <nav className="flex-1 space-y-1 p-3 overflow-y-auto">

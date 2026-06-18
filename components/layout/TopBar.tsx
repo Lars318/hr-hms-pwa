@@ -13,8 +13,8 @@ interface TopBarProps {
 export function TopBar({ email, profileId }: TopBarProps) {
   return (
     <header className="flex h-14 items-center justify-between gap-3 border-b bg-card px-4 lg:px-6">
-      {/* Logo/tittel synlig kun på mobil (sidebar er skjult) */}
-      <span className="text-sm font-semibold tracking-tight lg:hidden">HR / HMS</span>
+      {/* Logo synlig kun på mobil */}
+      <span className="text-sm font-bold tracking-tight lg:hidden text-primary">Pulsfollo</span>
 
       <div className="flex items-center gap-3 ml-auto">
         <PWAInstallPrompt />

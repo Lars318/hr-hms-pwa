@@ -7,18 +7,18 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "HR/HMS Portalen",
-  description: "Intern HR og HMS-løsning",
+  title: "Pulsfollo",
+  description: "HR og HMS for Pulsfollo",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
-    title: "HR/HMS",
+    statusBarStyle: "black-translucent",
+    title: "Pulsfollo",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2563eb",
+  themeColor: "#0d1b2e",
   width: "device-width",
   initialScale: 1,
 };

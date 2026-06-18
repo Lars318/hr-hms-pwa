@@ -1,14 +1,10 @@
-import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
-import { format } from "date-fns";
-import { nb } from "date-fns/locale";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { RoleBadge } from "@/components/shared/RoleBadge";
-import { Separator } from "@/components/ui/separator";
+import { ProfileTabs } from "@/features/employees/ProfileTabs";
 
 interface Props {
   params: { id: string };
@@ -16,7 +12,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const profile = await db.profile.findUnique({ where: { id: params.id } });
-  return { title: profile ? `${profile.fullName} – HR/HMS` : "Ansatt – HR/HMS" };
+  return { title: profile ? `${profile.fullName} – Pulsfollo` : "Ansattprofil – Pulsfollo" };
 }
 
 export default async function AnsattDetaljPage({ params }: Props) {
@@ -26,77 +22,77 @@ export default async function AnsattDetaljPage({ params }: Props) {
 
   const viewer = await db.profile.findUnique({ where: { supabaseUserId: user.id } });
   const isHrAdmin = viewer?.role === "ADMIN" || viewer?.role === "HR";
+  const isOwnProfile = viewer?.id === params.id;
 
-  const profile = await db.profile.findUnique({
-    where: { id: params.id },
-    include: { department: true, manager: { select: { id: true, fullName: true } } },
-  });
+  if (!isHrAdmin && !isOwnProfile) redirect("/ingen-tilgang");
+
+  const [profile, enrollments, documents] = await Promise.all([
+    db.profile.findUnique({
+      where: { id: params.id },
+      include: {
+        department: { select: { name: true } },
+        manager: { select: { id: true, fullName: true } },
+      },
+    }),
+    db.trainingRecord.findMany({
+      where: { profileId: params.id },
+      include: { course: { select: { id: true, title: true } } },
+      orderBy: { completedAt: "desc" },
+    }),
+    db.document.findMany({
+      where: { visibility: "PUBLIC" },
+      select: {
+        id: true, title: true, category: true, version: true,
+        readConfirmations: { where: { profileId: params.id }, select: { id: true } },
+      },
+      orderBy: { title: "asc" },
+      take: 20,
+    }),
+  ]);
 
   if (!profile) notFound();
 
-  // Vanlige ansatte kan kun se sin egen profil
-  if (!isHrAdmin && viewer?.id !== profile.id) redirect("/ingen-tilgang");
+  const courses = enrollments.map((e) => ({
+    id: e.id,
+    title: e.course.title,
+    completedAt: e.completedAt ?? null,
+    expiresAt: e.expiresAt ?? null,
+  }));
+
+  const docs = documents.map((d) => ({
+    id: d.id,
+    title: d.title,
+    category: d.category,
+    version: d.version,
+    confirmed: d.readConfirmations.length > 0,
+  }));
 
   return (
-    <div className="space-y-6 max-w-2xl">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={isHrAdmin ? "/ansatte" : "/dashboard"}>
-            <ArrowLeft className="h-4 w-4 mr-1" /> Tilbake
-          </Link>
-        </Button>
-        {isHrAdmin && (
-          <Button asChild size="sm">
-            <Link href={`/ansatte/${profile.id}/rediger`}>
-              <Pencil className="h-4 w-4 mr-1" /> Rediger
-            </Link>
-          </Button>
-        )}
-      </div>
+    <div className="max-w-lg mx-auto space-y-4">
+      <Button variant="ghost" size="sm" asChild className="-ml-2">
+        <Link href={isHrAdmin ? "/ansatte" : "/dashboard"}>
+          <ArrowLeft className="h-4 w-4 mr-1" /> Tilbake
+        </Link>
+      </Button>
 
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">{profile.fullName}</h1>
-        {profile.title && <p className="text-muted-foreground">{profile.title}</p>}
-        <div className="flex gap-2 mt-2">
-          <RoleBadge role={profile.role} />
-          <StatusBadge status={profile.status} />
-        </div>
-      </div>
-
-      <Separator />
-
-      <dl className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
-        <div>
-          <dt className="text-muted-foreground">E-post</dt>
-          <dd className="font-medium mt-0.5">{profile.email}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Telefon</dt>
-          <dd className="font-medium mt-0.5">{profile.phone ?? "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Avdeling</dt>
-          <dd className="font-medium mt-0.5">{profile.department?.name ?? "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Nærmeste leder</dt>
-          <dd className="font-medium mt-0.5">{profile.manager?.fullName ?? "—"}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">Ansatt dato</dt>
-          <dd className="font-medium mt-0.5">
-            {format(new Date(profile.employedAt), "d. MMMM yyyy", { locale: nb })}
-          </dd>
-        </div>
-        {profile.terminatedAt && (
-          <div>
-            <dt className="text-muted-foreground">Sluttdato</dt>
-            <dd className="font-medium mt-0.5">
-              {format(new Date(profile.terminatedAt), "d. MMMM yyyy", { locale: nb })}
-            </dd>
-          </div>
-        )}
-      </dl>
+      <ProfileTabs
+        profileId={profile.id}
+        fullName={profile.fullName}
+        email={profile.email}
+        phone={profile.phone}
+        title={profile.title}
+        avatarUrl={profile.avatarUrl}
+        role={profile.role}
+        status={profile.status}
+        department={profile.department}
+        manager={profile.manager}
+        employedAt={profile.employedAt}
+        terminatedAt={profile.terminatedAt}
+        courses={courses}
+        documents={docs}
+        canEdit={isHrAdmin}
+        editHref={`/ansatte/${profile.id}/rediger`}
+      />
     </div>
   );
 }
