@@ -26,7 +26,7 @@ export default async function AnsattDetaljPage({ params }: Props) {
 
   if (!isHrAdmin && !isOwnProfile) redirect("/ingen-tilgang");
 
-  const [profile, enrollments, documents] = await Promise.all([
+  const [profile, enrollments, documents, assignments] = await Promise.all([
     db.profile.findUnique({
       where: { id: params.id },
       include: {
@@ -47,6 +47,14 @@ export default async function AnsattDetaljPage({ params }: Props) {
       },
       orderBy: { title: "asc" },
       take: 20,
+    }),
+    db.profileAssignment.findMany({
+      where: { profileId: params.id, endDate: null },
+      include: {
+        location: { select: { id: true, name: true, city: true } },
+        department: { select: { id: true, name: true } },
+      },
+      orderBy: [{ isPrimary: "desc" }, { startDate: "asc" }],
     }),
   ]);
 
@@ -90,6 +98,13 @@ export default async function AnsattDetaljPage({ params }: Props) {
         terminatedAt={profile.terminatedAt}
         courses={courses}
         documents={docs}
+        assignments={assignments.map((a) => ({
+          id: a.id,
+          isPrimary: a.isPrimary,
+          roleLabel: a.roleLabel,
+          location: a.location,
+          department: a.department,
+        }))}
         canEdit={isHrAdmin}
         editHref={`/ansatte/${profile.id}/rediger`}
       />

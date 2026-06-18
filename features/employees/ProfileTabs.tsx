@@ -4,12 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Mail, Phone, Building2, UserCheck, Calendar, GraduationCap, FileText, CheckCircle2 } from "lucide-react";
+import { Mail, Phone, Building2, UserCheck, Calendar, GraduationCap, FileText, CheckCircle2, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RoleBadge } from "@/components/shared/RoleBadge";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { AvatarUpload } from "@/features/profile/AvatarUpload";
 import { EmploymentHistory } from "./EmploymentHistory";
+import { AssignmentManager } from "./AssignmentManager";
 import type { Role, ProfileStatus } from "@prisma/client";
 
 interface Course {
@@ -27,6 +28,14 @@ interface Document {
   confirmed: boolean;
 }
 
+interface Assignment {
+  id: string;
+  isPrimary: boolean;
+  roleLabel: string | null;
+  location: { id: string; name: string; city: string | null };
+  department: { id: string; name: string } | null;
+}
+
 interface ProfileTabsProps {
   profileId: string;
   fullName: string;
@@ -42,6 +51,7 @@ interface ProfileTabsProps {
   terminatedAt: Date | null;
   courses: Course[];
   documents: Document[];
+  assignments: Assignment[];
   canEdit: boolean;
   editHref: string;
 }
@@ -63,7 +73,7 @@ function Initials({ name }: { name: string }) {
 
 export function ProfileTabs({
   profileId, fullName, email, phone, title, avatarUrl, role, status,
-  department, manager, employedAt, terminatedAt, courses, documents,
+  department, manager, employedAt, terminatedAt, courses, documents, assignments,
   canEdit, editHref,
 }: ProfileTabsProps) {
   const [tab, setTab] = useState<Tab>("oversikt");
@@ -138,6 +148,27 @@ export function ProfileTabs({
               label={`Sluttet ${format(new Date(terminatedAt), "d. MMMM yyyy", { locale: nb })}`}
             />
           )}
+          {assignments.length > 0 && (
+            <div className="pt-2 border-t space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Lokasjoner</p>
+              {assignments.map((a) => (
+                <div key={a.id} className="flex items-center gap-3">
+                  <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium">
+                      {a.location.name}{a.location.city ? `, ${a.location.city}` : ""}
+                      {a.isPrimary && <span className="ml-2 text-xs bg-primary/10 text-primary rounded px-1.5 py-0.5">Primær</span>}
+                    </p>
+                    {(a.department || a.roleLabel) && (
+                      <p className="text-xs text-muted-foreground">
+                        {[a.department?.name, a.roleLabel].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -168,7 +199,12 @@ export function ProfileTabs({
 
       {/* Lønn & stilling */}
       {tab === "lonn" && canEdit && (
-        <EmploymentHistory profileId={profileId} />
+        <div className="space-y-6">
+          <EmploymentHistory profileId={profileId} />
+          <div className="rounded-2xl border bg-card p-5">
+            <AssignmentManager profileId={profileId} />
+          </div>
+        </div>
       )}
 
       {/* Dokumenter */}
