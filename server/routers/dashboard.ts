@@ -12,6 +12,60 @@ type FeedEvent = {
 };
 
 export const dashboardRouter = router({
+  // ── myTasks – samlet todo-liste for innlogget bruker ─────────────────────
+  myTasks: profileProcedure.query(async ({ ctx }) => {
+    const { profile, db } = ctx;
+    const now = new Date();
+
+    const [actions, signatures, inspections] = await Promise.all([
+      db.action.findMany({
+        where: { assignedToId: profile.id, status: { notIn: ["DONE", "CANCELLED"] } },
+        select: { id: true, title: true, priority: true, dueDate: true, status: true },
+        orderBy: [{ priority: "desc" }, { dueDate: "asc" }],
+        take: 10,
+      }),
+      db.signatureRequest.findMany({
+        where: { signerId: profile.id, signedAt: null },
+        select: { id: true, contractId: true, contract: { select: { title: true } } },
+        take: 5,
+      }),
+      db.inspectionRecord.findMany({
+        where: { performedById: profile.id, status: "IN_PROGRESS" },
+        select: { id: true, title: true, createdAt: true },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }),
+    ]);
+
+    type Task = { id: string; type: "action" | "signature" | "inspection"; title: string; href: string; overdue: boolean; priority?: string };
+    const tasks: Task[] = [
+      ...actions.map((a) => ({
+        id: a.id,
+        type: "action" as const,
+        title: a.title,
+        href: `/tiltak/${a.id}`,
+        overdue: !!a.dueDate && a.dueDate < now,
+        priority: a.priority,
+      })),
+      ...signatures.map((s) => ({
+        id: s.id,
+        type: "signature" as const,
+        title: `Signer: ${s.contract.title}`,
+        href: `/kontrakter`,
+        overdue: false,
+      })),
+      ...inspections.map((r) => ({
+        id: r.id,
+        type: "inspection" as const,
+        title: r.title,
+        href: `/hms-runde/${r.id}`,
+        overdue: false,
+      })),
+    ];
+
+    return tasks;
+  }),
+
   // ── activityFeed – siste hendelser på tvers ──────────────────────────────
   activityFeed: profileProcedure.query(async ({ ctx }) => {
     const { profile, db } = ctx;

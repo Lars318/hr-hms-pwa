@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
-import { DashboardClient } from "@/features/dashboard/DashboardClient";
+import { PersonalizedDashboard } from "@/features/dashboard/PersonalizedDashboard";
 import { DashboardGreeting } from "@/features/dashboard/DashboardGreeting";
 
 export const metadata = { title: "Dashboard – HR/HMS" };
@@ -21,7 +21,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-2">
       <DashboardGreeting name={profile.fullName} email={profile.email} />
-      <DashboardClient
+      <PersonalizedDashboard
         viewerRole={profile.role}
         viewerName={profile.fullName}
         isHms={isHms}
