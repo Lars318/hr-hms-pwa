@@ -216,11 +216,11 @@ export function HmsRundeChecklist({ record, canEdit }: Props) {
           />
           <Button
             className="w-full"
-            disabled={!allRequiredAnswered || completeRecord.isLoading}
+            disabled={!allRequiredAnswered || completeRecord.isPending}
             onClick={handleComplete}
           >
             <ClipboardCheck className="h-4 w-4 mr-2" />
-            {completeRecord.isLoading ? "Fullfører..." : "Fullfør runde"}
+            {completeRecord.isPending ? "Fullfører..." : "Fullfør runde"}
           </Button>
           {!allRequiredAnswered && (
             <p className="text-xs text-muted-foreground text-center">

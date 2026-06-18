@@ -190,8 +190,8 @@ export function TemplateAdmin({ templates }: Props) {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           <div className="flex gap-2">
-            <Button type="submit" disabled={create.isLoading}>
-              {create.isLoading ? "Lagrer..." : "Opprett mal"}
+            <Button type="submit" disabled={create.isPending}>
+              {create.isPending ? "Lagrer..." : "Opprett mal"}
             </Button>
             <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
               Avbryt

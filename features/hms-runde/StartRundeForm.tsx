@@ -86,8 +86,8 @@ export function StartRundeForm({ templates, locations }: Props) {
 
       {error && <p className="text-sm text-destructive">{error}</p>}
 
-      <Button type="submit" className="w-full" disabled={start.isLoading}>
-        {start.isLoading ? "Starter..." : "Start runde"}
+      <Button type="submit" className="w-full" disabled={start.isPending}>
+        {start.isPending ? "Starter..." : "Start runde"}
       </Button>
     </form>
   );
