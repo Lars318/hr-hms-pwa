@@ -31,7 +31,7 @@ export default async function AnsattDetaljPage({ params }: Props) {
       where: { id: params.id },
       include: {
         department: { select: { name: true } },
-        manager: { select: { id: true, fullName: true } },
+        manager: { select: { id: true, fullName: true, email: true } },
       },
     }),
     db.trainingRecord.findMany({

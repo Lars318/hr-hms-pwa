@@ -46,7 +46,7 @@ interface ProfileTabsProps {
   role: Role;
   status: ProfileStatus;
   department: { name: string } | null;
-  manager: { id: string; fullName: string } | null;
+  manager: { id: string; fullName: string; email: string } | null;
   employedAt: Date;
   terminatedAt: Date | null;
   courses: Course[];
@@ -136,7 +136,18 @@ export function ProfileTabs({
           {phone && <InfoRow icon={Phone} label={phone} />}
           {department && <InfoRow icon={Building2} label={department.name} />}
           {manager && (
-            <InfoRow icon={UserCheck} label={manager.fullName} sublabel="Nærmeste leder" />
+            <InfoRow
+              icon={UserCheck}
+              label={
+                <a
+                  href={`mailto:${manager.email}`}
+                  className="hover:underline hover:text-primary transition-colors"
+                >
+                  {manager.fullName}
+                </a>
+              }
+              sublabel="Nærmeste leder"
+            />
           )}
           <InfoRow
             icon={Calendar}
@@ -230,7 +241,7 @@ export function ProfileTabs({
   );
 }
 
-function InfoRow({ icon: Icon, label, sublabel }: { icon: React.ElementType; label: string; sublabel?: string }) {
+function InfoRow({ icon: Icon, label, sublabel }: { icon: React.ElementType; label: React.ReactNode; sublabel?: string }) {
   return (
     <div className="flex items-center gap-3">
       <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
