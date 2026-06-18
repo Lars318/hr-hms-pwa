@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { NotificationDropdown } from "@/features/notifications/NotificationDropdown";
 import { PWAInstallPrompt } from "@/features/pwa/PWAInstallPrompt";
+import { PulsfolloLogo } from "@/components/PulsfolloLogo";
 import { UserCircle } from "lucide-react";
 
 interface TopBarProps {
@@ -14,7 +15,10 @@ export function TopBar({ email, profileId }: TopBarProps) {
   return (
     <header className="flex h-14 items-center justify-between gap-3 border-b bg-card px-4 lg:px-6">
       {/* Logo synlig kun på mobil */}
-      <span className="text-sm font-bold tracking-tight lg:hidden text-primary">Pulsfollo</span>
+      <div className="flex items-center gap-2 lg:hidden">
+        <PulsfolloLogo size={24} />
+        <span className="text-sm font-bold tracking-tight text-primary">Pulsfollo</span>
+      </div>
 
       <div className="flex items-center gap-3 ml-auto">
         <PWAInstallPrompt />

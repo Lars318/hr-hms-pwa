@@ -7,6 +7,7 @@ import { LayoutDashboard, Users, Building2, MapPin, ShieldAlert, FolderOpen, Shi
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { clearAllDrafts } from "@/lib/offline/drafts";
+import { PulsfolloLogo } from "@/components/PulsfolloLogo";
 import type { ElementType } from "react";
 import type { Role } from "@prisma/client";
 
@@ -214,6 +215,7 @@ export function Sidebar({ role }: SidebarProps) {
   return (
     <aside className="hidden lg:flex h-full w-56 flex-col border-r bg-card">
       <div className="flex h-14 items-center border-b px-4">
+        <PulsfolloLogo size={22} />
         <span className="text-sm font-bold tracking-tight text-primary">Pulsfollo</span>
       </div>
 
