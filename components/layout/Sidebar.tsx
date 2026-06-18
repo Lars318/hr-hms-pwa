@@ -11,6 +11,7 @@ import {
   FlaskConical, ClipboardList, MessageSquare, FileWarning, FileText,
   KeyRound, ChevronDown,
 } from "lucide-react";
+import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { clearAllDrafts } from "@/lib/offline/drafts";
@@ -155,6 +156,10 @@ export function Sidebar({ role }: SidebarProps) {
       <div className="flex h-14 items-center gap-2 border-b px-4">
         <PulsfolloLogo size={22} />
         <span className="text-sm font-bold tracking-tight text-primary">Pulsfollo</span>
+      </div>
+
+      <div className="px-3 py-2 border-b">
+        <GlobalSearch role={role} placeholder="Søk…" size="sm" />
       </div>
 
       <nav className="flex-1 p-3 overflow-y-auto space-y-0.5">

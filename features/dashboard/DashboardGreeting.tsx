@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { UserCircle, CalendarOff, ShieldAlert, Users, BarChart2, Clock, BookOpen } from "lucide-react";
+import { GlobalSearch } from "@/components/search/GlobalSearch";
 import type { Role } from "@prisma/client";
 
 function getGreeting(hour: number) {
@@ -68,6 +69,8 @@ export function DashboardGreeting({ name, role }: DashboardGreetingProps) {
           Hva vil du gjøre i dag?
         </p>
       </div>
+
+      <GlobalSearch role={role} />
 
       <div className="flex flex-wrap gap-2">
         {actions.map((a) => (
