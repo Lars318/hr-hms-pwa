@@ -41,7 +41,7 @@ export default async function AnsattDetaljPage({ params }: Props) {
     <div className="space-y-6 max-w-2xl">
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/ansatte">
+          <Link href={isHrAdmin ? "/ansatte" : "/dashboard"}>
             <ArrowLeft className="h-4 w-4 mr-1" /> Tilbake
           </Link>
         </Button>

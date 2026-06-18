@@ -1,9 +1,10 @@
-import { Mail, Phone, Building2, Briefcase, Calendar } from "lucide-react";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { Mail, Phone, Building2, Calendar, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 
 interface ProfileCardProps {
+  profileId?: string;
   fullName: string;
   email: string;
   phone: string | null;
@@ -34,7 +35,7 @@ const ROLE_LABELS: Record<string, string> = {
 };
 
 export function ProfileCard({
-  fullName, email, phone, title, avatarUrl,
+  profileId, fullName, email, phone, title, avatarUrl,
   department, employedAt, role,
 }: ProfileCardProps) {
   return (
@@ -50,8 +51,19 @@ export function ProfileCard({
         ) : (
           <Initials name={fullName} />
         )}
-        <div className="min-w-0">
-          <h1 className="text-xl font-bold tracking-tight truncate">{fullName}</h1>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <h1 className="text-xl font-bold tracking-tight truncate">{fullName}</h1>
+            {profileId && (
+              <Link
+                href={`/ansatte/${profileId}`}
+                className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                title="Se full profil"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Link>
+            )}
+          </div>
           {title && (
             <p className="text-sm text-muted-foreground truncate">{title}</p>
           )}

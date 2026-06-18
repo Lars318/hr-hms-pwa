@@ -7,6 +7,7 @@ import {
   LayoutDashboard, ShieldAlert, Plus, ShieldCheck, MoreHorizontal,
   Bell, BarChart2, Activity, LogOut, X,
   CalendarDays, FolderOpen, Zap, BookOpen, Clock, Shield, AlertTriangle, GraduationCap, FlaskConical,
+  ClipboardList, FileText, MessageSquare, KeyRound,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -37,6 +38,11 @@ const moreItems: MoreMenuItem[] = [
   { href: "/admin/compliance",  label: "Compliance",      icon: Shield,    roles: ["ADMIN", "HR"] },
   { href: "/personvern",        label: "Personvern",      icon: Shield,    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/admin/system",      label: "Systemstatus",    icon: Activity,  roles: ["ADMIN"] },
+  { href: "/admin/reset-passord", label: "Tilbakestill pw", icon: KeyRound,  roles: ["ADMIN"] },
+  { href: "/onboarding",        label: "Onboarding",       icon: ClipboardList, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/admin/onboarding",  label: "Onboarding-admin", icon: ClipboardList, roles: ["ADMIN", "HR"] },
+  { href: "/kontrakter",        label: "Kontrakter",       icon: FileText,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/medarbeidersamtaler", label: "Samtaler",       icon: MessageSquare, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
 ];
 
 interface BottomNavProps {
@@ -63,7 +69,10 @@ export function BottomNav({ role }: BottomNavProps) {
     pathname.startsWith("/personalhandbok") ||
     pathname.startsWith("/varsling") ||
     pathname.startsWith("/opplaering") ||
-    pathname.startsWith("/kjemikalier");
+    pathname.startsWith("/kjemikalier") ||
+    pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/kontrakter") ||
+    pathname.startsWith("/medarbeidersamtaler");
 
   async function handleLogout() {
     setOpen(false);

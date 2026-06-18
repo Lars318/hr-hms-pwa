@@ -29,6 +29,7 @@ export function EmployeeDashboard({ data }: Props) {
     <div className="space-y-6 pb-4">
       {/* 1. Profilkort */}
       <ProfileCard
+        profileId={profile.id}
         fullName={profile.fullName}
         email={profile.email}
         phone={profile.phone}
