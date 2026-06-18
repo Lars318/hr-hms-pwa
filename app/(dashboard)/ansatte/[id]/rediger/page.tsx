@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { EmployeeForm } from "@/features/employees/EmployeeForm";
 import { AvatarUpload } from "@/features/profile/AvatarUpload";
+import { AssignmentManager } from "@/features/employees/AssignmentManager";
 
 interface Props {
   params: { id: string };
@@ -50,6 +51,11 @@ export default async function RedigerAnsattPage({ params }: Props) {
       />
 
       <EmployeeForm profile={profile} departments={departments} allProfiles={allProfiles} mode="edit" />
+
+      <div className="rounded-2xl border bg-card px-5 py-5 space-y-1">
+        <p className="text-sm font-semibold mb-3">Lokasjoner</p>
+        <AssignmentManager profileId={params.id} />
+      </div>
     </div>
   );
 }

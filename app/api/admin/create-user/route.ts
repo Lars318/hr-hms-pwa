@@ -11,10 +11,11 @@ export async function POST(request: Request) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const { email, password, fullName, title, phone, role, departmentId } =
+  const { email, password, fullName, title, phone, role, departmentId, locationIds, primaryLocationId } =
     await request.json() as {
       email: string; password: string; fullName: string;
       title?: string; phone?: string; role: string; departmentId?: string;
+      locationIds?: string[]; primaryLocationId?: string;
     };
 
   if (!email || !password || !fullName || password.length < 8) {
@@ -58,6 +59,18 @@ export async function POST(request: Request) {
         departmentId: departmentId || null,
       },
     });
+    // Create location assignments if provided
+    if (locationIds && locationIds.length > 0) {
+      await db.profileAssignment.createMany({
+        data: locationIds.map((locationId, i) => ({
+          profileId: newProfile.id,
+          locationId,
+          isPrimary: primaryLocationId ? locationId === primaryLocationId : i === 0,
+          startDate: new Date(),
+        })),
+      });
+    }
+
     return Response.json({ ok: true, profileId: newProfile.id });
   } catch (err) {
     // Rollback: delete auth user if profile creation fails

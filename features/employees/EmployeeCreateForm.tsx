@@ -4,10 +4,14 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
+import { trpc } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { MapPin, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { Department } from "@prisma/client";
 
 const schema = z.object({
@@ -29,6 +33,25 @@ export function EmployeeCreateForm({ departments }: { departments: Department[] 
     defaultValues: { role: "EMPLOYEE" },
   });
 
+  const { data: locations = [] } = trpc.location.list.useQuery(undefined, { staleTime: 300_000 });
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [primaryLocationId, setPrimaryLocationId] = useState<string>("");
+
+  function toggleLocation(id: string) {
+    setSelectedLocations((prev) => {
+      const next = prev.includes(id) ? prev.filter((l) => l !== id) : [...prev, id];
+      // If primary was removed, auto-assign first remaining
+      if (primaryLocationId === id && !next.includes(id)) {
+        setPrimaryLocationId(next[0] ?? "");
+      }
+      // Auto-assign primary if none set
+      if (!primaryLocationId && next.length > 0) {
+        setPrimaryLocationId(next[0]);
+      }
+      return next;
+    });
+  }
+
   async function onSubmit(values: FormValues) {
     const res = await fetch("/api/admin/create-user", {
       method: "POST",
@@ -38,6 +61,8 @@ export function EmployeeCreateForm({ departments }: { departments: Department[] 
         title: values.title || undefined,
         phone: values.phone || undefined,
         departmentId: values.departmentId || undefined,
+        locationIds: selectedLocations.length > 0 ? selectedLocations : undefined,
+        primaryLocationId: primaryLocationId || undefined,
       }),
     });
 
@@ -75,7 +100,7 @@ export function EmployeeCreateForm({ departments }: { departments: Department[] 
 
       <div className="space-y-1">
         <Label htmlFor="title">Stillingstittel</Label>
-        <Input id="title" {...register("title")} placeholder="f.eks. Personalsjef" />
+        <Input id="title" {...register("title")} placeholder="f.eks. Personlig trener" />
       </div>
 
       <div className="space-y-1">
@@ -103,6 +128,60 @@ export function EmployeeCreateForm({ departments }: { departments: Department[] 
           </Select>
         </div>
       </div>
+
+      {/* Lokasjoner */}
+      {locations.length > 0 && (
+        <div className="space-y-2">
+          <Label>Lokasjoner</Label>
+          <div className="space-y-2">
+            {locations.map((loc) => {
+              const checked = selectedLocations.includes(loc.id);
+              const isPrimary = primaryLocationId === loc.id;
+              return (
+                <div
+                  key={loc.id}
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl border px-3 py-2.5 cursor-pointer transition-colors",
+                    checked ? "border-primary/40 bg-primary/5" : "border-input bg-background hover:bg-muted/40"
+                  )}
+                  onClick={() => toggleLocation(loc.id)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleLocation(loc.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="h-4 w-4 rounded accent-primary"
+                  />
+                  <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="flex-1 text-sm font-medium">
+                    {loc.name}{loc.city ? `, ${loc.city}` : ""}
+                  </span>
+                  {checked && (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setPrimaryLocationId(loc.id); }}
+                      className={cn(
+                        "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-colors",
+                        isPrimary
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-primary"
+                      )}
+                      title="Sett som primærlokasjon"
+                    >
+                      <Star className="h-3 w-3" />
+                      {isPrimary ? "Primær" : "Sett primær"}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {selectedLocations.length === 0 && (
+            <p className="text-xs text-muted-foreground">Ingen lokasjon valgt — kan settes senere.</p>
+          )}
+        </div>
+      )}
 
       {errors.root && <p className="text-sm text-destructive">{errors.root.message}</p>}
 
