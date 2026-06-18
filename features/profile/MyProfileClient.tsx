@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { createClient } from "@/lib/supabase/client";
 import { CheckCircle2, Loader2, LogOut } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -161,6 +162,11 @@ export function MyProfileClient({ email }: { email: string }) {
       <p className="text-xs text-muted-foreground px-1">
         Rolle og e-post kan kun endres av administrator.
       </p>
+
+      <div className="flex items-center justify-between rounded-2xl border bg-card px-5 py-4">
+        <span className="text-sm font-medium">Visningsmodus</span>
+        <ThemeToggle />
+      </div>
 
       <button
         onClick={handleLogout}

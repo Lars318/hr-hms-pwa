@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { TrpcProvider } from "@/lib/trpc/provider";
 import { ToastProvider } from "@/lib/toast";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -33,11 +34,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="nb">
+    <html lang="nb" suppressHydrationWarning>
       <body className={inter.className}>
-        <TrpcProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </TrpcProvider>
+        <ThemeProvider>
+          <TrpcProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </TrpcProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

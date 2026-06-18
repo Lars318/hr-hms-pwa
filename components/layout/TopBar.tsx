@@ -4,6 +4,7 @@ import Link from "next/link";
 import { NotificationDropdown } from "@/features/notifications/NotificationDropdown";
 import { PWAInstallPrompt } from "@/features/pwa/PWAInstallPrompt";
 import { PulsfolloLogo } from "@/components/PulsfolloLogo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { UserCircle } from "lucide-react";
 
 interface TopBarProps {
@@ -21,6 +22,7 @@ export function TopBar({ email }: TopBarProps) {
 
       <div className="flex items-center gap-3 ml-auto">
         <PWAInstallPrompt />
+        <ThemeToggle />
         <NotificationDropdown />
         <Link
           href="/profil"
