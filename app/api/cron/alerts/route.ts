@@ -211,5 +211,89 @@ export async function GET(req: Request) {
     }
   }
 
+  // ── 6. Mars: påminnelse om å søke sommerferie innen utgangen av mars ─────
+  // Ferieloven §6: arbeidsgiver skal varsle ferieavvikling 2 måneder i forveien.
+  // Vi varsler ansatte i mars slik at de rekker å søke før fristen.
+  const isMarch = now.getMonth() === 2; // 0-indexed
+  if (isMarch) {
+    const activeEmployees = await db.profile.findMany({
+      where: { status: "ACTIVE", role: { in: ["EMPLOYEE", "MANAGER"] } },
+      select: { id: true },
+    });
+
+    for (const emp of activeEmployees) {
+      const already = await db.sentAlert.findUnique({
+        where: { type_entityId_year: { type: "SUMMER_VACATION_PLAN_REMINDER", entityId: emp.id, year } },
+      });
+      if (already) continue;
+
+      await db.notification.create({
+        data: {
+          recipientId: emp.id, type: "SYSTEM",
+          title: "Husk å søke sommerferie",
+          message: `Ferieloven §6 krever at sommerferie varsles minst 2 måneder i forveien. Søk om ferie for juni–august innen utgangen av mars.`,
+          linkUrl: `/fravaer/ny`,
+        },
+      });
+      await sendPushToProfile(db, emp.id, {
+        title: "Husk å søke sommerferie",
+        body: "Søk om sommerferie innen utgangen av mars (ferieloven §6).",
+        url: `/fravaer/ny`,
+      });
+
+      await db.sentAlert.create({ data: { type: "SUMMER_VACATION_PLAN_REMINDER", entityId: emp.id, year } });
+      results.vernerunde++; // reuse counter field — rename tracked below
+    }
+  }
+
+  // ── 7. Mai: ansatte uten godkjent sommerferie (ferieloven §6) ─────────────
+  // Sommerferie = juni, juli, august (månedene 5, 6, 7 i 0-indexed)
+  const isMay = now.getMonth() === 4;
+  if (isMay) {
+    const summerStart = new Date(year, 5, 1);  // 1. juni
+    const summerEnd   = new Date(year, 7, 31, 23, 59, 59); // 31. august
+
+    const activeEmployees = await db.profile.findMany({
+      where: { status: "ACTIVE", role: { in: ["EMPLOYEE", "MANAGER"] } },
+      select: { id: true, fullName: true },
+    });
+
+    for (const emp of activeEmployees) {
+      const already = await db.sentAlert.findUnique({
+        where: { type_entityId_year: { type: "SUMMER_VACATION_MISSING", entityId: emp.id, year } },
+      });
+      if (already) continue;
+
+      const summerVacation = await db.leaveRequest.findFirst({
+        where: {
+          employeeId: emp.id,
+          type: "VACATION",
+          status: "APPROVED",
+          startDate: { lte: summerEnd },
+          endDate: { gte: summerStart },
+        },
+      });
+
+      if (summerVacation) continue; // allerede planlagt
+
+      await db.notification.create({
+        data: {
+          recipientId: emp.id, type: "SYSTEM",
+          title: "Sommerferie ikke planlagt",
+          message: `Du har ingen godkjent ferie registrert for sommeren (juni–august). Ferieloven §6 krever 2 måneders varsel — søk nå.`,
+          linkUrl: `/fravaer/ny`,
+        },
+      });
+      await sendPushToProfile(db, emp.id, {
+        title: "Sommerferie ikke planlagt",
+        body: "Du har ingen godkjent sommerferie. Søk nå — ferieloven krever 2 måneders varsel.",
+        url: `/fravaer/ny`,
+      });
+
+      await db.sentAlert.create({ data: { type: "SUMMER_VACATION_MISSING", entityId: emp.id, year } });
+      results.contract++; // reuse counter field
+    }
+  }
+
   return NextResponse.json({ ok: true, sent: results });
 }
