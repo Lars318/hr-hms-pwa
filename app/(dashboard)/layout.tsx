@@ -30,7 +30,7 @@ export default async function DashboardLayout({
 
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         <OnlineStatusBanner />
-        <TopBar email={user.email ?? ""} profileId={profile?.id} />
+        <TopBar email={user.email ?? ""} />
         {/* pb-20 på mobil gir plass til BottomNav */}
         <main className="flex-1 overflow-y-auto p-4 pb-24 lg:p-6 lg:pb-6">
           {children}

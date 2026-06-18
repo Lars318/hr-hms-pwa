@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, ShieldAlert, Plus, ShieldCheck, MoreHorizontal,
-  Bell, BarChart2, Activity, LogOut, X, Menu,
+  Bell, BarChart2, Activity, LogOut, X, Menu, UserCircle,
   CalendarDays, FolderOpen, Zap, BookOpen, Clock, Shield, AlertTriangle, GraduationCap, FlaskConical,
   ClipboardList, FileText, MessageSquare, KeyRound, Users, Megaphone,
 } from "lucide-react";
@@ -31,6 +31,7 @@ const navGroups: NavGroup[] = [
     label: "Min dag",
     items: [
       { href: "/dashboard",    label: "Hjem",             icon: LayoutDashboard, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+      { href: "/profil",       label: "Min profil",        icon: UserCircle,     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
       { href: "/fravaer",      label: "Fravær",            icon: CalendarDays,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
       { href: "/overtid",      label: "Overtid",           icon: Clock,          roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
       { href: "/onboarding",   label: "Onboarding",        icon: ClipboardList,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
@@ -83,7 +84,7 @@ const navGroups: NavGroup[] = [
 
 const isMorePath = (pathname: string) =>
   ["/fravaer", "/overtid", "/dokumenter", "/tiltak", "/rapporter", "/varsler",
-   "/kollegaer", "/ansatte", "/admin", "/personalhandbok", "/varsling", "/opplaering",
+   "/profil", "/kollegaer", "/ansatte", "/admin", "/personalhandbok", "/varsling", "/opplaering",
    "/kjemikalier", "/onboarding", "/kontrakter", "/medarbeidersamtaler",
    "/sykefravaer"].some((p) => pathname.startsWith(p));
 
