@@ -166,6 +166,30 @@ enum LeaveRequestType {
   OTHER
 }
 
+enum SickLeaveCaseStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum FollowUpStepType {
+  OPPFOLGING_PLAN
+  DIALOG_MOTE_1
+  DIALOG_MOTE_2
+  NAV_NOTIFICATION
+}
+
+enum SalaryType {
+  MONTHLY
+  HOURLY
+  ANNUAL
+}
+
+enum AlertType {
+  PROBATION_ENDING
+  TRAINING_EXPIRING
+  BIRTHDAY
+}
+
 enum LeaveRequestStatus {
   PENDING
   APPROVED
@@ -265,6 +289,8 @@ model Profile {
   status         ProfileStatus @default(ACTIVE)
   employedAt     DateTime      @default(now())
   terminatedAt   DateTime?
+  dateOfBirth    DateTime?
+  probationEndsAt DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -332,6 +358,11 @@ model Profile {
   signatureRequests      SignatureRequest[]  @relation("SignatureRequestSigner")
 
   inspectionRecords InspectionRecord[] @relation("InspectionPerformedBy")
+
+  sickLeaveCases          SickLeaveCase[]          @relation("SickLeaveCaseEmployee")
+  sickLeaveStepsCompleted SickLeaveFollowUpStep[]   @relation("StepCompletedBy")
+  employmentRecords       EmploymentRecord[]        @relation("EmploymentRecordProfile")
+  createdEmploymentRecords EmploymentRecord[]       @relation("EmploymentRecordCreator")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -1385,4 +1416,80 @@ model InspectionResponse {
 
   @@unique([recordId, itemId])
   @@index([recordId])
+}
+
+// ─── Sykefraværsoppfølging ────────────────────────────────────────────────────
+
+model SickLeaveCase {
+  id         String              @id @default(cuid())
+  startDate  DateTime
+  returnDate DateTime?
+  totalDays  Int                 @default(0)
+  status     SickLeaveCaseStatus @default(ACTIVE)
+  notes      String?
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+
+  employee   Profile @relation("SickLeaveCaseEmployee", fields: [employeeId], references: [id])
+  employeeId String
+
+  steps SickLeaveFollowUpStep[]
+
+  @@index([employeeId])
+  @@index([status])
+  @@index([startDate])
+}
+
+model SickLeaveFollowUpStep {
+  id          String           @id @default(cuid())
+  type        FollowUpStepType
+  dueDate     DateTime
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime         @default(now())
+
+  case   SickLeaveCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  caseId String
+
+  completedBy   Profile? @relation("StepCompletedBy", fields: [completedById], references: [id])
+  completedById String?
+
+  @@index([caseId])
+  @@index([dueDate])
+}
+
+// ─── Lønns- og ansettelsesdata ────────────────────────────────────────────────
+
+model EmploymentRecord {
+  id                   String     @id @default(cuid())
+  effectiveFrom        DateTime
+  effectiveTo          DateTime?
+  employmentPercentage Float      @default(100)
+  salary               Int?
+  salaryType           SalaryType @default(MONTHLY)
+  jobTitle             String?
+  notes                String?
+  createdAt            DateTime   @default(now())
+
+  profile   Profile @relation("EmploymentRecordProfile", fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String
+
+  createdBy   Profile? @relation("EmploymentRecordCreator", fields: [createdById], references: [id])
+  createdById String?
+
+  @@index([profileId])
+  @@index([effectiveFrom])
+}
+
+// ─── Automatiske varsler (dedup-sporing) ─────────────────────────────────────
+
+model SentAlert {
+  id       String    @id @default(cuid())
+  type     AlertType
+  entityId String
+  year     Int
+  sentAt   DateTime  @default(now())
+
+  @@unique([type, entityId, year])
+  @@index([type])
 }

@@ -10,6 +10,10 @@ const profileUpdateSchema = z.object({
   managerId: z.string().optional().nullable(),
   role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]).optional(),
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+  dateOfBirth: z.string().optional().nullable(),
+  probationEndsAt: z.string().optional().nullable(),
+  employedAt: z.string().optional(),
+  terminatedAt: z.string().optional().nullable(),
 });
 
 export const profileRouter = router({
@@ -86,12 +90,18 @@ export const profileRouter = router({
   adminUpdate: hrProcedure
     .input(z.object({ id: z.string() }).merge(profileUpdateSchema))
     .mutation(async ({ ctx, input }) => {
-      const { id, ...data } = input;
+      const { id, dateOfBirth, probationEndsAt, employedAt, terminatedAt, ...rest } = input;
       const exists = await ctx.db.profile.findUnique({ where: { id } });
       if (!exists) throw new TRPCError({ code: "NOT_FOUND", message: "Ansatt ikke funnet." });
       return ctx.db.profile.update({
         where: { id },
-        data,
+        data: {
+          ...rest,
+          ...(dateOfBirth !== undefined ? { dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null } : {}),
+          ...(probationEndsAt !== undefined ? { probationEndsAt: probationEndsAt ? new Date(probationEndsAt) : null } : {}),
+          ...(employedAt ? { employedAt: new Date(employedAt) } : {}),
+          ...(terminatedAt !== undefined ? { terminatedAt: terminatedAt ? new Date(terminatedAt) : null } : {}),
+        },
         include: { department: true, manager: { select: { id: true, fullName: true } } },
       });
     }),

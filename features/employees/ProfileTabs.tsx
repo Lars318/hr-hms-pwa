@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { RoleBadge } from "@/components/shared/RoleBadge";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { AvatarUpload } from "@/features/profile/AvatarUpload";
+import { EmploymentHistory } from "./EmploymentHistory";
 import type { Role, ProfileStatus } from "@prisma/client";
 
 interface Course {
@@ -45,12 +46,13 @@ interface ProfileTabsProps {
   editHref: string;
 }
 
-type Tab = "oversikt" | "kompetanse" | "dokumenter";
+type Tab = "oversikt" | "kompetanse" | "dokumenter" | "lonn";
 
-const TABS: { id: Tab; label: string }[] = [
+const TABS: { id: Tab; label: string; hrOnly?: boolean }[] = [
   { id: "oversikt", label: "Oversikt" },
   { id: "kompetanse", label: "Kompetanse" },
   { id: "dokumenter", label: "Dokumenter" },
+  { id: "lonn", label: "Lønn & stilling", hrOnly: true },
 ];
 
 function Initials({ name }: { name: string }) {
@@ -101,7 +103,7 @@ export function ProfileTabs({
 
       {/* Tabs */}
       <div className="flex rounded-xl border bg-muted/30 p-1 gap-1">
-        {TABS.map((t) => (
+        {TABS.filter((t) => !t.hrOnly || canEdit).map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
@@ -162,6 +164,11 @@ export function ProfileTabs({
             </div>
           ))}
         </div>
+      )}
+
+      {/* Lønn & stilling */}
+      {tab === "lonn" && canEdit && (
+        <EmploymentHistory profileId={profileId} />
       )}
 
       {/* Dokumenter */}

@@ -79,6 +79,7 @@ const nav: NavEntry[] = [
     items: [
       { href: "/fravaer",            label: "Fravær",            icon: CalendarDays,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
       { href: "/fravaer/kalender",   label: "Fraværskalender",   icon: CalendarRange, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+      { href: "/sykefravaer",        label: "Sykefraværsoppfølging", icon: Activity,  roles: ["ADMIN", "HR", "MANAGER"] },
       { href: "/overtid",            label: "Overtid",           icon: Clock,         roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
       { href: "/overtid/godkjenning",label: "Godkjenn overtid",  icon: Clock,         roles: ["ADMIN", "HR", "MANAGER"] },
     ],
