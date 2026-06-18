@@ -1,7 +1,99 @@
 import { router, profileProcedure } from "@/server/trpc/trpc";
 import type { ActionStatus } from "@prisma/client";
 
+type FeedEvent = {
+  id: string;
+  type: "incident" | "action" | "leave" | "document" | "inspection";
+  title: string;
+  description: string;
+  href: string;
+  createdAt: Date;
+  actor?: string;
+};
+
 export const dashboardRouter = router({
+  // ── activityFeed – siste hendelser på tvers ──────────────────────────────
+  activityFeed: profileProcedure.query(async ({ ctx }) => {
+    const { profile, db } = ctx;
+    const isHrAdmin = profile.role === "ADMIN" || profile.role === "HR";
+    const isManager = profile.role === "MANAGER";
+    const deptId = profile.departmentId;
+
+    const incidentWhere = isHrAdmin ? {} : isManager && deptId ? { departmentId: deptId } : { reportedById: profile.id };
+    const actionWhere = isHrAdmin ? {} : isManager && deptId ? { OR: [{ departmentId: deptId }, { assignedToId: profile.id }] } : { assignedToId: profile.id };
+    const leaveWhere = isHrAdmin ? {} : isManager && deptId ? { departmentId: deptId } : { employeeId: profile.id };
+    const inspectionWhere = isHrAdmin ? {} : { performedById: profile.id };
+
+    const [incidents, actions, leaves, inspections] = await Promise.all([
+      db.incident.findMany({
+        where: incidentWhere,
+        select: { id: true, title: true, severity: true, status: true, createdAt: true, reportedBy: { select: { fullName: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      }),
+      db.action.findMany({
+        where: actionWhere,
+        select: { id: true, title: true, status: true, priority: true, createdAt: true, assignedTo: { select: { fullName: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+      }),
+      db.leaveRequest.findMany({
+        where: leaveWhere,
+        select: { id: true, type: true, status: true, startDate: true, createdAt: true, employee: { select: { fullName: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }),
+      db.inspectionRecord.findMany({
+        where: inspectionWhere,
+        select: { id: true, title: true, status: true, createdAt: true, performedBy: { select: { fullName: true } }, template: { select: { title: true } } },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      }),
+    ]);
+
+    const events: FeedEvent[] = [
+      ...incidents.map((i) => ({
+        id: i.id,
+        type: "incident" as const,
+        title: i.title,
+        description: `Avvik · ${i.severity} · ${i.status}`,
+        href: `/avvik/${i.id}`,
+        createdAt: i.createdAt,
+        actor: i.reportedBy.fullName,
+      })),
+      ...actions.map((a) => ({
+        id: a.id,
+        type: "action" as const,
+        title: a.title,
+        description: `Tiltak · ${a.priority} · ${a.status}`,
+        href: `/tiltak/${a.id}`,
+        createdAt: a.createdAt,
+        actor: a.assignedTo?.fullName,
+      })),
+      ...leaves.map((l) => ({
+        id: l.id,
+        type: "leave" as const,
+        title: `${l.employee.fullName} – ${l.type.toLowerCase()}`,
+        description: `Fravær · ${l.status}`,
+        href: `/fravaer`,
+        createdAt: l.createdAt,
+        actor: l.employee.fullName,
+      })),
+      ...inspections.map((r) => ({
+        id: r.id,
+        type: "inspection" as const,
+        title: r.title,
+        description: `HMS-runde · ${r.template.title} · ${r.status === "COMPLETED" ? "Fullført" : r.status === "IN_PROGRESS" ? "Pågående" : "Avbrutt"}`,
+        href: `/hms-runde/${r.id}`,
+        createdAt: r.createdAt,
+        actor: r.performedBy.fullName,
+      })),
+    ];
+
+    events.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return events.slice(0, 15);
+  }),
+
   // ── summary – alle aggregerte tall i ett kall ──────────────────────────────
   summary: profileProcedure.query(async ({ ctx }) => {
     const { profile, db } = ctx;

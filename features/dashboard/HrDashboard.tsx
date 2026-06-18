@@ -1,4 +1,5 @@
 import { Users, CalendarDays, BookOpen, FolderOpen, BarChart2, BookMarked, AlertTriangle, GraduationCap } from "lucide-react";
+import { ActivityFeed } from "./ActivityFeed";
 import { RoleDashboardHeader } from "./RoleDashboardHeader";
 import { QuickActionGrid, type QuickAction } from "./QuickActionGrid";
 import { MetricCard } from "./MetricCard";
@@ -105,6 +106,14 @@ export function HrDashboard({ name, data }: Props) {
           />
         </DashboardSection>
       )}
+
+      {/* Aktivitetsfeed */}
+      <div className="rounded-xl border bg-card">
+        <div className="px-4 pt-4 pb-2">
+          <h2 className="text-sm font-semibold text-foreground">Siste aktivitet</h2>
+        </div>
+        <ActivityFeed />
+      </div>
     </div>
   );
 }

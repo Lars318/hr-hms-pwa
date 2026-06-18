@@ -5,6 +5,7 @@ import { MetricCard } from "./MetricCard";
 import { DashboardSection } from "./DashboardSection";
 import { DepartmentOverviewCard } from "./DepartmentOverviewCard";
 import { RecentIncidentsCard } from "./RecentIncidentsCard";
+import { ActivityFeed } from "./ActivityFeed";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "@/server/routers/_app";
 
@@ -104,6 +105,14 @@ export function AdminDashboard({ name, data }: Props) {
           />
         </DashboardSection>
       )}
+
+      {/* Aktivitetsfeed */}
+      <div className="rounded-xl border bg-card">
+        <div className="px-4 pt-4 pb-2">
+          <h2 className="text-sm font-semibold text-foreground">Siste aktivitet</h2>
+        </div>
+        <ActivityFeed />
+      </div>
     </div>
   );
 }

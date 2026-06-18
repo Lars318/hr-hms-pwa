@@ -26,6 +26,7 @@ import { personnelCaseRouter } from "./personnelCase";
 import { commentRouter } from "./comment";
 import { contractRouter } from "./contract";
 import { signatureRouter } from "./signature";
+import { inspectionRouter } from "./inspection";
 
 export const appRouter = router({
   profile: profileRouter,
@@ -55,6 +56,7 @@ export const appRouter = router({
   comment: commentRouter,
   contract: contractRouter,
   signature: signatureRouter,
+  inspection: inspectionRouter,
 });
 
 export type AppRouter = typeof appRouter;

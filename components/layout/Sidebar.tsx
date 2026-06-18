@@ -193,6 +193,12 @@ const navItems: NavItem[] = [
     icon: FileText,
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
+  {
+    href: "/hms-runde",
+    label: "HMS-runde",
+    icon: ClipboardList,
+    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
+  },
 ];
 
 interface SidebarProps {

@@ -201,6 +201,7 @@ model Location {
   trainingCourses     TrainingCourse[]
   chemicals           Chemical[]
   onboardingTemplates OnboardingTemplate[]
+  inspectionRecords   InspectionRecord[]
 
   @@index([safetyRepresentativeId])
   @@index([hseManagerId])
@@ -328,6 +329,8 @@ model Profile {
   contracts              Contract[]         @relation("ContractEmployee")
   createdContracts       Contract[]         @relation("ContractCreator")
   signatureRequests      SignatureRequest[]  @relation("SignatureRequestSigner")
+
+  inspectionRecords InspectionRecord[] @relation("InspectionPerformedBy")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -1298,4 +1301,87 @@ model SignatureRequest {
   @@index([contractId])
   @@index([signerId])
   @@index([status])
+}
+
+// ─── HMS-runde ────────────────────────────────────────────────────────────────
+
+enum InspectionStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum InspectionAnswer {
+  YES
+  NO
+  PARTIAL
+  NA
+}
+
+model InspectionTemplate {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items   InspectionTemplateItem[]
+  records InspectionRecord[]
+}
+
+model InspectionTemplateItem {
+  id          String  @id @default(cuid())
+  question    String
+  description String?
+  order       Int
+  required    Boolean @default(true)
+
+  templateId String
+  template   InspectionTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  responses InspectionResponse[]
+
+  @@index([templateId])
+}
+
+model InspectionRecord {
+  id          String           @id @default(cuid())
+  title       String
+  status      InspectionStatus @default(IN_PROGRESS)
+  completedAt DateTime?
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  templateId String
+  template   InspectionTemplate @relation(fields: [templateId], references: [id])
+
+  locationId String?
+  location   Location? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  performedById String
+  performedBy   Profile @relation("InspectionPerformedBy", fields: [performedById], references: [id])
+
+  responses InspectionResponse[]
+
+  @@index([performedById])
+  @@index([templateId])
+  @@index([status])
+}
+
+model InspectionResponse {
+  id       String           @id @default(cuid())
+  answer   InspectionAnswer
+  comment  String?
+  photoUrl String?
+
+  recordId String
+  record   InspectionRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   InspectionTemplateItem @relation(fields: [itemId], references: [id])
+
+  @@unique([recordId, itemId])
+  @@index([recordId])
 }
