@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     body: JSON.stringify({
       type: "magiclink",
       email,
-      redirect_to: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://hr-hms-pwa.vercel.app"}/auth/callback`,
+      redirect_to: `${process.env.NEXT_PUBLIC_APP_URL ?? "https://hr-hms-pwa.vercel.app"}/auth/session`,
     }),
   });
 
