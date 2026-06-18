@@ -19,8 +19,8 @@ export default async function DashboardPage() {
     (profile.title?.toLowerCase().includes("hms") ?? false);
 
   return (
-    <div className="space-y-2">
-      <DashboardGreeting name={profile.fullName} email={profile.email} />
+    <div className="space-y-5">
+      <DashboardGreeting name={profile.fullName} role={profile.role} />
       <PersonalizedDashboard
         viewerRole={profile.role}
         viewerName={profile.fullName}
