@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { OnlineStatusBanner } from "@/features/pwa/OnlineStatusBanner";
+import { AssistantButton } from "@/components/assistant/AssistantButton";
 
 export default async function DashboardLayout({
   children,
@@ -38,6 +39,9 @@ export default async function DashboardLayout({
 
       {/* BottomNav — kun synlig under lg */}
       <BottomNav role={role} />
+
+      {/* Global AI-assistent */}
+      <AssistantButton />
     </div>
   );
 }
