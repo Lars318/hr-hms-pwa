@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { CheckCircle2, Loader2, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -19,11 +21,18 @@ function initials(name: string) {
 export function MyProfileClient({ email }: { email: string }) {
   const { data: profile, isLoading } = trpc.profile.me.useQuery();
   const utils = trpc.useUtils();
+  const router = useRouter();
 
   const [fullName, setFullName] = useState("");
   const [title, setTitle] = useState("");
   const [phone, setPhone] = useState("");
   const [saved, setSaved] = useState(false);
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
 
   useEffect(() => {
     if (profile) {
@@ -152,6 +161,14 @@ export function MyProfileClient({ email }: { email: string }) {
       <p className="text-xs text-muted-foreground px-1">
         Rolle og e-post kan kun endres av administrator.
       </p>
+
+      <button
+        onClick={handleLogout}
+        className="flex w-full items-center gap-2 rounded-2xl border border-destructive/30 px-5 py-4 text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
+      >
+        <LogOut className="h-4 w-4 shrink-0" />
+        Logg ut
+      </button>
     </div>
   );
 }
