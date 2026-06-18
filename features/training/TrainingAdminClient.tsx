@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ interface Props {
   profiles: { id: string; fullName: string; email: string }[];
 }
 
-export function TrainingAdminClient({ courses, locations, profiles }: Props) {
+function TrainingAdminClientInner({ courses, locations, profiles }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
 
@@ -229,5 +229,13 @@ export function TrainingAdminClient({ courses, locations, profiles }: Props) {
 
       <p className="text-xs text-muted-foreground">{data.length} records vist</p>
     </div>
+  );
+}
+
+export function TrainingAdminClient(props: Props) {
+  return (
+    <Suspense>
+      <TrainingAdminClientInner {...props} />
+    </Suspense>
   );
 }

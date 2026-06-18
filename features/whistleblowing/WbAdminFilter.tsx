@@ -1,8 +1,9 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export function WbAdminFilter() {
+function WbAdminFilterInner() {
   const router = useRouter();
   const sp = useSearchParams();
 
@@ -56,5 +57,13 @@ export function WbAdminFilter() {
         <option value="CRITICAL">Kritisk</option>
       </select>
     </div>
+  );
+}
+
+export function WbAdminFilter() {
+  return (
+    <Suspense>
+      <WbAdminFilterInner />
+    </Suspense>
   );
 }
