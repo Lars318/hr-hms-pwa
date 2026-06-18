@@ -180,6 +180,7 @@ export const dashboardRouter = router({
         id: string; fullName: string; email: string; phone: string | null;
         title: string | null; avatarUrl: string | null; employedAt: Date;
       };
+      manager: { id: string; fullName: string; title: string | null } | null;
       department: { id: string; name: string } | null;
       assignments: {
         id: string; isPrimary: boolean; roleLabel: string | null;
@@ -248,10 +249,13 @@ export const dashboardRouter = router({
 
       employeeDash = { pendingLeave, upcomingApprovedLeave };
 
-      // Hent avdelingsnavn og tilhørigheter parallelt
-      const [dept, myAssignments] = await Promise.all([
+      // Hent avdeling, leder og tilhørigheter parallelt
+      const [dept, myManager, myAssignments] = await Promise.all([
         profile.departmentId
           ? db.department.findUnique({ where: { id: profile.departmentId }, select: { id: true, name: true } })
+          : Promise.resolve(null),
+        profile.managerId
+          ? db.profile.findUnique({ where: { id: profile.managerId }, select: { id: true, fullName: true, title: true } })
           : Promise.resolve(null),
         db.profileAssignment.findMany({
           where: { profileId: profile.id, endDate: null },
@@ -317,6 +321,7 @@ export const dashboardRouter = router({
           avatarUrl: profile.avatarUrl,
           employedAt: profile.employedAt,
         },
+        manager: myManager,
         department: dept,
         assignments: myAssignments,
         counts: {

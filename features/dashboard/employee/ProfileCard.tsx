@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Phone, Building2, Calendar, ExternalLink } from "lucide-react";
+import { Mail, Phone, Building2, Calendar, ExternalLink, UserCheck } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 
@@ -10,6 +10,7 @@ interface ProfileCardProps {
   phone: string | null;
   title: string | null;
   avatarUrl: string | null;
+  manager?: { id: string; fullName: string; title: string | null } | null;
   department: { name: string } | null;
   employedAt: Date;
   role: string;
@@ -36,7 +37,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 export function ProfileCard({
   profileId, fullName, email, phone, title, avatarUrl,
-  department, employedAt, role,
+  manager, department, employedAt, role,
 }: ProfileCardProps) {
   return (
     <div className="rounded-2xl border bg-card p-5 space-y-4">
@@ -91,6 +92,17 @@ export function ProfileCard({
           <div className="flex items-center gap-2 text-muted-foreground">
             <Building2 className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">{department.name}</span>
+          </div>
+        )}
+
+        {manager && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <UserCheck className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">
+              <span className="text-xs text-muted-foreground">Nærmeste leder: </span>
+              <span className="font-medium text-foreground">{manager.fullName}</span>
+              {manager.title && <span className="text-xs"> · {manager.title}</span>}
+            </span>
           </div>
         )}
 

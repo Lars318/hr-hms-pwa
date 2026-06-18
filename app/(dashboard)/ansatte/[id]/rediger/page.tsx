@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { EmployeeForm } from "@/features/employees/EmployeeForm";
+import { AvatarUpload } from "@/features/profile/AvatarUpload";
 
 interface Props {
   params: { id: string };
@@ -41,6 +42,12 @@ export default async function RedigerAnsattPage({ params }: Props) {
           <p className="text-sm text-muted-foreground">{profile.fullName}</p>
         </div>
       </div>
+
+      <AvatarUpload
+        profileId={profile.id}
+        currentUrl={profile.avatarUrl}
+        fullName={profile.fullName}
+      />
 
       <EmployeeForm profile={profile} departments={departments} allProfiles={allProfiles} mode="edit" />
     </div>
