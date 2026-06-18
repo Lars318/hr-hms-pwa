@@ -49,7 +49,8 @@ const navGroups: NavGroup[] = [
   {
     label: "HR",
     items: [
-      { href: "/ansatte",      label: "Ansatte",           icon: Users,          roles: ["ADMIN", "HR", "MANAGER"] },
+      { href: "/kollegaer",    label: "Kollegaer",         icon: Users,          roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+      { href: "/ansatte",      label: "Ansatte (admin)",   icon: Users,          roles: ["ADMIN", "HR"] },
       { href: "/opplaering",   label: "Opplæring",         icon: GraduationCap,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
       { href: "/kontrakter",   label: "Kontrakter",        icon: FileText,       roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
       { href: "/medarbeidersamtaler", label: "Samtaler",   icon: MessageSquare,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
@@ -82,7 +83,7 @@ const navGroups: NavGroup[] = [
 
 const isMorePath = (pathname: string) =>
   ["/fravaer", "/overtid", "/dokumenter", "/tiltak", "/rapporter", "/varsler",
-   "/ansatte", "/admin", "/personalhandbok", "/varsling", "/opplaering",
+   "/kollegaer", "/ansatte", "/admin", "/personalhandbok", "/varsling", "/opplaering",
    "/kjemikalier", "/onboarding", "/kontrakter", "/medarbeidersamtaler",
    "/sykefravaer"].some((p) => pathname.startsWith(p));
 

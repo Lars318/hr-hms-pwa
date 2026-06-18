@@ -153,13 +153,23 @@ export const ROUTE_MAP: AssistantRoute[] = [
     roles: ALL,
   },
 
+  {
+    id: "kollegaer",
+    title: "Kollegaer",
+    href: "/kollegaer",
+    description: "Finn og kontakt dine kollegaer",
+    keywords: ["kollegaer", "kollega", "ansatte", "ansatt", "medarbeider", "finn kollega", "kontakt kollega", "hvem jobber her", "telefonliste"],
+    aliases: ["ansattliste", "personalkatalog"],
+    roles: ALL,
+  },
+
   // ── MANAGER / HR / ADMIN ────────────────────────────────────────────────────
   {
     id: "ansatte",
-    title: "Ansatte",
+    title: "Ansatte (admin)",
     href: "/ansatte",
-    description: "Oversikt over alle ansatte",
-    keywords: ["ansatte", "ansatt", "medarbeider", "liste", "team", "profil", "oversikt ansatte"],
+    description: "Administrer ansattprofiler, roller og tilganger",
+    keywords: ["administrer ansatte", "ny ansatt", "endre rolle", "deaktiver ansatt"],
     roles: MGMT,
   },
   {

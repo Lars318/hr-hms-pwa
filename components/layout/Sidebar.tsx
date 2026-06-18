@@ -62,7 +62,8 @@ const nav: NavEntry[] = [
     icon: Users,
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
     items: [
-      { href: "/ansatte",               label: "Ansatte",             icon: Users,        roles: ["ADMIN", "HR"] },
+      { href: "/kollegaer",              label: "Kollegaer",           icon: Users,        roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+      { href: "/ansatte",               label: "Ansatte (admin)",     icon: Users,        roles: ["ADMIN", "HR"] },
       { href: "/admin/avdelinger",      label: "Avdelinger",          icon: Building2,    roles: ["ADMIN", "HR"] },
       { href: "/lokasjoner",            label: "Lokasjoner",          icon: MapPin,       roles: ["ADMIN", "HR"] },
       { href: "/onboarding",            label: "Onboarding",          icon: ClipboardList,roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },

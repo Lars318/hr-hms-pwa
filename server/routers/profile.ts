@@ -20,6 +20,50 @@ export const profileRouter = router({
   // Innlogget bruker henter sin egen profil
   me: profileProcedure.query(({ ctx }) => ctx.profile),
 
+  // Alle innloggede: ansattkatalog (kun trygge felter, kun aktive)
+  directory: profileProcedure
+    .input(
+      z.object({
+        search: z.string().optional(),
+        locationId: z.string().optional(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { search, locationId } = input;
+      return ctx.db.profile.findMany({
+        where: {
+          status: "ACTIVE",
+          ...(search
+            ? {
+                OR: [
+                  { fullName: { contains: search, mode: "insensitive" } },
+                  { title: { contains: search, mode: "insensitive" } },
+                ],
+              }
+            : {}),
+          ...(locationId
+            ? { profileAssignments: { some: { locationId, endDate: null } } }
+            : {}),
+        },
+        select: {
+          id: true,
+          fullName: true,
+          title: true,
+          phone: true,
+          email: true,
+          avatarUrl: true,
+          role: true,
+          department: { select: { name: true } },
+          profileAssignments: {
+            where: { isPrimary: true, endDate: null },
+            select: { location: { select: { id: true, name: true, city: true } } },
+            take: 1,
+          },
+        },
+        orderBy: { fullName: "asc" },
+      });
+    }),
+
   // HR/ADMIN: hent alle profiler med søk og filter
   list: hrProcedure
     .input(
