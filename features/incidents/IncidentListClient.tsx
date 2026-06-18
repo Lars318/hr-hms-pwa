@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
@@ -25,15 +25,23 @@ const STATUS_TABS: { id: StatusTab; label: string }[] = [
   { id: "RESOLVED", label: "Lukkede" },
 ];
 
-export function IncidentListClient({ departments, viewerRole }: IncidentListClientProps) {
+function DraftBanner() {
   const searchParams = useSearchParams();
   const draftSaved = searchParams.get("draft") === "saved";
   const [draftCount, setDraftCount] = useState(0);
-  const [statusTab, setStatusTab] = useState<StatusTab>("");
-
   useEffect(() => {
     if (draftSaved) setDraftCount(getDrafts().length);
   }, [draftSaved]);
+  if (!draftSaved) return null;
+  return (
+    <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">
+      Avvik lagret som kladd ({draftCount} kladd venter). Sendes inn automatisk når du er tilkoblet igjen.
+    </div>
+  );
+}
+
+export function IncidentListClient({ departments, viewerRole }: IncidentListClientProps) {
+  const [statusTab, setStatusTab] = useState<StatusTab>("");
 
   const [filters, setFilters] = useState<IncidentFilterState>({
     search: "",
@@ -53,11 +61,9 @@ export function IncidentListClient({ departments, viewerRole }: IncidentListClie
 
   return (
     <div className="space-y-4">
-      {draftSaved && (
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">
-          Avvik lagret som kladd ({draftCount} kladd venter). Sendes inn automatisk når du er tilkoblet igjen.
-        </div>
-      )}
+      <Suspense>
+        <DraftBanner />
+      </Suspense>
 
       {/* Søkebar */}
       <div className="relative">
