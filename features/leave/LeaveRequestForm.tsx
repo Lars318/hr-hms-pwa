@@ -19,7 +19,7 @@ import type { LeaveRequestType } from "@prisma/client";
 const schema = z
   .object({
     type: z.enum([
-      "VACATION", "SICK_LEAVE", "CARE_LEAVE",
+      "VACATION", "SICK_LEAVE", "CARE_LEAVE", "EGENMELDING",
       "PARENTAL_LEAVE", "UNPAID_LEAVE", "OTHER",
     ] as const),
     startDate: z.string().min(1, "Startdato er påkrevd"),
@@ -76,6 +76,7 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
 
   const watchedType = watch("type");
   const needsReason = requiresReason(watchedType as LeaveRequestType);
+  const isEgenmelding = watchedType === "EGENMELDING";
 
   const createMutation = trpc.leaveRequest.create.useMutation({
     onSuccess: (req) => {
@@ -117,6 +118,11 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
           ))}
         </Select>
         {errors.type && <p className="text-xs text-destructive">{errors.type.message}</p>}
+        {isEgenmelding && (
+          <p className="text-xs text-muted-foreground bg-muted rounded p-2">
+            Egenmelding teller alltid som 3 dager, uavhengig av faktisk varighet. Du har inntil 4 egenmeldinger per kalenderår.
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">

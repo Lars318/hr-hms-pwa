@@ -9,9 +9,18 @@ import {
 import type { Prisma, LeaveRequestStatus } from "@prisma/client";
 
 const leaveTypes = [
-  "VACATION", "SICK_LEAVE", "CARE_LEAVE",
+  "VACATION", "SICK_LEAVE", "CARE_LEAVE", "EGENMELDING",
   "PARENTAL_LEAVE", "UNPAID_LEAVE", "OTHER",
 ] as const;
+
+// Egenmelding rules: 4 instances × 3 days = 12 days total per calendar year.
+// Each instance counts as 3 days regardless of actual days registered.
+const EGENMELDING_MAX_INSTANCES = 4;
+const EGENMELDING_DAYS_PER_INSTANCE = 3;
+// Default ferie quota (25 working days = 5 weeks)
+const FERIE_DAYS_PER_YEAR = 25;
+// Default omsorgsfravær quota (10 days per year, 20 if more than 2 children)
+const OMSORG_DAYS_PER_YEAR = 10;
 
 const leaveStatuses = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"] as const;
 
@@ -397,6 +406,66 @@ export const leaveRequestRouter = router({
       });
     }),
 
+  // ── balance ───────────────────────────────────────────────────────────────
+  balance: profileProcedure
+    .input(z.object({ employeeId: z.string().optional(), year: z.number().int().min(2020).max(2100).optional() }))
+    .query(async ({ ctx, input }) => {
+      const { profile, db } = ctx;
+      const isHrAdmin = profile.role === "ADMIN" || profile.role === "HR";
+
+      const targetId = input.employeeId && isHrAdmin ? input.employeeId : profile.id;
+      const year = input.year ?? new Date().getFullYear();
+      const yearStart = new Date(year, 0, 1);
+      const yearEnd = new Date(year, 11, 31, 23, 59, 59, 999);
+
+      const requests = await db.leaveRequest.findMany({
+        where: {
+          employeeId: targetId,
+          status: { in: ["APPROVED", "PENDING"] },
+          startDate: { gte: yearStart, lte: yearEnd },
+          type: { in: ["EGENMELDING", "CARE_LEAVE", "VACATION"] },
+        },
+        select: { type: true, days: true, startDate: true },
+        orderBy: { startDate: "asc" },
+      });
+
+      // Egenmelding: count instances (not days), each = 3 days
+      const egenmeldingInstances = requests.filter((r) => r.type === "EGENMELDING").length;
+      const egenmeldingDaysUsed = egenmeldingInstances * EGENMELDING_DAYS_PER_INSTANCE;
+      const egenmeldingInstancesRemaining = Math.max(0, EGENMELDING_MAX_INSTANCES - egenmeldingInstances);
+
+      // Omsorgsfravær: count actual days
+      const omsorgsfravaerDaysUsed = requests
+        .filter((r) => r.type === "CARE_LEAVE")
+        .reduce((sum, r) => sum + r.days, 0);
+
+      // Ferie: count actual days
+      const ferieDaysUsed = requests
+        .filter((r) => r.type === "VACATION")
+        .reduce((sum, r) => sum + r.days, 0);
+
+      return {
+        year,
+        egenmelding: {
+          instancesUsed: egenmeldingInstances,
+          instancesRemaining: egenmeldingInstancesRemaining,
+          daysUsed: egenmeldingDaysUsed,
+          daysPerInstance: EGENMELDING_DAYS_PER_INSTANCE,
+          maxInstances: EGENMELDING_MAX_INSTANCES,
+        },
+        omsorgsfravær: {
+          daysUsed: omsorgsfravaerDaysUsed,
+          daysRemaining: Math.max(0, OMSORG_DAYS_PER_YEAR - omsorgsfravaerDaysUsed),
+          quota: OMSORG_DAYS_PER_YEAR,
+        },
+        ferie: {
+          daysUsed: ferieDaysUsed,
+          daysRemaining: Math.max(0, FERIE_DAYS_PER_YEAR - ferieDaysUsed),
+          quota: FERIE_DAYS_PER_YEAR,
+        },
+      };
+    }),
+
   // ── cancel ────────────────────────────────────────────────────────────────
   cancel: profileProcedure
     .input(z.object({ id: z.string() }))
@@ -461,7 +530,8 @@ export const leaveRequestRouter = router({
 const TYPE_LABELS: Record<string, string> = {
   VACATION: "Ferie",
   SICK_LEAVE: "Sykemelding",
-  CARE_LEAVE: "Omsorgspermisjon",
+  CARE_LEAVE: "Omsorgsfravær",
+  EGENMELDING: "Egenmelding",
   PARENTAL_LEAVE: "Foreldrepermisjon",
   UNPAID_LEAVE: "Permisjon uten lønn",
   OTHER: "Annet fravær",
