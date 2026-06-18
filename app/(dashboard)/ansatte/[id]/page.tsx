@@ -36,7 +36,7 @@ export default async function AnsattDetaljPage({ params }: Props) {
     }),
     db.trainingRecord.findMany({
       where: { profileId: params.id },
-      include: { course: { select: { id: true, title: true } } },
+      include: { course: { select: { id: true, name: true } } },
       orderBy: { completedAt: "desc" },
     }),
     db.document.findMany({
@@ -54,7 +54,7 @@ export default async function AnsattDetaljPage({ params }: Props) {
 
   const courses = enrollments.map((e) => ({
     id: e.id,
-    title: e.course.title,
+    title: e.course.name,
     completedAt: e.completedAt ?? null,
     expiresAt: e.expiresAt ?? null,
   }));
