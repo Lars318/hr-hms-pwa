@@ -155,7 +155,14 @@ export function Sidebar({ role }: SidebarProps) {
     <aside className="hidden lg:flex h-full w-56 flex-col border-r bg-card">
       <div className="flex h-14 items-center gap-2 border-b px-4">
         <PulsfolloLogo size={22} />
-        <span className="text-sm font-bold tracking-tight text-primary">Pulsfollo</span>
+        <span className="flex-1 text-sm font-bold tracking-tight text-primary">Pulsfollo</span>
+        <button
+          onClick={handleLogout}
+          title="Logg ut"
+          className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+        >
+          <LogOut className="h-4 w-4" />
+        </button>
       </div>
 
       <div className="px-3 py-2 border-b">
@@ -237,15 +244,6 @@ export function Sidebar({ role }: SidebarProps) {
         })}
       </nav>
 
-      <div className="border-t p-3">
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-        >
-          <LogOut className="h-4 w-4" />
-          Logg ut
-        </button>
-      </div>
     </aside>
   );
 }

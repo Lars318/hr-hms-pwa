@@ -8,21 +8,28 @@ export function PulsfolloLogo({ className, size = 28 }: Props) {
     <svg
       width={size}
       height={size}
-      viewBox="0 0 120 130"
-      fill="none"
+      viewBox="28 340 44 30"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      {/* Hode */}
-      <ellipse cx="60" cy="15" rx="12" ry="13" fill="#E05A25" />
-      {/* Venstre arm (opp-venstre til ned-høyre gjennom midten) */}
-      <ellipse cx="60" cy="55" rx="44" ry="10" transform="rotate(-38 60 55)" fill="#E05A25" />
-      {/* Høyre arm (opp-høyre til ned-venstre gjennom midten) */}
-      <ellipse cx="60" cy="55" rx="44" ry="10" transform="rotate(38 60 55)" fill="#E05A25" />
-      {/* Venstre bein */}
-      <ellipse cx="60" cy="90" rx="44" ry="10" transform="rotate(38 60 90)" fill="#E05A25" />
-      {/* Høyre bein */}
-      <ellipse cx="60" cy="90" rx="44" ry="10" transform="rotate(-38 60 90)" fill="#E05A25" />
+      {/* Dot */}
+      <path
+        fill="#FF5000"
+        d="M51.12,344.86c-0.01,1.32-1.85,2.37-4.12,2.36c-2.27-0.01-4.09-1.09-4.08-2.41
+          c0.01-1.32,1.85-2.37,4.11-2.36C49.3,342.46,51.13,343.54,51.12,344.86z"
+      />
+      {/* Wave */}
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        fill="#FF5000"
+        d="M32.29,347.18l6.62,2.67c0,0,1.47,0.64,1.16,1.98c-0.24,1.02-1.86,1.76-2.57,2.06
+          c-0.7,0.3-2.56,0.7-3.39,2.13c-0.84,1.43,0.36,2.2,1.57,2.06c1.21-0.14,2.68-0.99,4.14-1.6
+          c1.46-0.61,4.76-3.45,11.5-0.08c6.74,3.38,10.37,5.89,11.75,4.11c1.38-1.78,0.15-3.8-2.07-4.88
+          c-2.22-1.08-5.74-2.63-5.79-4.27c-0.05-1.51,0.92-2.59,3.48-3.81c2.55-1.22,11.55-3.78,8.85-7.09
+          c-2.69-3.31-8.06,1.46-9.6,2.74c-1.54,1.28-7.04,5.11-10.85,5.04c-3.88-0.07-8.59-4.04-10.08-5.12
+          c-1.49-1.08-4.49-2.14-6.04-0.61C29.77,343.71,29.73,345.75,32.29,347.18z"
+      />
     </svg>
   );
 }

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { PersonalizedDashboard } from "@/features/dashboard/PersonalizedDashboard";
 import { DashboardGreeting } from "@/features/dashboard/DashboardGreeting";
+import { TodoPopup } from "@/features/dashboard/TodoPopup";
 
 export const metadata = { title: "Dashboard – HR/HMS" };
 
@@ -20,6 +21,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-5">
+      <TodoPopup role={profile.role} />
       <DashboardGreeting name={profile.fullName} role={profile.role} />
       <PersonalizedDashboard
         viewerRole={profile.role}
