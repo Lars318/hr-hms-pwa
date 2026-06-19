@@ -26,9 +26,9 @@ export function QuickEgenmelding() {
 
   if (done) {
     return (
-      <div className="flex items-center gap-3 rounded-2xl bg-teal-500/10 border border-teal-500/20 px-4 py-3">
-        <HeartPulse className="h-5 w-5 text-teal-500 shrink-0" />
-        <p className="text-sm font-medium text-teal-700 dark:text-teal-300">
+      <div className="flex items-center gap-3 rounded-2xl bg-primary/10 border border-primary/20 px-4 py-3">
+        <HeartPulse className="h-5 w-5 text-primary shrink-0" />
+        <p className="text-sm font-medium text-primary">
           Egenmelding registrert for i dag
         </p>
       </div>
@@ -41,7 +41,7 @@ export function QuickEgenmelding() {
         mutation.mutate({ type: "EGENMELDING", startDate: today, endDate: today })
       }
       disabled={mutation.isPending}
-      className="w-full h-12 text-base gap-2 bg-teal-600 hover:bg-teal-700 text-white"
+      className="w-full h-12 text-base gap-2 bg-accent hover:bg-accent/90 text-accent-foreground"
     >
       <HeartPulse className="h-5 w-5" />
       {mutation.isPending ? "Registrerer…" : "Jeg er syk i dag"}
