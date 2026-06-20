@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { SickLeaveList } from "@/features/sickLeave/SickLeaveList";
 
-export const metadata = { title: "Sykefraværsoppfølging – Pulsfollo" };
+export const metadata = { title: "Sykefraværsoppfølging – Truls HR" };
 
 export default async function SykefravaerPage() {
   const supabase = createClient();

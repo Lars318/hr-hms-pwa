@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { StartRundeForm } from "@/features/hms-runde/StartRundeForm";
 
-export const metadata = { title: "Start HMS-runde – Pulsfollo" };
+export const metadata = { title: "Start HMS-runde – Truls HR" };
 
 export default async function NyHmsRundePage() {
   const supabase = createClient();

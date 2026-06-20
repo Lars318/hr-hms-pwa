@@ -160,7 +160,7 @@ export function Sidebar({ role }: SidebarProps) {
     <aside className="hidden lg:flex h-full w-56 flex-col bg-neutral-900">
       <div className="flex h-14 items-center gap-2 border-b border-neutral-800 px-4">
         <PulsfolloLogo size={22} />
-        <span className="flex-1 text-sm font-bold tracking-tight text-white">Pulsfollo</span>
+        <span className="flex-1 text-sm font-bold tracking-tight text-white">Truls HR</span>
         <button
           onClick={handleLogout}
           title="Logg ut"

@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { TemplateAdmin } from "@/features/hms-runde/TemplateAdmin";
 
-export const metadata = { title: "HMS-maler – Pulsfollo" };
+export const metadata = { title: "HMS-maler – Truls HR" };
 
 export default async function HmsMalerPage() {
   const supabase = createClient();

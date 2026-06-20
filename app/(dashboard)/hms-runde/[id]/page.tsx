@@ -12,7 +12,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const record = await db.inspectionRecord.findUnique({ where: { id: params.id } });
-  return { title: record ? `${record.title} – Pulsfollo` : "HMS-runde – Pulsfollo" };
+  return { title: record ? `${record.title} – Truls HR` : "HMS-runde – Truls HR" };
 }
 
 export default async function HmsRundeDetaljPage({ params }: Props) {

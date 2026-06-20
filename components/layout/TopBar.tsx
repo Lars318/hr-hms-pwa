@@ -18,7 +18,7 @@ export function TopBar({ email }: TopBarProps) {
       {/* Logo synlig kun på mobil */}
       <div className="flex items-center gap-2 lg:hidden">
         <PulsfolloLogo size={24} />
-        <span className="text-sm font-bold tracking-tight text-primary">Pulsfollo</span>
+        <span className="text-sm font-bold tracking-tight text-primary">Truls HR</span>
       </div>
 
       <div className="flex items-center gap-3 ml-auto">

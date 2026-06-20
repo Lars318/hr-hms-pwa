@@ -12,7 +12,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const profile = await db.profile.findUnique({ where: { id: params.id } });
-  return { title: profile ? `${profile.fullName} – Pulsfollo` : "Ansattprofil – Pulsfollo" };
+  return { title: profile ? `${profile.fullName} – Truls HR` : "Ansattprofil – Truls HR" };
 }
 
 export default async function AnsattDetaljPage({ params }: Props) {

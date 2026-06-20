@@ -131,7 +131,7 @@ export function BottomNav({ role }: BottomNavProps) {
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 h-14 border-b shrink-0">
-          <span className="text-sm font-bold tracking-tight text-primary">Pulsfollo HR/HMS</span>
+          <span className="text-sm font-bold tracking-tight text-primary">Truls HR</span>
           <button
             onClick={() => setOpen(false)}
             className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-accent transition-colors"

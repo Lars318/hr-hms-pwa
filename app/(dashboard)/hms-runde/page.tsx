@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, ClipboardList } from "lucide-react";
 import { HmsRundeList } from "@/features/hms-runde/HmsRundeList";
 
-export const metadata = { title: "HMS-runde – Pulsfollo" };
+export const metadata = { title: "HMS-runde – Truls HR" };
 
 export default async function HmsRundePage() {
   const supabase = createClient();

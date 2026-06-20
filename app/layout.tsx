@@ -8,8 +8,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Pulsfollo",
-  description: "HR og HMS for Pulsfollo",
+  title: "Truls HR",
+  description: "HR og HMS-system",
   manifest: "/manifest.json",
   icons: {
     icon: "/icons/icon-192.png",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Pulsfollo",
+    title: "Truls HR",
   },
 };
 
