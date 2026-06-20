@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { UserCircle, CalendarOff, ShieldAlert, Users, BarChart2, Clock, BookOpen } from "lucide-react";
+import { CalendarOff, ShieldAlert, Users, BarChart2, Clock, UserCircle, BookOpen, HeartPulse } from "lucide-react";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
+import { format } from "date-fns";
+import { nb } from "date-fns/locale";
 import type { Role } from "@prisma/client";
 
 function getGreeting(hour: number) {
@@ -21,28 +23,29 @@ interface QuickAction {
   label: string;
   href: string;
   icon: React.ElementType;
+  primary?: boolean;
 }
 
 function getQuickActions(role: Role): QuickAction[] {
-  const base: QuickAction[] = [
-    { label: "Min profil",       href: "/profil",      icon: UserCircle },
-    { label: "Meld fravær",      href: "/fravaer/ny",  icon: CalendarOff },
-    { label: "Nytt avvik",       href: "/avvik/ny",    icon: ShieldAlert },
-    { label: "Personalhåndbok",  href: "/personalhandbok", icon: BookOpen },
-  ];
-
   if (role === "MANAGER" || role === "HR" || role === "ADMIN") {
     return [
-      { label: "Min profil",         href: "/profil",               icon: UserCircle },
-      { label: "Ansatte",            href: "/ansatte",              icon: Users },
-      { label: "Meld fravær",        href: "/fravaer/ny",           icon: CalendarOff },
-      { label: "Nytt avvik",         href: "/avvik/ny",             icon: ShieldAlert },
-      { label: "Rapporter",          href: "/rapporter",            icon: BarChart2 },
-      { label: "Godkjenn overtid",   href: "/overtid/godkjenning",  icon: Clock },
+      { label: "Egenmelding",      href: "/fravaer/ny?type=EGENMELDING", icon: HeartPulse, primary: true },
+      { label: "Meld fravær",      href: "/fravaer/ny",                  icon: CalendarOff },
+      { label: "Nytt avvik",       href: "/avvik/ny",                    icon: ShieldAlert },
+      { label: "Ansatte",          href: "/ansatte",                     icon: Users },
+      { label: "Godkjenn overtid", href: "/overtid/godkjenning",         icon: Clock },
+      { label: "Rapporter",        href: "/rapporter",                   icon: BarChart2 },
+      { label: "Min profil",       href: "/profil",                      icon: UserCircle },
     ];
   }
 
-  return base;
+  return [
+    { label: "Egenmelding",     href: "/fravaer/ny?type=EGENMELDING", icon: HeartPulse, primary: true },
+    { label: "Meld fravær",     href: "/fravaer/ny",                  icon: CalendarOff },
+    { label: "Nytt avvik",      href: "/avvik/ny",                    icon: ShieldAlert },
+    { label: "Personalhåndbok", href: "/personalhandbok",             icon: BookOpen },
+    { label: "Min profil",      href: "/profil",                      icon: UserCircle },
+  ];
 }
 
 interface DashboardGreetingProps {
@@ -52,34 +55,41 @@ interface DashboardGreetingProps {
 
 export function DashboardGreeting({ name, role }: DashboardGreetingProps) {
   const [greeting, setGreeting] = useState("Hei");
+  const [dateStr, setDateStr] = useState("");
 
   useEffect(() => {
-    setGreeting(getGreeting(new Date().getHours()));
+    const now = new Date();
+    setGreeting(getGreeting(now.getHours()));
+    setDateStr(format(now, "EEEE d. MMMM yyyy", { locale: nb }));
   }, []);
 
   const actions = getQuickActions(role);
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border px-6 py-6 space-y-4">
+    <div className="-mx-4 -mt-4 lg:-mx-6 lg:-mt-6 bg-accent/70 px-6 pt-6 pb-5 space-y-4">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {greeting}, {firstName(name)} 👋
+        <p className="text-xs font-medium text-accent-foreground/60 capitalize mb-0.5">{dateStr}</p>
+        <h1 className="text-2xl font-bold tracking-tight text-accent-foreground">
+          {greeting}, {firstName(name)}
         </h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Hva vil du gjøre i dag?
-        </p>
       </div>
 
-      <GlobalSearch role={role} />
+      <div className="[&_input]:bg-white/50 [&_input]:border-white/30 [&_input]:placeholder:text-accent-foreground/50">
+        <GlobalSearch role={role} />
+      </div>
 
       <div className="flex flex-wrap gap-2">
         {actions.map((a) => (
           <Link
             key={a.href}
             href={a.href}
-            className="flex items-center gap-1.5 rounded-full border bg-card/80 px-4 py-2 text-sm font-medium hover:bg-card hover:shadow-sm transition-all"
+            className={
+              a.primary
+                ? "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
+                : "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium bg-white/40 text-accent-foreground border border-white/30 hover:bg-white/60 transition-colors"
+            }
           >
-            <a.icon className="h-3.5 w-3.5 text-muted-foreground" />
+            <a.icon className="h-3.5 w-3.5" />
             {a.label}
           </Link>
         ))}

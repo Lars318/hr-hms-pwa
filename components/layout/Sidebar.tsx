@@ -33,7 +33,8 @@ interface NavGroup {
   items: NavItem[];
 }
 
-type NavEntry = { type: "item" } & NavItem | { type: "group" } & NavGroup;
+type NavSection = { type: "section"; label: string; roles: Role[] };
+type NavEntry = { type: "item" } & NavItem | { type: "group" } & NavGroup | NavSection;
 
 const nav: NavEntry[] = [
   {
@@ -43,6 +44,7 @@ const nav: NavEntry[] = [
     icon: LayoutDashboard,
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
   },
+  { type: "section", label: "HMS", roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   {
     type: "group",
     label: "HMS",
@@ -57,6 +59,7 @@ const nav: NavEntry[] = [
       { href: "/opplaering",  label: "Opplæring",     icon: GraduationCap,roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
     ],
   },
+  { type: "section", label: "Personal", roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   {
     type: "group",
     label: "Personal",
@@ -96,6 +99,7 @@ const nav: NavEntry[] = [
       { href: "/personalhandbok",label: "Personalhåndbok",icon: BookOpen,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
     ],
   },
+  { type: "section", label: "Admin", roles: ["ADMIN", "HR"] },
   {
     type: "group",
     label: "Admin",
@@ -152,25 +156,34 @@ export function Sidebar({ role }: SidebarProps) {
   }
 
   return (
-    <aside className="hidden lg:flex h-full w-56 flex-col border-r bg-card">
-      <div className="flex h-14 items-center gap-2 border-b px-4">
+    <aside className="hidden lg:flex h-full w-56 flex-col bg-neutral-900">
+      <div className="flex h-14 items-center gap-2 border-b border-neutral-800 px-4">
         <PulsfolloLogo size={22} />
-        <span className="flex-1 text-sm font-bold tracking-tight text-primary">Pulsfollo</span>
+        <span className="flex-1 text-sm font-bold tracking-tight text-white">Pulsfollo</span>
         <button
           onClick={handleLogout}
           title="Logg ut"
-          className="flex items-center justify-center rounded-md p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+          className="flex items-center justify-center rounded-md p-1.5 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200 transition-colors"
         >
           <LogOut className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="px-3 py-2 border-b">
+      <div className="px-3 py-2 border-b border-neutral-800">
         <GlobalSearch role={role} placeholder="Søk…" size="sm" />
       </div>
 
       <nav className="flex-1 p-3 overflow-y-auto space-y-0.5">
-        {nav.map((entry) => {
+        {nav.map((entry, i) => {
+          if (entry.type === "section") {
+            if (!entry.roles.includes(role)) return null;
+            return (
+              <p key={`section-${i}`} className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-neutral-600">
+                {entry.label}
+              </p>
+            );
+          }
+
           if (entry.type === "item") {
             if (!entry.roles.includes(role)) return null;
             const active = isActive(entry.href, pathname);
@@ -181,8 +194,8 @@ export function Sidebar({ role }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   active
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "bg-primary/20 text-primary-light"
+                    : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
                 )}
               >
                 <entry.icon className="h-4 w-4 shrink-0" />
@@ -206,8 +219,8 @@ export function Sidebar({ role }: SidebarProps) {
                 className={cn(
                   "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   hasActive && !isOpen
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "text-neutral-100"
+                    : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
                 )}
               >
                 <entry.icon className="h-4 w-4 shrink-0" />
@@ -218,7 +231,7 @@ export function Sidebar({ role }: SidebarProps) {
               </button>
 
               {isOpen && (
-                <div className="ml-3 pl-3 border-l border-border space-y-0.5 mt-0.5 mb-1">
+                <div className="ml-3 pl-3 border-l border-neutral-700 space-y-0.5 mt-0.5 mb-1">
                   {visibleItems.map((item) => {
                     const active = isActive(item.href, pathname);
                     return (
@@ -228,8 +241,8 @@ export function Sidebar({ role }: SidebarProps) {
                         className={cn(
                           "flex items-center gap-3 rounded-md px-3 py-1.5 text-sm transition-colors",
                           active
-                            ? "bg-primary text-primary-foreground font-medium"
-                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                            ? "bg-primary/20 text-green-300 font-medium"
+                            : "text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200"
                         )}
                       >
                         <item.icon className="h-3.5 w-3.5 shrink-0" />
@@ -244,6 +257,14 @@ export function Sidebar({ role }: SidebarProps) {
         })}
       </nav>
 
+      <div className="border-t border-neutral-800 p-3">
+        <div className="flex items-center gap-2.5 px-1">
+          <div className="h-7 w-7 rounded-full bg-primary/30 flex items-center justify-center text-xs font-medium text-green-300 shrink-0">
+            {role.charAt(0)}
+          </div>
+          <span className="text-xs text-neutral-400 flex-1 truncate">{role}</span>
+        </div>
+      </div>
     </aside>
   );
 }

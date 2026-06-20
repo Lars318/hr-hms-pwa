@@ -20,14 +20,16 @@ export default async function DashboardPage() {
     (profile.title?.toLowerCase().includes("hms") ?? false);
 
   return (
-    <div className="space-y-5">
+    <div>
       <TodoPopup role={profile.role} />
       <DashboardGreeting name={profile.fullName} role={profile.role} />
+      <div className="mt-6">
       <PersonalizedDashboard
         viewerRole={profile.role}
         viewerName={profile.fullName}
         isHms={isHms}
       />
+      </div>
     </div>
   );
 }
