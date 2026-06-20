@@ -241,16 +241,16 @@ export function BottomNav({ role }: BottomNavProps) {
             <span className="text-[10px] font-medium text-muted-foreground mt-0.5">Ny</span>
           </Link>
 
-          {/* Risiko */}
+          {/* Min profil */}
           <Link
-            href="/risiko"
+            href="/profil"
             className={cn(
               "flex flex-col items-center gap-0.5 min-w-[3rem] py-1 px-2 rounded-lg transition-colors",
-              isActive("/risiko") ? "text-primary" : "text-muted-foreground"
+              isActive("/profil") ? "text-primary" : "text-muted-foreground"
             )}
           >
-            <ShieldCheck className="h-5 w-5" />
-            <span className="text-[10px] font-medium">Risiko</span>
+            <UserCircle className="h-5 w-5" />
+            <span className="text-[10px] font-medium">Profil</span>
           </Link>
 
           {/* Meny — åpner sidebar */}

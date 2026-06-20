@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { createClient } from "@/lib/supabase/client";
 import {
-  LogOut, ChevronRight, Briefcase, Bell, Shield,
-  MapPin, Building2, Tag, Phone, Mail, Pencil, Check, X,
-  Sun, Moon, Monitor, Loader2,
+  LogOut, ChevronRight, Briefcase, Shield,
+  MapPin, Building2, Phone, Mail, Pencil, Check, X,
+  Sun, Moon, Monitor, Loader2, Fingerprint, Tag,
 } from "lucide-react";
 import { AvatarUpload } from "@/features/profile/AvatarUpload";
 import { PasskeySetup } from "@/features/auth/PasskeySetup";
@@ -27,7 +27,6 @@ const ROLE_COLOR: Record<string, string> = {
   MANAGER: "bg-primary/15 text-primary",
   EMPLOYEE: "bg-muted text-muted-foreground",
 };
-
 
 function initials(name: string) {
   return name
@@ -71,11 +70,6 @@ function ThemeRow() {
       ))}
     </div>
   );
-}
-
-interface MenuSection {
-  title: string;
-  items: { icon: React.ElementType; label: string; href?: string; value?: string }[];
 }
 
 export function MyProfileClient({ email }: { email: string }) {
@@ -125,41 +119,14 @@ export function MyProfileClient({ email }: { email: string }) {
     title !== (profile.title ?? "") ||
     phone !== (profile.phone ?? "");
 
-  const location =
-    (profile as any).profileAssignments?.[0]?.location?.name ?? null;
+  const location = (profile as any).profileAssignments?.[0]?.location?.name ?? null;
   const department = (profile as any).department?.name ?? null;
-
-  const menuSections: MenuSection[] = [
-    {
-      title: "Jobb",
-      items: [
-        { icon: Briefcase, label: "Stilling", value: profile.title ?? "—" },
-        { icon: Building2, label: "Avdeling", value: department ?? "—" },
-        { icon: MapPin, label: "Lokasjon", value: location ?? "—" },
-        { icon: Tag, label: "Rolle", value: ROLE_LABEL[profile.role] ?? profile.role },
-      ],
-    },
-    {
-      title: "Kontakt",
-      items: [
-        { icon: Mail, label: "E-post", value: email },
-        { icon: Phone, label: "Telefon", value: profile.phone ?? "—" },
-      ],
-    },
-    {
-      title: "Innstillinger",
-      items: [
-        { icon: Bell, label: "Varsler" },
-        { icon: Shield, label: "Personvern" },
-      ],
-    },
-  ];
 
   return (
     <div className="flex flex-col gap-0 -mt-6 -mx-4 lg:-mx-8">
-      {/* ── Hero ── */}
-      <div className="relative h-56 lg:h-64 overflow-hidden bg-primary/20">
-        {/* Background: person image if no avatar, else avatar blurred */}
+
+      {/* ── Hero banner ── */}
+      <div className="relative h-44 lg:h-56 overflow-hidden bg-primary">
         <img
           src={
             profile.avatarUrl
@@ -168,11 +135,9 @@ export function MyProfileClient({ email }: { email: string }) {
           }
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover object-top blur-sm scale-110"
+          className="absolute inset-0 h-full w-full object-cover object-top opacity-30 blur-sm scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-background/80" />
-
-        {/* Edit button */}
+        {/* Rediger-knapp */}
         <button
           onClick={() => setEditing((v) => !v)}
           className="absolute top-4 right-4 z-10 flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/30 transition-colors"
@@ -181,8 +146,8 @@ export function MyProfileClient({ email }: { email: string }) {
           Rediger
         </button>
 
-        {/* Avatar med opplasting */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+        {/* Avatar */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 z-10">
           <div className="ring-4 ring-background rounded-full shadow-xl">
             <AvatarUpload
               profileId={profile.id}
@@ -193,8 +158,8 @@ export function MyProfileClient({ email }: { email: string }) {
         </div>
       </div>
 
-      {/* ── Name block ── */}
-      <div className="pt-16 pb-6 px-4 text-center">
+      {/* ── Navn og info ── */}
+      <div className="pt-16 pb-5 px-4 text-center">
         {editing ? (
           <div className="flex flex-col items-center gap-2 max-w-xs mx-auto">
             <input
@@ -264,27 +229,29 @@ export function MyProfileClient({ email }: { email: string }) {
           <>
             <h1 className="text-2xl font-bold tracking-tight">{profile.fullName}</h1>
             {profile.title && (
-              <p className="mt-1 text-sm text-muted-foreground">{profile.title}</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">{profile.title}</p>
             )}
+
+            {/* Rolle + metadata */}
             <div className="mt-2 flex items-center justify-center gap-2 flex-wrap">
-              {location && (
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" />
-                  {location}
-                </span>
-              )}
+              <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", ROLE_COLOR[profile.role] ?? "bg-muted text-muted-foreground")}>
+                {ROLE_LABEL[profile.role] ?? profile.role}
+              </span>
               {department && (
                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Building2 className="h-3 w-3" />
                   {department}
                 </span>
               )}
-              <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", ROLE_COLOR[profile.role] ?? "bg-muted text-muted-foreground")}>
-                {ROLE_LABEL[profile.role] ?? profile.role}
-              </span>
+              {location && (
+                <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <MapPin className="h-3 w-3" />
+                  {location}
+                </span>
+              )}
             </div>
 
-            {/* Contact pills */}
+            {/* Kontaktknapper */}
             <div className="mt-4 flex items-center justify-center gap-2">
               {profile.phone && (
                 <a
@@ -292,7 +259,7 @@ export function MyProfileClient({ email }: { email: string }) {
                   className="flex items-center gap-1.5 rounded-full border bg-card px-4 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
                 >
                   <Phone className="h-3.5 w-3.5" />
-                  Ring meg
+                  {profile.phone}
                 </a>
               )}
               <a
@@ -300,69 +267,45 @@ export function MyProfileClient({ email }: { email: string }) {
                 className="flex items-center gap-1.5 rounded-full border bg-card px-4 py-1.5 text-xs font-medium hover:bg-muted transition-colors"
               >
                 <Mail className="h-3.5 w-3.5" />
-                Send e-post
+                E-post
               </a>
             </div>
           </>
         )}
       </div>
 
-      {/* ── Menu sections ── */}
-      <div className="px-4 pb-8 flex flex-col gap-3">
-        {menuSections.map((section) => (
-          <div key={section.title}>
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">
-              {section.title}
-            </p>
-            <div className="rounded-2xl border bg-card overflow-hidden divide-y divide-border">
-              {section.items.map(({ icon: Icon, label, value, href }) => (
-                <div
-                  key={label}
-                  onClick={() => href && router.push(href)}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3.5",
-                    href && "cursor-pointer hover:bg-muted/50 transition-colors"
-                  )}
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">
-                    <Icon className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <span className="flex-1 text-sm font-medium">{label}</span>
-                  {value ? (
-                    <span className="text-sm text-muted-foreground truncate max-w-[160px]">{value}</span>
-                  ) : (
-                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+      {/* ── Seksjoner ── */}
+      <div className="px-4 pb-10 flex flex-col gap-3">
 
-        {/* Passkey / Face ID */}
+        {/* Jobb */}
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">
-            Sikkerhet
-          </p>
-          <div className="rounded-2xl border bg-card px-4 py-3.5 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">
-                <Shield className="h-4 w-4 text-muted-foreground" />
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">Jobb</p>
+          <div className="rounded-2xl border bg-card overflow-hidden divide-y divide-border">
+            {[
+              { icon: Briefcase, label: "Stilling", value: profile.title ?? "—" },
+              { icon: Building2, label: "Avdeling", value: department ?? "—" },
+              { icon: MapPin,    label: "Lokasjon",  value: location ?? "—" },
+              { icon: Tag,       label: "Rolle",     value: ROLE_LABEL[profile.role] ?? profile.role },
+              { icon: Mail,      label: "E-post",    value: email },
+              { icon: Phone,     label: "Telefon",   value: profile.phone ?? "—" },
+            ].map(({ icon: Icon, label, value }) => (
+              <div key={label} className="flex items-center gap-3 px-4 py-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">
+                  <Icon className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <span className="flex-1 text-sm font-medium text-foreground">{label}</span>
+                <span className="text-sm text-muted-foreground truncate max-w-[160px]">{value}</span>
               </div>
-              <span className="text-sm font-medium">Face ID / Passkey</span>
-            </div>
-            <PasskeySetup hasPasskey={false} />
+            ))}
           </div>
         </div>
 
-        {/* Theme */}
+        {/* Utseende */}
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">
-            Utseende
-          </p>
-          <div className="rounded-2xl border bg-card px-4 py-3.5 flex items-center justify-between">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">Utseende</p>
+          <div className="rounded-2xl border bg-card px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">
                 <Monitor className="h-4 w-4 text-muted-foreground" />
               </div>
               <span className="text-sm font-medium">Visningsmodus</span>
@@ -371,20 +314,44 @@ export function MyProfileClient({ email }: { email: string }) {
           </div>
         </div>
 
-        {/* Logout */}
+        {/* Sikkerhet */}
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">Sikkerhet</p>
+          <div className="rounded-2xl border bg-card overflow-hidden divide-y divide-border">
+            <div className="flex items-center gap-3 px-4 py-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">
+                <Fingerprint className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Face ID / Passkey</p>
+                <p className="text-xs text-muted-foreground">Rask og sikker innlogging</p>
+              </div>
+              <PasskeySetup hasPasskey={false} />
+            </div>
+            <div
+              className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => router.push("/personvern")}
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">
+                <Shield className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <span className="flex-1 text-sm font-medium">Personvern</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </div>
+        </div>
+
+        {/* Logg ut */}
         <button
           onClick={handleLogout}
-          className="mt-2 flex w-full items-center gap-3 rounded-2xl border border-destructive/30 bg-card px-4 py-3.5 text-sm font-medium text-destructive hover:bg-destructive/5 transition-colors"
+          className="flex w-full items-center gap-3 rounded-2xl border border-destructive/30 bg-card px-4 py-3.5 text-sm font-medium text-destructive hover:bg-destructive/5 transition-colors"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-destructive/10">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-destructive/10 shrink-0">
             <LogOut className="h-4 w-4 text-destructive" />
           </div>
           Logg ut
         </button>
 
-        <p className="text-center text-xs text-muted-foreground mt-2">
-          Rolle og e-post kan kun endres av administrator.
-        </p>
       </div>
     </div>
   );
