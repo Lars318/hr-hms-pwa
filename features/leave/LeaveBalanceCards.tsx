@@ -35,18 +35,18 @@ function BalanceCard({
   }[variant];
 
   return (
-    <div className="rounded-2xl border bg-card p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${iconStyles}`}>
-          <Icon className="h-5 w-5" />
+    <div className="rounded-2xl border bg-card p-3 sm:p-4 flex flex-col gap-2.5">
+      <div className="flex items-center gap-2">
+        <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${iconStyles}`}>
+          <Icon className="h-4 w-4" />
         </div>
-        <span className="text-xs text-muted-foreground text-right leading-tight">{label}</span>
+        <span className="text-xs font-medium text-muted-foreground leading-tight">{label}</span>
       </div>
 
       <div>
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-3xl font-bold tracking-tight">{remaining}</span>
-          <span className="text-sm text-muted-foreground">av {total} {unit} igjen</span>
+        <div className="flex items-baseline gap-1">
+          <span className="text-2xl font-bold tracking-tight">{remaining}</span>
+          <span className="text-xs text-muted-foreground">/ {total} {unit}</span>
         </div>
         {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
       </div>
@@ -77,14 +77,14 @@ export function LeaveBalanceCards() {
   if (!data) return null;
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-3 gap-2 sm:gap-3">
       <BalanceCard
         icon={FileCheck}
         label="Egenmelding"
         remaining={data.egenmelding.instancesRemaining}
         total={data.egenmelding.maxInstances}
-        unit="egenmeldinger"
-        subtitle={`${data.egenmelding.daysUsed} av ${data.egenmelding.maxInstances * data.egenmelding.daysPerInstance} dager`}
+        unit="gang"
+        subtitle={`${data.egenmelding.daysUsed} av ${data.egenmelding.maxInstances * data.egenmelding.daysPerInstance} dager brukt`}
         variant="accent"
       />
       <BalanceCard
