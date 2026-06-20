@@ -70,8 +70,8 @@ export function AssistantWidget({ onClose }: AssistantWidgetProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b bg-card shrink-0">
         <div>
-          <p className="font-semibold text-sm">HMS/HR-assistent</p>
-          <p className="text-xs text-muted-foreground">Veiledning basert på interne rutiner</p>
+          <p className="font-semibold text-sm">Truls</p>
+          <p className="text-xs text-muted-foreground">Din HR/HMS-assistent</p>
         </div>
         <button
           onClick={onClose}

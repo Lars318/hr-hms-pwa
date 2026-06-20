@@ -14,7 +14,7 @@ export function AssistantButton() {
         <button
           onClick={() => setOpen(true)}
           className="fixed bottom-24 right-4 z-[60] h-14 w-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 active:scale-95 transition-all md:bottom-6"
-          aria-label="Åpne HMS/HR-assistent"
+          aria-label="Åpne Truls"
         >
           <MessageCircle className="h-6 w-6" />
         </button>
