@@ -157,20 +157,20 @@ export function Sidebar({ role }: SidebarProps) {
   }
 
   return (
-    <aside className="hidden lg:flex h-full w-56 flex-col bg-neutral-900">
-      <div className="flex h-14 items-center gap-2 border-b border-neutral-800 px-4">
+    <aside className="hidden lg:flex h-full w-56 flex-col bg-primary">
+      <div className="flex h-14 items-center gap-2 border-b border-white/10 px-4">
         <PulsfolloLogo size={22} />
         <span className="flex-1 text-sm font-bold tracking-tight text-white">Truls HR</span>
         <button
           onClick={handleLogout}
           title="Logg ut"
-          className="flex items-center justify-center rounded-md p-1.5 text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200 transition-colors"
+          className="flex items-center justify-center rounded-md p-1.5 text-white/40 hover:bg-white/10 hover:text-white transition-colors"
         >
           <LogOut className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="px-3 py-2 border-b border-neutral-800">
+      <div className="px-3 py-2 border-b border-white/10">
         <GlobalSearch role={role} placeholder="Søk…" size="sm" />
       </div>
 
@@ -179,7 +179,7 @@ export function Sidebar({ role }: SidebarProps) {
           if (entry.type === "section") {
             if (!entry.roles.includes(role)) return null;
             return (
-              <p key={`section-${i}`} className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-neutral-600">
+              <p key={`section-${i}`} className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/35">
                 {entry.label}
               </p>
             );
@@ -195,8 +195,8 @@ export function Sidebar({ role }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   active
-                    ? "bg-primary/20 text-primary-light"
-                    : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
+                    ? "bg-white/20 text-white"
+                    : "text-white/60 hover:bg-white/10 hover:text-white"
                 )}
               >
                 <entry.icon className="h-4 w-4 shrink-0" />
@@ -220,8 +220,8 @@ export function Sidebar({ role }: SidebarProps) {
                 className={cn(
                   "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                   hasActive && !isOpen
-                    ? "text-neutral-100"
-                    : "text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100"
+                    ? "text-white"
+                    : "text-white/60 hover:bg-white/10 hover:text-white"
                 )}
               >
                 <entry.icon className="h-4 w-4 shrink-0" />
@@ -232,7 +232,7 @@ export function Sidebar({ role }: SidebarProps) {
               </button>
 
               {isOpen && (
-                <div className="ml-3 pl-3 border-l border-neutral-700 space-y-0.5 mt-0.5 mb-1">
+                <div className="ml-3 pl-3 border-l border-white/15 space-y-0.5 mt-0.5 mb-1">
                   {visibleItems.map((item) => {
                     const active = isActive(item.href, pathname);
                     return (
@@ -242,8 +242,8 @@ export function Sidebar({ role }: SidebarProps) {
                         className={cn(
                           "flex items-center gap-3 rounded-md px-3 py-1.5 text-sm transition-colors",
                           active
-                            ? "bg-primary/20 text-green-300 font-medium"
-                            : "text-neutral-500 hover:bg-neutral-800 hover:text-neutral-200"
+                            ? "bg-white/20 text-white font-medium"
+                            : "text-white/50 hover:bg-white/10 hover:text-white"
                         )}
                       >
                         <item.icon className="h-3.5 w-3.5 shrink-0" />
@@ -258,12 +258,12 @@ export function Sidebar({ role }: SidebarProps) {
         })}
       </nav>
 
-      <div className="border-t border-neutral-800 p-3">
+      <div className="border-t border-white/10 p-3">
         <div className="flex items-center gap-2.5 px-1">
-          <div className="h-7 w-7 rounded-full bg-primary/30 flex items-center justify-center text-xs font-medium text-green-300 shrink-0">
+          <div className="h-7 w-7 rounded-full bg-white/20 flex items-center justify-center text-xs font-medium text-white shrink-0">
             {role.charAt(0)}
           </div>
-          <span className="text-xs text-neutral-400 flex-1 truncate">{role}</span>
+          <span className="text-xs text-white/50 flex-1 truncate">{role}</span>
         </div>
       </div>
     </aside>

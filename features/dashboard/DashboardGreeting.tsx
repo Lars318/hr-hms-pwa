@@ -66,7 +66,7 @@ export function DashboardGreeting({ name, role }: DashboardGreetingProps) {
   const actions = getQuickActions(role);
 
   return (
-    <div className="-mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3">
+    <div className="-mx-4 -mt-4 lg:mx-0 lg:mt-0 px-4 pt-4 pb-2 lg:px-0 lg:pt-0 lg:pb-3">
       <div className="rounded-2xl bg-accent/80 px-6 pt-8 pb-7 flex flex-col items-center text-center space-y-5">
         <div>
           <p className="text-xs font-medium text-accent-foreground/60 capitalize mb-1">{dateStr}</p>
