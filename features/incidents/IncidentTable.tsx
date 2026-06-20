@@ -33,28 +33,46 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
 
   return (
     <>
-      {/* ── Mobil: kortoversikt ──────────────────────────────────────── */}
-      <div className="md:hidden space-y-3">
-        {incidents.map((inc) => (
-          <Link key={inc.id} href={`/avvik/${inc.id}`} className="block">
-            <div className="rounded-2xl border bg-card p-4 active:bg-muted/50 transition-colors">
-              <div className="flex items-start justify-between gap-3 min-w-0">
-                <span className="font-medium line-clamp-2 flex-1 min-w-0">{inc.title}</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+      {/* ── Mobil: ikonbaserte listekort ─────────────────────────────── */}
+      <div className="md:hidden rounded-2xl border bg-card divide-y divide-border">
+        {incidents.map((inc) => {
+          const sevIcon = {
+            CRITICAL: { bg: "bg-red-100", text: "text-red-700",    icon: "🔴" },
+            HIGH:     { bg: "bg-red-50",  text: "text-red-600",    icon: "🟠" },
+            MEDIUM:   { bg: "bg-amber-50",text: "text-amber-700",  icon: "🟡" },
+            LOW:      { bg: "bg-muted",   text: "text-muted-foreground", icon: "⚪" },
+          }[inc.severity] ?? { bg: "bg-muted", text: "text-muted-foreground", icon: "⚪" };
+
+          const sevLabel = { CRITICAL: "Kritisk", HIGH: "Høy", MEDIUM: "Middels", LOW: "Lav" }[inc.severity] ?? inc.severity;
+          const statusLabel = { OPEN: "Åpen", IN_PROGRESS: "Pågår", RESOLVED: "Lukket", CLOSED: "Arkivert" }[inc.status] ?? inc.status;
+          const statusStyle = {
+            OPEN:        "bg-red-50 text-red-700",
+            IN_PROGRESS: "bg-blue-50 text-blue-700",
+            RESOLVED:    "bg-green-50 text-green-700",
+            CLOSED:      "bg-muted text-muted-foreground",
+          }[inc.status] ?? "bg-muted text-muted-foreground";
+
+          const ageDays = Math.floor((Date.now() - new Date(inc.createdAt).getTime()) / 86_400_000);
+
+          return (
+            <Link key={inc.id} href={`/avvik/${inc.id}`} className="flex items-start gap-3 px-4 py-3 active:bg-muted/40 transition-colors">
+              <div className={`h-9 w-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${sevIcon.bg}`}>
+                <ShieldAlert className={`h-4 w-4 ${sevIcon.text}`} />
               </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <IncidentStatusBadge status={inc.status} />
-                <SeverityBadge severity={inc.severity} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium line-clamp-1">{inc.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                  {inc.department?.name ?? "—"} · {ageDays === 0 ? "i dag" : `${ageDays} dag${ageDays !== 1 ? "er" : ""} siden`}
+                </p>
+                <div className="flex gap-1.5 mt-1.5">
+                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${sevIcon.bg} ${sevIcon.text}`}>{sevLabel}</span>
+                  <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusStyle}`}>{statusLabel}</span>
+                </div>
               </div>
-              <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground min-w-0">
-                <span className="truncate">{inc.department?.name ?? "—"}</span>
-                <span className="shrink-0 ml-2">
-                  {format(new Date(inc.occurredAt), "d. MMM yyyy", { locale: nb })}
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
+              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-2" />
+            </Link>
+          );
+        })}
       </div>
 
       {/* ── Desktop: tabell ──────────────────────────────────────────── */}

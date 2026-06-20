@@ -4,10 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard, ShieldAlert, Plus, ShieldCheck, MoreHorizontal,
+  LayoutDashboard, ShieldAlert, Plus, ShieldCheck,
   Bell, BarChart2, Activity, LogOut, X, Menu, UserCircle,
   CalendarDays, FolderOpen, Zap, BookOpen, Clock, Shield, AlertTriangle, GraduationCap, FlaskConical,
-  ClipboardList, FileText, MessageSquare, KeyRound, Users, Megaphone,
+  ClipboardList, FileText, MessageSquare, KeyRound, Users, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -141,33 +141,48 @@ export function BottomNav({ role }: BottomNavProps) {
           </button>
         </div>
 
-        {/* Nav groups */}
-        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
+        {/* Nav groups — kortbasert design */}
+        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-5">
           {navGroups.map((group) => {
             const visible = group.items.filter((i) => i.roles.includes(role));
             if (visible.length === 0) return null;
             return (
               <div key={group.label}>
-                <p className="px-3 mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                <p className="px-1 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                   {group.label}
                 </p>
-                <div className="space-y-0.5">
-                  {visible.map(({ href, label, icon: Icon }) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={() => setOpen(false)}
-                      className={cn(
-                        "flex items-center gap-3 rounded-xl px-3 min-h-[42px] text-sm font-medium transition-colors",
-                        isActive(href)
-                          ? "bg-primary/10 text-primary"
-                          : "text-foreground hover:bg-accent"
-                      )}
-                    >
-                      <Icon className="h-4 w-4 shrink-0" />
-                      {label}
-                    </Link>
-                  ))}
+                <div className="rounded-2xl border bg-card divide-y divide-border overflow-hidden">
+                  {visible.map(({ href, label, icon: Icon, roles: _r }, idx) => {
+                    const active = isActive(href);
+                    const iconColors = [
+                      "bg-green-50 text-green-700",
+                      "bg-blue-50 text-blue-700",
+                      "bg-amber-50 text-amber-700",
+                      "bg-red-50 text-red-700",
+                      "bg-purple-50 text-purple-700",
+                      "bg-teal-50 text-teal-700",
+                    ];
+                    const iconColor = active ? "bg-primary/15 text-primary" : iconColors[idx % iconColors.length];
+                    return (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                          "flex items-center gap-3 px-3 py-2.5 transition-colors",
+                          active ? "bg-primary/5" : "hover:bg-muted/40"
+                        )}
+                      >
+                        <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center shrink-0", iconColor)}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <span className={cn("text-sm font-medium flex-1", active ? "text-primary" : "text-foreground")}>
+                          {label}
+                        </span>
+                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground -rotate-90 shrink-0" />
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             );

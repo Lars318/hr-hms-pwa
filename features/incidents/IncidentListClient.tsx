@@ -77,17 +77,17 @@ export function IncidentListClient({ departments, viewerRole }: IncidentListClie
         />
       </div>
 
-      {/* Status-tabs */}
-      <div className="flex gap-2">
+      {/* Status-chips */}
+      <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-none">
         {STATUS_TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setStatusTab(t.id)}
             className={cn(
-              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+              "rounded-full px-3.5 py-1.5 text-xs font-medium whitespace-nowrap transition-colors shrink-0",
               statusTab === t.id
                 ? "bg-primary text-primary-foreground"
-                : "bg-card border text-muted-foreground hover:text-foreground"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
             )}
           >
             {t.label}
