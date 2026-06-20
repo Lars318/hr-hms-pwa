@@ -29,22 +29,17 @@ interface QuickAction {
 function getQuickActions(role: Role): QuickAction[] {
   if (role === "MANAGER" || role === "HR" || role === "ADMIN") {
     return [
-      { label: "Egenmelding",      href: "/fravaer/ny?type=EGENMELDING", icon: HeartPulse, primary: true },
-      { label: "Meld fravær",      href: "/fravaer/ny",                  icon: CalendarOff },
-      { label: "Nytt avvik",       href: "/avvik/ny",                    icon: ShieldAlert },
-      { label: "Ansatte",          href: "/ansatte",                     icon: Users },
-      { label: "Godkjenn overtid", href: "/overtid/godkjenning",         icon: Clock },
-      { label: "Rapporter",        href: "/rapporter",                   icon: BarChart2 },
-      { label: "Min profil",       href: "/profil",                      icon: UserCircle },
+      { label: "Nytt avvik",       href: "/avvik/ny",               icon: ShieldAlert, primary: true },
+      { label: "Ansatte",          href: "/ansatte",                icon: Users },
+      { label: "Godkjenn overtid", href: "/overtid/godkjenning",   icon: Clock },
+      { label: "Rapporter",        href: "/rapporter",             icon: BarChart2 },
     ];
   }
 
   return [
-    { label: "Egenmelding",     href: "/fravaer/ny?type=EGENMELDING", icon: HeartPulse, primary: true },
-    { label: "Meld fravær",     href: "/fravaer/ny",                  icon: CalendarOff },
-    { label: "Nytt avvik",      href: "/avvik/ny",                    icon: ShieldAlert },
-    { label: "Personalhåndbok", href: "/personalhandbok",             icon: BookOpen },
-    { label: "Min profil",      href: "/profil",                      icon: UserCircle },
+    { label: "Egenmelding", href: "/fravaer/ny?type=EGENMELDING", icon: HeartPulse, primary: true },
+    { label: "Meld fravær", href: "/fravaer/ny",                  icon: CalendarOff },
+    { label: "Min profil",  href: "/profil",                      icon: UserCircle },
   ];
 }
 
