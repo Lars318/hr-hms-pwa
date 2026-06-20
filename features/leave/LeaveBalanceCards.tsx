@@ -35,20 +35,20 @@ function BalanceCard({
   }[variant];
 
   return (
-    <div className="rounded-2xl border bg-card p-3 sm:p-4 flex flex-col gap-2.5">
-      <div className="flex items-center gap-2">
-        <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${iconStyles}`}>
-          <Icon className="h-4 w-4" />
+    <div className="rounded-2xl border bg-card p-3 flex flex-col gap-2 h-full">
+      <div className="flex items-center gap-1.5 min-w-0">
+        <div className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 ${iconStyles}`}>
+          <Icon className="h-3.5 w-3.5" />
         </div>
-        <span className="text-xs font-medium text-muted-foreground leading-tight">{label}</span>
+        <span className="text-[11px] font-medium text-muted-foreground truncate">{label}</span>
       </div>
 
-      <div>
-        <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-bold tracking-tight">{remaining}</span>
-          <span className="text-xs text-muted-foreground">/ {total} {unit}</span>
+      <div className="flex-1">
+        <div className="flex items-baseline gap-1 flex-wrap">
+          <span className="text-2xl font-bold tracking-tight leading-none">{remaining}</span>
+          <span className="text-[11px] text-muted-foreground whitespace-nowrap">/ {total} {unit}</span>
         </div>
-        {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+        {subtitle && <p className="text-[10px] text-muted-foreground mt-1 leading-snug">{subtitle}</p>}
       </div>
 
       <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -76,15 +76,17 @@ export function LeaveBalanceCards() {
 
   if (!data) return null;
 
+  const egenmeldingUsed = data.egenmelding.maxInstances - data.egenmelding.instancesRemaining;
+
   return (
-    <div className="grid grid-cols-3 gap-2 sm:gap-3">
+    <div className="grid grid-cols-3 gap-2 sm:gap-3 items-stretch">
       <BalanceCard
         icon={FileCheck}
         label="Egenmelding"
-        remaining={data.egenmelding.instancesRemaining}
+        remaining={egenmeldingUsed}
         total={data.egenmelding.maxInstances}
-        unit="gang"
-        subtitle={`${data.egenmelding.daysUsed} av ${data.egenmelding.maxInstances * data.egenmelding.daysPerInstance} dager brukt`}
+        unit="brukt"
+        subtitle={`${data.egenmelding.daysUsed} av ${data.egenmelding.maxInstances * data.egenmelding.daysPerInstance} dager`}
         variant="accent"
       />
       <BalanceCard
