@@ -297,6 +297,45 @@ export const trainingRouter = router({
       }));
     }),
 
+  // ─── Kompetansematrise ──────────────────────────────────────────────────────
+  matrix: hrProcedure
+    .input(z.object({ departmentId: z.string().optional(), requiredOnly: z.boolean().optional() }))
+    .query(async ({ ctx, input }) => {
+      const now = new Date();
+      const soon = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+      const [courses, profiles] = await Promise.all([
+        ctx.db.trainingCourse.findMany({
+          where: { status: "ACTIVE", ...(input.requiredOnly ? { isRequired: true } : {}) },
+          orderBy: [{ isRequired: "desc" }, { category: "asc" }, { name: "asc" }],
+          select: { id: true, name: true, category: true, isRequired: true, validityMonths: true },
+        }),
+        ctx.db.profile.findMany({
+          where: { status: "ACTIVE", ...(input.departmentId ? { departmentId: input.departmentId } : {}) },
+          orderBy: [{ fullName: "asc" }],
+          select: {
+            id: true, fullName: true, title: true,
+            department: { select: { id: true, name: true } },
+            trainingRecords: { select: { courseId: true, completedAt: true, expiresAt: true } },
+          },
+        }),
+      ]);
+
+      const rows = profiles.map((p) => {
+        const recordMap = new Map(p.trainingRecords.map((r) => [r.courseId, r]));
+        const cells = courses.map((c) => {
+          const rec = recordMap.get(c.id);
+          if (!rec) return { status: "missing" as const };
+          if (rec.expiresAt && rec.expiresAt < now) return { status: "expired" as const, expiresAt: rec.expiresAt };
+          if (rec.expiresAt && rec.expiresAt < soon) return { status: "expiring" as const, expiresAt: rec.expiresAt };
+          return { status: "ok" as const, completedAt: rec.completedAt };
+        });
+        return { profile: { id: p.id, fullName: p.fullName, title: p.title, department: p.department }, cells };
+      });
+
+      return { courses, rows };
+    }),
+
   // Antall obligatoriske kurs som mangler – brukes til dashboardkort
   openCount: profileProcedure
     .query(async ({ ctx }) => {

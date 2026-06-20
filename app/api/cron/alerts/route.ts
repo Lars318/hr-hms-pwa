@@ -12,7 +12,7 @@ export async function GET(req: Request) {
 
   const now = new Date();
   const year = now.getFullYear();
-  const results = { probation: 0, training: 0, birthday: 0, contract: 0, vernerunde: 0 };
+  const results = { probation: 0, training: 0, birthday: 0, contract: 0, vernerunde: 0, incidentEscalation: 0 };
 
   // ── 1. Prøvetid utløper innen 14 dager ───────────────────────────────────
   const probationWindow = new Date(now);
@@ -292,6 +292,64 @@ export async function GET(req: Request) {
 
       await db.sentAlert.create({ data: { type: "SUMMER_VACATION_MISSING", entityId: emp.id, year } });
       results.contract++; // reuse counter field
+    }
+  }
+
+  // ── 8. Avvik-eskalering (7d → leder, 14d → HR, 21d → admin) ─────────────
+  const openIncidents = await db.incident.findMany({
+    where: { status: { in: ["OPEN", "IN_PROGRESS"] } },
+    select: {
+      id: true, title: true, severity: true, createdAt: true,
+      assignedTo: { select: { id: true } },
+      department: { select: { id: true } },
+      reportedBy: { select: { id: true } },
+    },
+  });
+
+  const THRESHOLDS = [
+    { days: 7,  type: "INCIDENT_OVERDUE_7D"  as const, label: "7 dager", roles: ["MANAGER"] as const },
+    { days: 14, type: "INCIDENT_OVERDUE_14D" as const, label: "14 dager", roles: ["HR", "ADMIN"] as const },
+    { days: 21, type: "INCIDENT_OVERDUE_21D" as const, label: "21 dager", roles: ["ADMIN"] as const },
+  ];
+
+  for (const incident of openIncidents) {
+    const ageMs = now.getTime() - new Date(incident.createdAt).getTime();
+    const ageDays = Math.floor(ageMs / 86_400_000);
+
+    for (const threshold of THRESHOLDS) {
+      if (ageDays < threshold.days) continue;
+
+      const already = await db.sentAlert.findUnique({
+        where: { type_entityId_year: { type: threshold.type, entityId: incident.id, year } },
+      });
+      if (already) continue;
+
+      const recipients = await db.profile.findMany({
+        where: { status: "ACTIVE", role: { in: [...threshold.roles] as ("MANAGER" | "HR" | "ADMIN")[] } },
+        select: { id: true },
+      });
+
+      const severityLabel = { LOW: "lav", MEDIUM: "middels", HIGH: "høy", CRITICAL: "kritisk" }[incident.severity] ?? incident.severity;
+      const msg = `Avvik "${incident.title}" (${severityLabel} alvorlighet) har vært åpent i ${ageDays} dager uten å bli lukket.`;
+
+      for (const r of recipients) {
+        await db.notification.create({
+          data: {
+            recipientId: r.id, type: "SYSTEM",
+            title: `Ubehandlet avvik — ${ageDays} dager`,
+            message: msg,
+            linkUrl: `/avvik/${incident.id}`,
+          },
+        });
+        await sendPushToProfile(db, r.id, {
+          title: `Ubehandlet avvik (${ageDays}d)`,
+          body: msg,
+          url: `/avvik/${incident.id}`,
+        });
+      }
+
+      await db.sentAlert.create({ data: { type: threshold.type, entityId: incident.id, year } });
+      results.incidentEscalation++;
     }
   }
 

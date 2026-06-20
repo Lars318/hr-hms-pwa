@@ -107,6 +107,7 @@ const nav: NavEntry[] = [
     roles: ["ADMIN", "HR"],
     items: [
       { href: "/opplaering/admin",      label: "Opplæringsadmin",    icon: GraduationCap, roles: ["ADMIN", "HR"] },
+      { href: "/opplaering/matrise",    label: "Kompetansematrise",  icon: GraduationCap, roles: ["ADMIN", "HR", "MANAGER"] },
       { href: "/admin/onboarding",      label: "Onboarding-admin",   icon: ClipboardList, roles: ["ADMIN", "HR"] },
       { href: "/varsling",              label: "Varsling",            icon: AlertTriangle, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
       { href: "/varsling/admin",        label: "Varslingssaker",      icon: AlertTriangle, roles: ["ADMIN", "HR"] },
