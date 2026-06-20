@@ -66,33 +66,35 @@ export function DashboardGreeting({ name, role }: DashboardGreetingProps) {
   const actions = getQuickActions(role);
 
   return (
-    <div className="-mx-4 -mt-4 lg:-mx-6 lg:-mt-6 bg-accent/70 px-6 pt-6 pb-5 space-y-4">
-      <div>
-        <p className="text-xs font-medium text-accent-foreground/60 capitalize mb-0.5">{dateStr}</p>
-        <h1 className="text-2xl font-bold tracking-tight text-accent-foreground">
-          {greeting}, {firstName(name)}
-        </h1>
-      </div>
+    <div className="-mx-4 -mt-4 lg:-mx-6 lg:-mt-6 px-4 pt-4 pb-2 lg:px-6 lg:pt-5 lg:pb-3">
+      <div className="rounded-2xl bg-accent/80 px-6 pt-8 pb-7 flex flex-col items-center text-center space-y-5">
+        <div>
+          <p className="text-xs font-medium text-accent-foreground/60 capitalize mb-1">{dateStr}</p>
+          <h1 className="text-3xl font-bold tracking-tight text-accent-foreground leading-tight">
+            {greeting}, {firstName(name)}
+          </h1>
+        </div>
 
-      <div className="[&_input]:bg-white/50 [&_input]:border-white/30 [&_input]:placeholder:text-accent-foreground/50">
-        <GlobalSearch role={role} />
-      </div>
+        <div className="w-full max-w-md [&_input]:bg-white/60 [&_input]:border-white/30 [&_input]:placeholder:text-accent-foreground/50 [&_input]:rounded-full [&_button]:rounded-full">
+          <GlobalSearch role={role} />
+        </div>
 
-      <div className="flex flex-wrap gap-2">
-        {actions.map((a) => (
-          <Link
-            key={a.href}
-            href={a.href}
-            className={
-              a.primary
-                ? "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
-                : "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium bg-white/40 text-accent-foreground border border-white/30 hover:bg-white/60 transition-colors"
-            }
-          >
-            <a.icon className="h-3.5 w-3.5" />
-            {a.label}
-          </Link>
-        ))}
+        <div className="flex flex-wrap gap-2 justify-center">
+          {actions.map((a) => (
+            <Link
+              key={a.href}
+              href={a.href}
+              className={
+                a.primary
+                  ? "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium bg-neutral-900 text-white hover:bg-neutral-800 transition-colors"
+                  : "flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium bg-white/40 text-accent-foreground border border-white/30 hover:bg-white/60 transition-colors"
+              }
+            >
+              <a.icon className="h-3.5 w-3.5" />
+              {a.label}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
