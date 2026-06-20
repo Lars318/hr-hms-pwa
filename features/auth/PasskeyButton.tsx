@@ -14,6 +14,16 @@ export function PasskeyButton() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  async function parseJsonOrThrow(res: Response, label: string) {
+    const text = await res.text();
+    if (!text) throw new Error(`${label}: tomt svar fra server (status ${res.status})`);
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error(`${label}: ugyldig svar fra server — ${text.slice(0, 120)}`);
+    }
+  }
+
   async function handleAuth() {
     if (!email) return;
     setLoading(true);
@@ -25,13 +35,10 @@ export function PasskeyButton() {
         body: JSON.stringify({ email }),
       });
 
-      if (!optRes.ok) {
-        const data = await optRes.json();
-        throw new Error(data.error ?? "Feil ved henting av passkey-opsjoner");
-      }
+      const optData = await parseJsonOrThrow(optRes, "auth-options");
+      if (!optRes.ok) throw new Error(optData.error ?? "Feil ved henting av passkey-opsjoner");
 
-      const options = await optRes.json();
-      const authResponse = await startAuthentication({ optionsJSON: options });
+      const authResponse = await startAuthentication({ optionsJSON: optData });
 
       const verifyRes = await fetch("/api/auth/webauthn/auth-verify", {
         method: "POST",
@@ -39,13 +46,10 @@ export function PasskeyButton() {
         body: JSON.stringify({ email, authResponse }),
       });
 
-      if (!verifyRes.ok) {
-        const data = await verifyRes.json();
-        throw new Error(data.error ?? "Verifisering feilet");
-      }
+      const verifyData = await parseJsonOrThrow(verifyRes, "auth-verify");
+      if (!verifyRes.ok) throw new Error(verifyData.error ?? "Verifisering feilet");
 
-      const { redirectTo } = await verifyRes.json();
-      router.push(redirectTo ?? "/dashboard");
+      router.push(verifyData.redirectTo ?? "/dashboard");
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       if (!msg.includes("cancelled") && !msg.includes("NotAllowedError")) {
