@@ -177,7 +177,6 @@ export const documentRouter = router({
     }),
 
   // ── create ─────────────────────────────────────────────────────────────────
-  // Steg 3 – lagre dokumentmetadata etter vellykket opplasting
   create: hrProcedure
     .input(
       z.object({
@@ -185,6 +184,9 @@ export const documentRouter = router({
         title: z.string().min(1, "Tittel er påkrevd").max(200),
         category: z.enum(categories),
         description: z.string().max(1000).optional(),
+        tags: z.array(z.string().max(50)).max(20).default([]),
+        customCategoryId: z.string().optional(),
+        linkedProfileId: z.string().optional(),
         visibility: z.enum(visibilities),
         filePath: z.string().min(1).max(500),
         mimeType: z.enum(ALLOWED_MIME_TYPES as unknown as [string, ...string[]]),
@@ -244,7 +246,6 @@ export const documentRouter = router({
     }),
 
   // ── update ─────────────────────────────────────────────────────────────────
-  // Oppdater metadata. Ny fil → bumpVersion: true → version + 1
   update: hrProcedure
     .input(
       z.object({
@@ -252,10 +253,12 @@ export const documentRouter = router({
         title: z.string().min(1).max(200).optional(),
         category: z.enum(categories).optional(),
         description: z.string().max(1000).optional().nullable(),
+        tags: z.array(z.string().max(50)).max(20).optional(),
+        customCategoryId: z.string().optional().nullable(),
+        linkedProfileId: z.string().optional().nullable(),
         visibility: z.enum(visibilities).optional(),
         effectiveFrom: z.string().datetime({ offset: true }).optional().nullable(),
         expiresAt: z.string().datetime({ offset: true }).optional().nullable(),
-        // Ny fil
         filePath: z.string().max(500).optional(),
         mimeType: z.enum(ALLOWED_MIME_TYPES as unknown as [string, ...string[]]).optional(),
         sizeBytes: z.number().int().positive().max(MAX_FILE_SIZE_BYTES).optional(),

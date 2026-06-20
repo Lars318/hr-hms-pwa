@@ -319,6 +319,7 @@ model Profile {
   assignedIncidents    Incident[]                 @relation("IncidentAssignee")
   uploadedAttachments  Attachment[]
   ownedDocuments       Document[]
+  linkedDocuments      Document[]  @relation("DocumentLinkedProfile")
   readConfirmations    DocumentReadConfirmation[]
   ownedAssessments     RiskAssessment[]           @relation("RiskAssessmentOwner")
   responsibleRiskItems RiskItem[]                 @relation("RiskItemResponsible")
@@ -439,30 +440,52 @@ model Attachment {
   @@index([createdAt])
 }
 
+// Bruker-definerte dokumentkategorier (kan legges til i admin)
+model DocumentCategoryLabel {
+  id        String     @id @default(cuid())
+  name      String
+  color     String     @default("#5F5E5A")
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+
+  documents Document[]
+
+  @@index([sortOrder])
+}
+
 // Selve filen ligger i Supabase Storage (bucket: documents)
 model Document {
-  id            String             @id @default(cuid())
-  title         String
-  category      DocumentCategory
-  description   String?
-  version       Int                @default(1)
-  filePath      String             // path i Supabase Storage
-  mimeType      String
-  sizeBytes     Int
-  visibility    DocumentVisibility @default(PUBLIC)
-  effectiveFrom DateTime?
-  expiresAt     DateTime?
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
+  id               String             @id @default(cuid())
+  title            String
+  category         DocumentCategory
+  description      String?
+  tags             String[]           @default([])
+  version          Int                @default(1)
+  filePath         String
+  mimeType         String
+  sizeBytes        Int
+  visibility       DocumentVisibility @default(PUBLIC)
+  effectiveFrom    DateTime?
+  expiresAt        DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 
   owner   Profile @relation(fields: [ownerId], references: [id])
   ownerId String
 
+  customCategory   DocumentCategoryLabel? @relation(fields: [customCategoryId], references: [id], onDelete: SetNull)
+  customCategoryId String?
+
+  linkedProfile    Profile? @relation("DocumentLinkedProfile", fields: [linkedProfileId], references: [id], onDelete: SetNull)
+  linkedProfileId  String?
+
   readConfirmations DocumentReadConfirmation[]
 
   @@index([category])
+  @@index([customCategoryId])
   @@index([visibility])
   @@index([ownerId])
+  @@index([linkedProfileId])
   @@index([expiresAt])
 }
 
