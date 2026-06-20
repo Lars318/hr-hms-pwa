@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   // Invalidate current user's session server-side
   await admin.auth.admin.signOut(user.id, "global");
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hr-hms-pwa.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hr-hms-fuvkodkrg-larshenrik-9900s-projects.vercel.app";
 
   const { data, error } = await admin.auth.admin.generateLink({
     type: "magiclink",
