@@ -6,109 +6,107 @@ import { db } from "@/lib/db";
 import { getRpConfig, CHALLENGE_COOKIE } from "@/lib/webauthn";
 
 export async function POST(req: NextRequest) {
-  const challenge = req.cookies.get(CHALLENGE_COOKIE)?.value;
-  if (!challenge) return NextResponse.json({ error: "Ugyldig sesjon" }, { status: 400 });
-
-  const body = await req.json();
-  const { email, authResponse } = body;
-  if (!email || !authResponse) {
-    return NextResponse.json({ error: "Mangler data" }, { status: 400 });
-  }
-
-  const profile = await db.profile.findUnique({
-    where: { email },
-    include: { webAuthnCredentials: true },
-  });
-
-  if (!profile) return NextResponse.json({ error: "Bruker ikke funnet" }, { status: 404 });
-
-  const credential = profile.webAuthnCredentials.find(
-    (c) => c.credentialId === authResponse.id
-  );
-  if (!credential) return NextResponse.json({ error: "Passkey ikke funnet" }, { status: 404 });
-
-  const { rpID, origin } = getRpConfig(req.url);
-
-  let verification;
   try {
-    verification = await verifyAuthenticationResponse({
-      response: authResponse,
-      expectedChallenge: challenge,
-      expectedOrigin: origin,
-      expectedRPID: rpID,
-      credential: {
-        id: credential.credentialId,
-        publicKey: new Uint8Array(credential.publicKey),
-        counter: Number(credential.counter),
+    const challenge = req.cookies.get(CHALLENGE_COOKIE)?.value;
+    if (!challenge) return NextResponse.json({ error: "Ugyldig sesjon" }, { status: 400 });
+
+    const body = await req.json();
+    const { authResponse } = body;
+    if (!authResponse?.id) {
+      return NextResponse.json({ error: "Mangler data" }, { status: 400 });
+    }
+
+    // Slå opp credential direkte — ingen e-post nødvendig
+    const credential = await db.webAuthnCredential.findUnique({
+      where: { credentialId: authResponse.id },
+      include: { profile: true },
+    });
+    if (!credential) return NextResponse.json({ error: "Passkey ikke funnet" }, { status: 404 });
+
+    const { rpID, origin } = getRpConfig(req.url);
+
+    let verification;
+    try {
+      verification = await verifyAuthenticationResponse({
+        response: authResponse,
+        expectedChallenge: challenge,
+        expectedOrigin: origin,
+        expectedRPID: rpID,
+        credential: {
+          id: credential.credentialId,
+          publicKey: new Uint8Array(credential.publicKey),
+          counter: Number(credential.counter),
+        },
+      });
+    } catch (e) {
+      return NextResponse.json({ error: String(e) }, { status: 400 });
+    }
+
+    if (!verification.verified) {
+      return NextResponse.json({ error: "Verifisering feilet" }, { status: 400 });
+    }
+
+    await db.webAuthnCredential.update({
+      where: { id: credential.id },
+      data: {
+        counter: BigInt(verification.authenticationInfo.newCounter),
+        lastUsedAt: new Date(),
       },
     });
-  } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 400 });
-  }
 
-  if (!verification.verified) {
-    return NextResponse.json({ error: "Verifisering feilet" }, { status: 400 });
-  }
+    const admin = createAdminClient();
+    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: credential.profile.email,
+    });
 
-  // Update counter
-  await db.webAuthnCredential.update({
-    where: { id: credential.id },
-    data: {
-      counter: BigInt(verification.authenticationInfo.newCounter),
-      lastUsedAt: new Date(),
-    },
-  });
-
-  const admin = createAdminClient();
-  const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
-    type: "magiclink",
-    email,
-  });
-
-  if (linkError || !linkData?.properties?.hashed_token) {
-    return NextResponse.json(
-      { error: linkError?.message ?? "Kunne ikke opprette sesjon" },
-      { status: 500 }
-    );
-  }
-
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "https://hr-hms-fuvkodkrg-larshenrik-9900s-projects.vercel.app";
-
-  const response = NextResponse.json({ verified: true, redirectTo: `${siteUrl}/dashboard` });
-
-  const supabaseForSession = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return req.cookies.getAll();
-        },
-        setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(
-              name,
-              value,
-              options as Parameters<typeof response.cookies.set>[2]
-            );
-          });
-        },
-      },
+    if (linkError || !linkData?.properties?.hashed_token) {
+      return NextResponse.json(
+        { error: linkError?.message ?? "Kunne ikke opprette sesjon" },
+        { status: 500 }
+      );
     }
-  );
 
-  const { error: verifyError } = await supabaseForSession.auth.verifyOtp({
-    token_hash: linkData.properties.hashed_token,
-    type: "magiclink",
-  });
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      "https://hr-hms-fuvkodkrg-larshenrik-9900s-projects.vercel.app";
 
-  if (verifyError) {
-    return NextResponse.json({ error: verifyError.message }, { status: 500 });
+    const response = NextResponse.json({ verified: true, redirectTo: `${siteUrl}/dashboard` });
+
+    const supabaseForSession = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return req.cookies.getAll();
+          },
+          setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(
+                name,
+                value,
+                options as Parameters<typeof response.cookies.set>[2]
+              );
+            });
+          },
+        },
+      }
+    );
+
+    const { error: verifyError } = await supabaseForSession.auth.verifyOtp({
+      token_hash: linkData.properties.hashed_token,
+      type: "magiclink",
+    });
+
+    if (verifyError) {
+      return NextResponse.json({ error: verifyError.message }, { status: 500 });
+    }
+
+    response.cookies.set(CHALLENGE_COOKIE, "", { maxAge: 0, path: "/" });
+    return response;
+  } catch (e) {
+    console.error("[webauthn/auth-verify]", e);
+    return NextResponse.json({ error: "Serverfeil ved verifisering" }, { status: 500 });
   }
-
-  // Clear challenge cookie
-  response.cookies.set(CHALLENGE_COOKIE, "", { maxAge: 0, path: "/" });
-  return response;
 }

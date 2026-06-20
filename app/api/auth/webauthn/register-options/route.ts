@@ -28,8 +28,8 @@ export async function GET(req: NextRequest) {
         id: c.credentialId,
       })),
       authenticatorSelection: {
-        residentKey: "preferred",
-        userVerification: "preferred",
+        residentKey: "required",
+        userVerification: "required",
       },
     });
 
