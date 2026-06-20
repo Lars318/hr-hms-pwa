@@ -22,29 +22,29 @@ export async function GET(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  // Invalidate current user's session server-side
-  await admin.auth.admin.signOut(user.id, "global");
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hr-hms-fuvkodkrg-larshenrik-9900s-projects.vercel.app";
-
-  const { data, error } = await admin.auth.admin.generateLink({
+  // Generate magic link — we only need the hashed_token, not the action_link
+  const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email,
-    options: { redirectTo: `${siteUrl}/auth/callback` },
   });
 
-  if (error || !data?.properties?.action_link) {
-    return NextResponse.json({ error: error?.message ?? "Kunne ikke generere lenke" }, { status: 500 });
+  if (linkError || !linkData?.properties?.hashed_token) {
+    return NextResponse.json(
+      { error: linkError?.message ?? "Kunne ikke generere token" },
+      { status: 500 }
+    );
   }
 
-  // Redirect to magic link and clear all sb-* auth cookies from the request
-  const response = NextResponse.redirect(data.properties.action_link, { status: 302 });
+  // Verify the OTP server-side — this sets session cookies via the SSR client
+  const { error: verifyError } = await supabase.auth.verifyOtp({
+    token_hash: linkData.properties.hashed_token,
+    type: "magiclink",
+  });
 
-  for (const cookie of req.cookies.getAll()) {
-    if (cookie.name.startsWith("sb-")) {
-      response.cookies.set(cookie.name, "", { maxAge: 0, path: "/" });
-    }
+  if (verifyError) {
+    return NextResponse.json({ error: verifyError.message }, { status: 500 });
   }
 
-  return response;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://hr-hms-fuvkodkrg-larshenrik-9900s-projects.vercel.app";
+  return NextResponse.redirect(`${siteUrl}/dashboard`);
 }
