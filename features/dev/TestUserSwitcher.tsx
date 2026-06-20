@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Users, ChevronDown, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
-import { impersonateUser } from "@/app/actions/impersonate";
+
 import { cn } from "@/lib/utils";
 
 const ROLE_LABELS: Record<string, string> = {
@@ -35,15 +35,9 @@ export function TestUserSwitcher() {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  async function switchTo(email: string) {
+  function switchTo(email: string) {
     setLoading(email);
-    try {
-      const { url } = await impersonateUser(email);
-      window.location.href = url;
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "Feil ved bytte");
-      setLoading(null);
-    }
+    window.location.href = `/api/dev/impersonate?email=${encodeURIComponent(email)}`;
   }
 
   const profiles = data ?? [];
