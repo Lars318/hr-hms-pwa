@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasskeyButton } from "./PasskeyButton";
 
 const schema = z.object({
   email: z.string().email("Ugyldig e-postadresse"),
@@ -83,6 +84,17 @@ export function LoginForm() {
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Logger inn…" : "Logg inn"}
       </Button>
+
+      <div className="relative my-2">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">eller</span>
+        </div>
+      </div>
+
+      <PasskeyButton />
     </form>
   );
 }

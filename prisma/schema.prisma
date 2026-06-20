@@ -378,6 +378,7 @@ model Profile {
   sickLeaveStepsCompleted SickLeaveFollowUpStep[]   @relation("StepCompletedBy")
   employmentRecords       EmploymentRecord[]        @relation("EmploymentRecordProfile")
   createdEmploymentRecords EmploymentRecord[]       @relation("EmploymentRecordCreator")
+  webAuthnCredentials     WebAuthnCredential[]
 
   @@index([supabaseUserId])
   @@index([email])
@@ -1529,4 +1530,20 @@ model Announcement {
   @@index([authorId])
   @@index([publishedAt])
   @@index([target])
+}
+
+model WebAuthnCredential {
+  id           String    @id @default(cuid())
+  credentialId String    @unique
+  publicKey    Bytes
+  counter      BigInt    @default(0)
+  deviceType   String?
+  backedUp     Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
+
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String
+
+  @@index([profileId])
 }

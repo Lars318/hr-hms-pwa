@@ -10,6 +10,7 @@ import {
   Sun, Moon, Monitor, Loader2,
 } from "lucide-react";
 import { AvatarUpload } from "@/features/profile/AvatarUpload";
+import { PasskeySetup } from "@/features/auth/PasskeySetup";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
@@ -337,6 +338,22 @@ export function MyProfileClient({ email }: { email: string }) {
             </div>
           </div>
         ))}
+
+        {/* Passkey / Face ID */}
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">
+            Sikkerhet
+          </p>
+          <div className="rounded-2xl border bg-card px-4 py-3.5 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">
+                <Shield className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <span className="text-sm font-medium">Face ID / Passkey</span>
+            </div>
+            <PasskeySetup hasPasskey={false} />
+          </div>
+        </div>
 
         {/* Theme */}
         <div>
