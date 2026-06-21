@@ -35,9 +35,23 @@ export function TestUserSwitcher() {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  function switchTo(email: string) {
+  async function switchTo(email: string) {
     setLoading(email);
-    window.location.href = `/api/dev/impersonate?email=${encodeURIComponent(email)}`;
+    try {
+      const res = await fetch(`/api/dev/impersonate?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
+      if (!res.ok || !data.actionLink) {
+        console.error("Impersonate feilet:", data.error);
+        setLoading(null);
+        return;
+      }
+      // Naviger direkte til Supabase action_link — identisk med å klikke magic link i e-post.
+      // Supabase setter session-cookies og redirecter tilbake til /auth/callback → /dashboard.
+      window.location.href = data.actionLink;
+    } catch (e) {
+      console.error("Impersonate feilet:", e);
+      setLoading(null);
+    }
   }
 
   const profiles = data ?? [];
