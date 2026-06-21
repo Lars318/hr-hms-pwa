@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { Button } from "@/components/ui/button";
 import { Fingerprint, Loader2 } from "lucide-react";
@@ -9,7 +8,6 @@ import { Fingerprint, Loader2 } from "lucide-react";
 export function PasskeyButton() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   async function handleAuth() {
     setLoading(true);
@@ -33,7 +31,7 @@ export function PasskeyButton() {
       const verifyData = JSON.parse(verifyText);
       if (!verifyRes.ok) throw new Error(verifyData.error ?? "Verifisering feilet");
 
-      router.push(verifyData.redirectTo ?? "/dashboard");
+      window.location.href = verifyData.callbackUrl ?? "/dashboard";
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       if (!msg.includes("cancelled") && !msg.includes("NotAllowedError")) {

@@ -67,42 +67,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ??
-      "https://hr-hms-fuvkodkrg-larshenrik-9900s-projects.vercel.app";
+    // Return callback URL — nettleseren navigerer dit som full page load,
+    // slik at /auth/callback setter cookies naturlig (samme mønster som impersonering).
+    const callbackUrl = new URL("/auth/callback", req.url);
+    callbackUrl.searchParams.set("token_hash", linkData.properties.hashed_token);
+    callbackUrl.searchParams.set("type", "magiclink");
+    callbackUrl.searchParams.set("next", "/dashboard");
 
-    const response = NextResponse.json({ verified: true, redirectTo: `${siteUrl}/dashboard` });
-
-    const supabaseForSession = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return req.cookies.getAll();
-          },
-          setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(
-                name,
-                value,
-                options as Parameters<typeof response.cookies.set>[2]
-              );
-            });
-          },
-        },
-      }
-    );
-
-    const { error: verifyError } = await supabaseForSession.auth.verifyOtp({
-      token_hash: linkData.properties.hashed_token,
-      type: "magiclink",
-    });
-
-    if (verifyError) {
-      return NextResponse.json({ error: verifyError.message }, { status: 500 });
-    }
-
+    const response = NextResponse.json({ verified: true, callbackUrl: callbackUrl.toString() });
     response.cookies.set(CHALLENGE_COOKIE, "", { maxAge: 0, path: "/" });
     return response;
   } catch (e) {
