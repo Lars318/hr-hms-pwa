@@ -11,6 +11,7 @@ function BalanceCard({
   unit,
   subtitle,
   variant,
+  mode = "remaining",
 }: {
   icon: React.ElementType;
   label: string;
@@ -19,8 +20,12 @@ function BalanceCard({
   unit: string;
   subtitle?: string;
   variant: "primary" | "accent" | "muted";
+  mode?: "remaining" | "used";
 }) {
-  const pct = total > 0 ? Math.min(100, ((total - remaining) / total) * 100) : 0;
+  // mode="remaining": remaining er hva som er igjen → brukt = total - remaining
+  // mode="used":      remaining er hva som er brukt → brukt = remaining
+  const used = mode === "used" ? remaining : total - remaining;
+  const pct = total > 0 ? Math.min(100, (used / total) * 100) : 0;
 
   const iconStyles = {
     primary: "bg-primary/15 text-primary",
@@ -88,6 +93,7 @@ export function LeaveBalanceCards() {
         unit="brukt"
         subtitle={`${data.egenmelding.daysUsed} av ${data.egenmelding.maxInstances * data.egenmelding.daysPerInstance} dager`}
         variant="accent"
+        mode="used"
       />
       <BalanceCard
         icon={HeartHandshake}
