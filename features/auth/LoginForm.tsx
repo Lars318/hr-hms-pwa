@@ -29,6 +29,12 @@ export function LoginForm() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    if (code) {
+      router.replace(`/auth/callback?code=${code}`);
+      return;
+    }
     const hash = window.location.hash;
     if (hash.includes("type=recovery")) {
       router.replace("/auth/update-password" + hash);
@@ -126,7 +132,7 @@ export function LoginForm() {
               setMagicLoading(true);
               const { error } = await supabase.auth.signInWithOtp({
                 email: magicEmail,
-                options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
+                options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
               });
               setMagicLoading(false);
               if (!error) setMagicSent(true);
