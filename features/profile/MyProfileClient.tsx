@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   LogOut, ChevronRight, Briefcase, Shield,
   MapPin, Building2, Phone, Mail, Pencil, Check, X,
-  Sun, Moon, Monitor, Loader2, Fingerprint, Tag,
+  Sun, Moon, Loader2, Fingerprint, Tag,
 } from "lucide-react";
 import { AvatarUpload } from "@/features/profile/AvatarUpload";
 import { PasskeySetup } from "@/features/auth/PasskeySetup";
@@ -38,37 +38,22 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-function ThemeRow() {
-  const { theme, setTheme } = useTheme();
+function ThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 
-  const options = [
-    { value: "light", icon: Sun, label: "Lys" },
-    { value: "system", icon: Monitor, label: "System" },
-    { value: "dark", icon: Moon, label: "Mørk" },
-  ] as const;
+  const isDark = resolvedTheme === "dark";
 
   return (
-    <div className="flex items-center rounded-xl border bg-muted p-0.5 gap-0.5">
-      {options.map(({ value, icon: Icon, label }) => (
-        <button
-          key={value}
-          onClick={() => setTheme(value)}
-          title={label}
-          className={cn(
-            "flex items-center justify-center rounded-lg h-7 w-7 transition-colors",
-            theme === value
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-          aria-label={label}
-        >
-          <Icon className="h-3.5 w-3.5" />
-        </button>
-      ))}
-    </div>
+    <button
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label={isDark ? "Bytt til lys modus" : "Bytt til mørk modus"}
+      className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors"
+    >
+      {isDark ? <Sun className="h-4 w-4 text-muted-foreground" /> : <Moon className="h-4 w-4 text-muted-foreground" />}
+    </button>
   );
 }
 
@@ -306,11 +291,11 @@ export function MyProfileClient({ email }: { email: string }) {
           <div className="rounded-2xl border bg-card px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">
-                <Monitor className="h-4 w-4 text-muted-foreground" />
+                <Sun className="h-4 w-4 text-muted-foreground" />
               </div>
               <span className="text-sm font-medium">Visningsmodus</span>
             </div>
-            <ThemeRow />
+            <ThemeToggle />
           </div>
         </div>
 
