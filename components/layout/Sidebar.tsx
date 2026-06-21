@@ -26,100 +26,66 @@ interface NavItem {
   roles: Role[];
 }
 
-interface NavGroup {
+interface NavSection {
+  type: "section";
   label: string;
-  icon: ElementType;
   roles: Role[];
-  items: NavItem[];
 }
 
-type NavSection = { type: "section"; label: string; roles: Role[] };
-type NavEntry = { type: "item" } & NavItem | { type: "group" } & NavGroup | NavSection;
+// Flat nav — every item is a direct link, no accordion groups.
+// Items are shown/hidden purely by role.
+const navItems: NavItem[] = [
+  // Alle roller
+  { href: "/dashboard",       label: "Dashboard",         icon: LayoutDashboard, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/fravaer",         label: "Fravær",            icon: CalendarDays,    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/overtid",         label: "Overtid",           icon: Clock,           roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/avvik",           label: "Avvik",             icon: ShieldAlert,     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/personalhandbok", label: "Personalhåndbok",   icon: BookOpen,        roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/kollegaer",       label: "Kollegaer",         icon: Users,           roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/dokumenter",      label: "Dokumenter",        icon: FolderOpen,      roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/varsling",        label: "Varsling",          icon: AlertTriangle,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
 
-const nav: NavEntry[] = [
-  {
-    type: "item",
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
-  },
-  { type: "section", label: "HMS", roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-  {
-    type: "group",
-    label: "HMS",
-    icon: ShieldAlert,
-    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
-    items: [
-      { href: "/avvik",       label: "Avvik",        icon: ShieldAlert,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/hms-runde",   label: "HMS-runde",    icon: ClipboardList,roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/risiko",      label: "Risiko",        icon: ShieldCheck,  roles: ["ADMIN", "HR", "MANAGER"] },
-      { href: "/tiltak",      label: "Tiltak",        icon: Zap,          roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/kjemikalier", label: "Stoffkartotek", icon: FlaskConical, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/opplaering",  label: "Opplæring",     icon: GraduationCap,roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-    ],
-  },
-  { type: "section", label: "Personal", roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-  {
-    type: "group",
-    label: "Personal",
-    icon: Users,
-    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
-    items: [
-      { href: "/kollegaer",              label: "Kollegaer",           icon: Users,        roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/ansatte",               label: "Ansatte (admin)",     icon: Users,        roles: ["ADMIN", "HR"] },
-      { href: "/admin/avdelinger",      label: "Avdelinger",          icon: Building2,    roles: ["ADMIN", "HR"] },
-      { href: "/lokasjoner",            label: "Lokasjoner",          icon: MapPin,       roles: ["ADMIN", "HR"] },
-      { href: "/onboarding",            label: "Onboarding",          icon: ClipboardList,roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/medarbeidersamtaler",   label: "Medarbeidersamtaler", icon: MessageSquare,roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/kontrakter",            label: "Kontrakter",          icon: FileText,     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/admin/personalsaker",   label: "Personalsaker",       icon: FileWarning,  roles: ["ADMIN", "HR", "MANAGER"] },
-    ],
-  },
-  {
-    type: "group",
-    label: "Fravær & Tid",
-    icon: CalendarDays,
-    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
-    items: [
-      { href: "/fravaer",            label: "Fravær",            icon: CalendarDays,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/fravaer/kalender",   label: "Fraværskalender",   icon: CalendarRange, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/sykefravaer",        label: "Sykefraværsoppfølging", icon: Activity,  roles: ["ADMIN", "HR", "MANAGER"] },
-      { href: "/overtid",            label: "Overtid",           icon: Clock,         roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/overtid/godkjenning",label: "Godkjenn overtid",  icon: Clock,         roles: ["ADMIN", "HR", "MANAGER"] },
-    ],
-  },
-  {
-    type: "group",
-    label: "Dokumenter",
-    icon: FolderOpen,
-    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
-    items: [
-      { href: "/dokumenter",     label: "Dokumenter",    icon: FolderOpen, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/personalhandbok",label: "Personalhåndbok",icon: BookOpen,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-    ],
-  },
-  { type: "section", label: "Admin", roles: ["ADMIN", "HR"] },
-  {
-    type: "group",
-    label: "Admin",
-    icon: Shield,
-    roles: ["ADMIN", "HR"],
-    items: [
-      { href: "/opplaering/admin",      label: "Opplæringsadmin",    icon: GraduationCap, roles: ["ADMIN", "HR"] },
-      { href: "/opplaering/matrise",    label: "Kompetansematrise",  icon: GraduationCap, roles: ["ADMIN", "HR", "MANAGER"] },
-      { href: "/admin/onboarding",      label: "Onboarding-admin",   icon: ClipboardList, roles: ["ADMIN", "HR"] },
-      { href: "/varsling",              label: "Varsling",            icon: AlertTriangle, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/varsling/admin",        label: "Varslingssaker",      icon: AlertTriangle, roles: ["ADMIN", "HR"] },
-      { href: "/rapporter",             label: "Rapporter",           icon: BarChart2,     roles: ["ADMIN", "HR", "MANAGER"] },
-      { href: "/admin/compliance",      label: "Compliance",          icon: Shield,        roles: ["ADMIN", "HR"] },
-      { href: "/personvern",            label: "Personvern",          icon: Shield,        roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/personvern/foresporsler",label: "GDPR-forespørsler",  icon: Shield,        roles: ["ADMIN", "HR"] },
-      { href: "/admin/system",          label: "Systemstatus",        icon: Activity,      roles: ["ADMIN"] },
-      { href: "/admin/reset-passord",   label: "Tilbakestill passord",icon: KeyRound,      roles: ["ADMIN"] },
-    ],
-  },
+  // Leder+
+  { href: "/fravaer/kalender",    label: "Fraværskalender",       icon: CalendarRange, roles: ["ADMIN", "HR", "MANAGER"] },
+  { href: "/overtid/godkjenning", label: "Godkjenn overtid",      icon: Clock,         roles: ["ADMIN", "HR", "MANAGER"] },
+  { href: "/sykefravaer",         label: "Sykefraværsoppfølging", icon: Activity,      roles: ["ADMIN", "HR", "MANAGER"] },
+  { href: "/tiltak",              label: "Tiltak",                icon: Zap,           roles: ["ADMIN", "HR", "MANAGER"] },
+  { href: "/risiko",              label: "Risiko",                icon: ShieldCheck,   roles: ["ADMIN", "HR", "MANAGER"] },
+  { href: "/medarbeidersamtaler", label: "Medarbeidersamtaler",   icon: MessageSquare, roles: ["ADMIN", "HR", "MANAGER"] },
+  { href: "/admin/personalsaker", label: "Personalsaker",         icon: FileWarning,   roles: ["ADMIN", "HR", "MANAGER"] },
+  { href: "/rapporter",           label: "Rapporter",             icon: BarChart2,     roles: ["ADMIN", "HR", "MANAGER"] },
+  { href: "/opplaering/matrise",  label: "Kompetansematrise",     icon: GraduationCap, roles: ["ADMIN", "HR", "MANAGER"] },
+
+  // HR + Admin
+  { href: "/ansatte",              label: "Ansatte",              icon: Users,         roles: ["ADMIN", "HR"] },
+  { href: "/admin/avdelinger",     label: "Avdelinger",           icon: Building2,     roles: ["ADMIN", "HR"] },
+  { href: "/lokasjoner",           label: "Lokasjoner",           icon: MapPin,        roles: ["ADMIN", "HR"] },
+  { href: "/hms-runde",            label: "HMS-runde",            icon: ClipboardList, roles: ["ADMIN", "HR"] },
+  { href: "/kjemikalier",          label: "Stoffkartotek",        icon: FlaskConical,  roles: ["ADMIN", "HR"] },
+  { href: "/opplaering",           label: "Opplæring",            icon: GraduationCap, roles: ["ADMIN", "HR"] },
+  { href: "/opplaering/admin",     label: "Opplæringsadmin",      icon: GraduationCap, roles: ["ADMIN", "HR"] },
+  { href: "/onboarding",           label: "Onboarding",           icon: ClipboardList, roles: ["ADMIN", "HR"] },
+  { href: "/admin/onboarding",     label: "Onboarding-admin",     icon: ClipboardList, roles: ["ADMIN", "HR"] },
+  { href: "/kontrakter",           label: "Kontrakter",           icon: FileText,      roles: ["ADMIN", "HR"] },
+  { href: "/varsling/admin",       label: "Varslingssaker",       icon: AlertTriangle, roles: ["ADMIN", "HR"] },
+  { href: "/admin/compliance",     label: "Compliance",           icon: Shield,        roles: ["ADMIN", "HR"] },
+  { href: "/personvern",           label: "Personvern",           icon: Shield,        roles: ["ADMIN", "HR"] },
+  { href: "/personvern/foresporsler", label: "GDPR-forespørsler", icon: Shield,        roles: ["ADMIN", "HR"] },
+  { href: "/admin/system",         label: "Systemstatus",         icon: Activity,      roles: ["ADMIN"] },
+  { href: "/admin/reset-passord",  label: "Tilbakestill passord", icon: KeyRound,      roles: ["ADMIN"] },
 ];
+
+// Section dividers shown between role-bands
+const sections: NavSection[] = [
+  { type: "section", label: "Leder",  roles: ["ADMIN", "HR", "MANAGER"] },
+  { type: "section", label: "HR / Admin", roles: ["ADMIN", "HR"] },
+];
+
+// First item index per section (used to inject divider before the block)
+const sectionStartHrefs: Record<string, string> = {
+  "Leder":       "/fravaer/kalender",
+  "HR / Admin":  "/ansatte",
+};
 
 interface SidebarProps {
   role: Role;
@@ -136,25 +102,30 @@ export function Sidebar({ role }: SidebarProps) {
   const router = useRouter();
   const supabase = createClient();
 
-  // Auto-expand groups that contain the active page
-  const initialOpen = nav
-    .filter((e): e is { type: "group" } & NavGroup => e.type === "group")
-    .filter((g) => g.items.some((item) => isActive(item.href, pathname)))
-    .map((g) => g.label);
-
-  const [openGroups, setOpenGroups] = useState<string[]>(initialOpen);
-
-  function toggleGroup(label: string) {
-    setOpenGroups((prev) =>
-      prev.includes(label) ? prev.filter((l) => l !== label) : [...prev, label]
-    );
-  }
+  // Admin/HR get a collapsible "advanced" section to keep the list short
+  const [advancedOpen, setAdvancedOpen] = useState(() =>
+    navItems
+      .filter((i) => i.roles.every((r) => r !== "MANAGER" && r !== "EMPLOYEE"))
+      .some((i) => isActive(i.href, pathname))
+  );
 
   async function handleLogout() {
     clearAllDrafts();
     await supabase.auth.signOut();
     router.push("/login");
   }
+
+  const visibleItems = navItems.filter((i) => i.roles.includes(role));
+
+  // Split into primary (all roles + manager) and advanced (HR/admin only)
+  const primaryItems = visibleItems.filter(
+    (i) => i.roles.includes("EMPLOYEE") || i.roles.includes("MANAGER")
+  );
+  const advancedItems = visibleItems.filter(
+    (i) => !i.roles.includes("EMPLOYEE") && !i.roles.includes("MANAGER")
+  );
+
+  const hasAdvanced = advancedItems.length > 0;
 
   return (
     <aside className="hidden lg:flex h-full w-56 flex-col bg-primary">
@@ -175,87 +146,62 @@ export function Sidebar({ role }: SidebarProps) {
       </div>
 
       <nav className="flex-1 p-3 overflow-y-auto space-y-0.5">
-        {nav.map((entry, i) => {
-          if (entry.type === "section") {
-            if (!entry.roles.includes(role)) return null;
-            return (
-              <p key={`section-${i}`} className="px-3 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/35">
-                {entry.label}
-              </p>
-            );
-          }
-
-          if (entry.type === "item") {
-            if (!entry.roles.includes(role)) return null;
-            const active = isActive(entry.href, pathname);
-            return (
-              <Link
-                key={entry.href}
-                href={entry.href}
-                className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  active
-                    ? "bg-white/20 text-white"
-                    : "text-white/60 hover:bg-white/10 hover:text-white"
-                )}
-              >
-                <entry.icon className="h-4 w-4 shrink-0" />
-                {entry.label}
-              </Link>
-            );
-          }
-
-          // Group
-          const visibleItems = entry.items.filter((item) => item.roles.includes(role));
-          if (!visibleItems.length || !entry.roles.some((r) => r === role)) return null;
-
-          const isOpen = openGroups.includes(entry.label);
-          const hasActive = visibleItems.some((item) => isActive(item.href, pathname));
-
+        {primaryItems.map((item) => {
+          const active = isActive(item.href, pathname);
           return (
-            <div key={entry.label}>
-              <button
-                type="button"
-                onClick={() => toggleGroup(entry.label)}
-                className={cn(
-                  "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  hasActive && !isOpen
-                    ? "text-white"
-                    : "text-white/60 hover:bg-white/10 hover:text-white"
-                )}
-              >
-                <entry.icon className="h-4 w-4 shrink-0" />
-                <span className="flex-1 text-left">{entry.label}</span>
-                <ChevronDown
-                  className={cn("h-3.5 w-3.5 transition-transform", isOpen && "rotate-180")}
-                />
-              </button>
-
-              {isOpen && (
-                <div className="ml-3 pl-3 border-l border-white/15 space-y-0.5 mt-0.5 mb-1">
-                  {visibleItems.map((item) => {
-                    const active = isActive(item.href, pathname);
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                          "flex items-center gap-3 rounded-md px-3 py-1.5 text-sm transition-colors",
-                          active
-                            ? "bg-white/20 text-white font-medium"
-                            : "text-white/50 hover:bg-white/10 hover:text-white"
-                        )}
-                      >
-                        <item.icon className="h-3.5 w-3.5 shrink-0" />
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </div>
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                active
+                  ? "bg-white/20 text-white"
+                  : "text-white/60 hover:bg-white/10 hover:text-white"
               )}
-            </div>
+            >
+              <item.icon className="h-4 w-4 shrink-0" />
+              {item.label}
+            </Link>
           );
         })}
+
+        {hasAdvanced && (
+          <>
+            <div className="pt-3 pb-0.5">
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen((v) => !v)}
+                className="flex w-full items-center gap-2 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white/35 hover:text-white/60 transition-colors"
+              >
+                <span className="flex-1 text-left">Admin</span>
+                <ChevronDown className={cn("h-3 w-3 transition-transform", advancedOpen && "rotate-180")} />
+              </button>
+            </div>
+
+            {advancedOpen && (
+              <div className="space-y-0.5">
+                {advancedItems.map((item) => {
+                  const active = isActive(item.href, pathname);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                        active
+                          ? "bg-white/20 text-white"
+                          : "text-white/60 hover:bg-white/10 hover:text-white"
+                      )}
+                    >
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
       </nav>
 
       <div className="border-t border-white/10 p-3">
