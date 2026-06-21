@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasskeyButton } from "./PasskeyButton";
+import { Mail } from "lucide-react";
 
 const schema = z.object({
   email: z.string().email("Ugyldig e-postadresse"),
@@ -22,6 +23,9 @@ export function LoginForm() {
   const router = useRouter();
   const supabase = createClient();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [magicSent, setMagicSent] = useState(false);
+  const [magicLoading, setMagicLoading] = useState(false);
+  const [magicEmail, setMagicEmail] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -95,6 +99,49 @@ export function LoginForm() {
       </div>
 
       <PasskeyButton />
+
+      <div className="relative my-2">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">eller</span>
+        </div>
+      </div>
+
+      {!magicSent ? (
+        <div className="space-y-2">
+          <Input
+            type="email"
+            placeholder="Send innloggingslenke til e-post"
+            value={magicEmail}
+            onChange={(e) => setMagicEmail(e.target.value)}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full gap-2"
+            disabled={magicLoading || !magicEmail}
+            onClick={async () => {
+              setMagicLoading(true);
+              const { error } = await supabase.auth.signInWithOtp({
+                email: magicEmail,
+                options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
+              });
+              setMagicLoading(false);
+              if (!error) setMagicSent(true);
+              else setServerError(error.message);
+            }}
+          >
+            <Mail className="h-4 w-4" />
+            {magicLoading ? "Sender…" : "Send innloggingslenke"}
+          </Button>
+        </div>
+      ) : (
+        <p className="text-sm text-center text-primary font-medium">
+          ✓ Sjekk e-posten din for innloggingslenken
+        </p>
+      )}
     </form>
   );
 }
