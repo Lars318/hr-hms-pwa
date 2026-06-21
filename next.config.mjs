@@ -83,9 +83,14 @@ const withPWA = nextPwa({
 // ── Content Security Policy ───────────────────────────────────────────────────
 // Next.js 14 App Router requires 'unsafe-inline' for scripts (bootstrap chunks).
 // For a stricter policy, implement nonce-based CSP via middleware — see README.
-const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-  : "*.supabase.co";
+let supabaseHost = "*.supabase.co";
+try {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    supabaseHost = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname;
+  }
+} catch {
+  // Ugyldig URL — bruk wildcard som fallback
+}
 
 const cspDirectives = [
   "default-src 'self'",
