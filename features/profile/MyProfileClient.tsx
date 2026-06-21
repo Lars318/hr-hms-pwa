@@ -87,8 +87,15 @@ export function MyProfileClient({ email }: { email: string }) {
 
   async function handleLogout() {
     const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
+    try {
+      await Promise.race([
+        supabase.auth.signOut(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 3000)),
+      ]);
+    } catch {
+      // Naviger til login uansett om signOut henger eller feiler
+    }
+    window.location.href = "/login";
   }
 
   if (isLoading || !profile) {

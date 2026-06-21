@@ -106,8 +106,15 @@ export function BottomNav({ role }: BottomNavProps) {
     setOpen(false);
     clearAllDrafts();
     const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
+    try {
+      await Promise.race([
+        supabase.auth.signOut(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 3000)),
+      ]);
+    } catch {
+      // Naviger til login uansett
+    }
+    window.location.href = "/login";
   }
 
   return (
