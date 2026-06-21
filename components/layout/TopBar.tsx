@@ -25,7 +25,7 @@ export function TopBar({ email, role }: TopBarProps) {
       </div>
 
       <div className="flex items-center gap-3 ml-auto">
-        {role === "ADMIN" && <TestUserSwitcher />}
+        {process.env.NEXT_PUBLIC_ENABLE_TEST_SWITCHER === "true" && <TestUserSwitcher />}
         <PWAInstallPrompt />
         <PaletteSwitcher />
         <ThemeToggle />

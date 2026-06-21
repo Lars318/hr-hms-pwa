@@ -7,17 +7,13 @@ export async function GET(req: NextRequest) {
   const email = req.nextUrl.searchParams.get("email");
   if (!email) return NextResponse.json({ error: "Mangler email" }, { status: 400 });
 
+  if (process.env.ENABLE_TEST_SWITCHER !== "true") {
+    return NextResponse.json({ error: "Ikke tilgjengelig" }, { status: 403 });
+  }
+
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Ikke innlogget" }, { status: 401 });
-
-  const caller = await db.profile.findUnique({
-    where: { supabaseUserId: user.id },
-    select: { role: true },
-  });
-  if (caller?.role !== "ADMIN") {
-    return NextResponse.json({ error: "Kun ADMIN kan bytte bruker" }, { status: 403 });
-  }
 
   const admin = createAdminClient();
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
