@@ -19,28 +19,26 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Kun ADMIN kan bytte bruker" }, { status: 403 });
   }
 
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "https://hr-hms-fuvkodkrg-larshenrik-9900s-projects.vercel.app";
-
   const admin = createAdminClient();
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "magiclink",
     email,
-    options: {
-      redirectTo: `${siteUrl}/auth/callback?next=/dashboard`,
-    },
   });
 
-  if (linkError || !linkData?.properties?.action_link) {
+  if (linkError || !linkData?.properties?.hashed_token) {
     return NextResponse.json(
       { error: linkError?.message ?? "Kunne ikke generere lenke" },
       { status: 500 }
     );
   }
 
-  // Returner action_link som JSON — klienten gjør window.location.href direkte til Supabase.
-  // Dette er identisk med å klikke en magic link i e-post, og lar nettleseren håndtere
-  // session-cookies uten server-side manipulasjon.
-  return NextResponse.json({ actionLink: linkData.properties.action_link });
+  // Redirect nettleseren til vår egen callback med token_hash.
+  // Callback-ruten kjører verifyOtp i sin egen request-kontekst og setter
+  // session-cookies naturlig — ingen server-side cookie-manipulasjon nødvendig.
+  const callbackUrl = new URL("/auth/callback", req.url);
+  callbackUrl.searchParams.set("token_hash", linkData.properties.hashed_token);
+  callbackUrl.searchParams.set("type", "magiclink");
+  callbackUrl.searchParams.set("next", "/dashboard");
+
+  return NextResponse.redirect(callbackUrl);
 }
