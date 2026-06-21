@@ -17,10 +17,10 @@ interface SecondaryAction {
 }
 
 const primaryActions: PrimaryAction[] = [
-  { href: "/avvik/ny",       label: "Meld avvik",         icon: ShieldAlert,  variant: "warning" },
-  { href: "/overtid/ny",     label: "Registrer overtid",  icon: Clock,        variant: "default" },
-  { href: "/fravaer/ny",     label: "Søk fravær",         icon: CalendarDays, variant: "primary" },
   { href: "/personalhandbok",label: "Les håndbok",        icon: BookOpen,     variant: "default" },
+  { href: "/fravaer/ny",     label: "Søk fravær",         icon: CalendarDays, variant: "primary" },
+  { href: "/overtid/ny",     label: "Registrer overtid",  icon: Clock,        variant: "default" },
+  { href: "/avvik/ny",       label: "Meld avvik",         icon: ShieldAlert,  variant: "warning" },
   { href: "/varsling/ny",    label: "Varsle kritikkverdig forhold", icon: AlertTriangle, variant: "default" },
 ];
 

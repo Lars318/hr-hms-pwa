@@ -6,7 +6,6 @@ import { SummaryStrip }            from "./employee/SummaryStrip";
 import { TodoSection }             from "./employee/TodoSection";
 import { RecentItemsSection }      from "./employee/RecentItemsSection";
 import { DocumentsHandbookSection } from "./employee/DocumentsHandbookSection";
-import { BelongingSection }        from "./employee/BelongingSection";
 
 type Summary = inferRouterOutputs<AppRouter>["dashboard"]["summary"];
 
@@ -21,7 +20,7 @@ export function EmployeeDashboard({ data }: Props) {
   if (!employeeProfileHome) return null;
 
   const {
-    profile, manager, department, assignments, counts, handbookStatus,
+    profile, manager, department, counts, handbookStatus,
     todoItems, recentIncidents, recentActions, recentLeave, unconfirmedDocs,
   } = employeeProfileHome;
 
@@ -44,37 +43,29 @@ export function EmployeeDashboard({ data }: Props) {
       {/* 2. Snarveier */}
       <EmployeeQuickActions />
 
-      {/* 3. Status-strip */}
-      <SummaryStrip
-        openActions={counts.openActions}
-        openIncidents={counts.openIncidents}
-        pendingLeave={counts.pendingLeave}
-        unconfirmedDocs={counts.unconfirmedDocs}
-        handbookStatus={handbookStatus}
-      />
-
-      {/* 4. Må gjøres */}
+      {/* 3. Må gjøres */}
       <TodoSection items={todoItems as Parameters<typeof TodoSection>[0]["items"]} />
 
-      {/* 5. Siste saker */}
+      {/* 4. Siste saker */}
       <RecentItemsSection
         incidents={recentIncidents as unknown as Parameters<typeof RecentItemsSection>[0]["incidents"]}
         actions={recentActions as unknown as Parameters<typeof RecentItemsSection>[0]["actions"]}
         leave={recentLeave as unknown as Parameters<typeof RecentItemsSection>[0]["leave"]}
       />
 
-      {/* 6. Dokumenter og håndbok */}
+      {/* 5. Dokumenter og håndbok */}
       <DocumentsHandbookSection
         unconfirmedDocs={unconfirmedDocs as Parameters<typeof DocumentsHandbookSection>[0]["unconfirmedDocs"]}
         handbookStatus={handbookStatus}
       />
 
-      {/* 7. Tilhørighet */}
-      <BelongingSection
-        department={department}
-        role="EMPLOYEE"
-        title={profile.title}
-        assignments={assignments as Parameters<typeof BelongingSection>[0]["assignments"]}
+      {/* 6. Min status */}
+      <SummaryStrip
+        openActions={counts.openActions}
+        openIncidents={counts.openIncidents}
+        pendingLeave={counts.pendingLeave}
+        unconfirmedDocs={counts.unconfirmedDocs}
+        handbookStatus={handbookStatus}
       />
     </div>
   );

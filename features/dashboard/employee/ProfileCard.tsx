@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Mail, Phone, Building2, Calendar, ExternalLink, UserCheck } from "lucide-react";
+import { Mail, Phone, Building2, Calendar, UserCheck } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 
@@ -53,17 +52,8 @@ export function ProfileCard({
           <Initials name={fullName} />
         )}
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
+          <div className="flex items-start gap-2">
             <h1 className="text-xl font-bold tracking-tight truncate">{fullName}</h1>
-            {profileId && (
-              <Link
-                href={`/ansatte/${profileId}`}
-                className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
-                title="Se full profil"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </Link>
-            )}
           </div>
           {title && (
             <p className="text-sm text-muted-foreground truncate">{title}</p>
