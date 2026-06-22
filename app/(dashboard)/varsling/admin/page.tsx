@@ -40,7 +40,6 @@ export default async function VarslingAdminPage({ searchParams }: Props) {
   if (searchParams.category) whereBase.category = searchParams.category as WhistleblowingCategory;
   if (searchParams.severity) whereBase.severity = searchParams.severity as WhistleblowingSeverity;
   if (searchParams.locationId) whereBase.locationId = searchParams.locationId;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where = whereBase as any;
 
   const cases = await db.whistleblowingCase.findMany({
