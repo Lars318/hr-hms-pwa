@@ -31,7 +31,7 @@ export function LoginForm() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     if (code) {
-      router.replace(`/auth/callback?code=${code}`);
+      window.location.href = `/auth/callback?code=${code}`;
       return;
     }
     const hash = window.location.hash;
