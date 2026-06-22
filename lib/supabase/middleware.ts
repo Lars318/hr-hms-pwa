@@ -57,10 +57,13 @@ export async function updateSession(request: NextRequest) {
   // before checking authentication.
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
+  const type = searchParams.get("type");
   if ((code || tokenHash) && pathname !== "/auth/callback") {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/callback";
-    if (!url.searchParams.has("next")) url.searchParams.set("next", "/dashboard");
+    if (!url.searchParams.has("next")) {
+      url.searchParams.set("next", type === "recovery" ? "/auth/update-password" : "/dashboard");
+    }
     return NextResponse.redirect(url);
   }
 
