@@ -11,13 +11,23 @@ export async function GET(request: Request) {
   const supabase = createClient();
 
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(`${origin}${next}`);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) {
+      // Detect password recovery flow via AMR (authentication method reference)
+      const amr = data.session?.user?.app_metadata?.amr as Array<{ method: string }> | undefined
+        ?? (data.session as unknown as { amr?: Array<{ method: string }> })?.amr;
+      const isRecovery = Array.isArray(amr) && amr.some((m) => m.method === "recovery");
+      const destination = isRecovery ? "/auth/update-password" : next;
+      return NextResponse.redirect(`${origin}${destination}`);
+    }
   }
 
   if (tokenHash && type) {
     const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
-    if (!error) return NextResponse.redirect(`${origin}${next}`);
+    if (!error) {
+      const destination = type === "recovery" ? "/auth/update-password" : next;
+      return NextResponse.redirect(`${origin}${destination}`);
+    }
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
