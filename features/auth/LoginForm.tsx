@@ -42,8 +42,8 @@ export function LoginForm() {
         return;
       }
       window.location.href = "/dashboard";
-    } catch {
-      setError("Noe gikk galt. Prøv igjen.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Noe gikk galt. Prøv igjen.");
     } finally {
       setLoading(false);
     }
@@ -67,8 +67,8 @@ export function LoginForm() {
         return;
       }
       setMagicSent(true);
-    } catch {
-      setError("Kunne ikke sende e-post. Prøv igjen.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Kunne ikke sende e-post. Prøv igjen.");
     } finally {
       setMagicLoading(false);
     }
