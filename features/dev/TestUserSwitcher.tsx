@@ -25,7 +25,7 @@ export function TestUserSwitcher() {
   const [loading, setLoading] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
-  const { data } = trpc.profile.list.useQuery({});
+  const { data } = trpc.profile.devList.useQuery();
 
   useEffect(() => {
     function onClick(e: MouseEvent) {

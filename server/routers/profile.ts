@@ -64,6 +64,17 @@ export const profileRouter = router({
       });
     }),
 
+  // Dev-only: hent alle profiler for testbruker-bytter (krever ENABLE_TEST_SWITCHER=true)
+  devList: profileProcedure.query(async ({ ctx }) => {
+    if (process.env.ENABLE_TEST_SWITCHER !== "true") {
+      throw new TRPCError({ code: "FORBIDDEN" });
+    }
+    return ctx.db.profile.findMany({
+      select: { id: true, fullName: true, email: true, role: true },
+      orderBy: { fullName: "asc" },
+    });
+  }),
+
   // HR/ADMIN: hent alle profiler med søk og filter
   list: hrProcedure
     .input(
