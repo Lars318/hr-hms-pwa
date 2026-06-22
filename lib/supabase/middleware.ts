@@ -29,7 +29,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Supabase PKCE magic link: ?code= lander på rot-URL → send til /auth/callback
+  const code = searchParams.get("code");
+  if (code && pathname !== "/auth/callback") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    url.searchParams.set("code", code);
+    url.searchParams.set("next", "/dashboard");
+    return NextResponse.redirect(url);
+  }
 
   // Offentlige ruter som ikke krever innlogging
   const publicPaths = [
