@@ -1,5 +1,6 @@
 import { LoginForm } from "@/features/auth/LoginForm";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Logg inn – Truls HR" };
 
 export default function LoginPage() {

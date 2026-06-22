@@ -21,7 +21,6 @@ type FormValues = z.infer<typeof schema>;
 
 export function LoginForm() {
   const router = useRouter();
-  const supabase = createClient();
   const [serverError, setServerError] = useState<string | null>(null);
   const [magicSent, setMagicSent] = useState(false);
   const [magicLoading, setMagicLoading] = useState(false);
@@ -49,6 +48,7 @@ export function LoginForm() {
 
   async function onSubmit({ email, password }: FormValues) {
     setServerError(null);
+    const supabase = createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setServerError("Feil e-post eller passord.");
@@ -130,6 +130,7 @@ export function LoginForm() {
             disabled={magicLoading || !magicEmail}
             onClick={async () => {
               setMagicLoading(true);
+              const supabase = createClient();
               const { error } = await supabase.auth.signInWithOtp({
                 email: magicEmail,
                 options: { emailRedirectTo: `${window.location.origin}/auth/callback` },

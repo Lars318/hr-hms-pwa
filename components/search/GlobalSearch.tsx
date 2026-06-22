@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Search, Phone, Mail, ArrowRight, X } from "lucide-react";
 import { trpc } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
@@ -123,7 +124,7 @@ export function GlobalSearch({ role, placeholder = "Søk etter kollega eller sid
                     <div key={p.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/50 transition-colors">
                       <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold shrink-0 select-none">
                         {p.avatarUrl
-                          ? <img src={p.avatarUrl} alt={p.fullName} className="h-8 w-8 rounded-full object-cover" />
+                          ? <Image src={p.avatarUrl} alt={p.fullName} width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
                           : initials(p.fullName)
                         }
                       </div>
