@@ -1,51 +1,73 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+// Public paths that don't require authentication
+const PUBLIC_PATHS = [
+  "/login",
+  "/auth/callback",
+  "/auth/update-password",
+  "/auth/session",
+  "/api/health",
+];
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options as Parameters<typeof supabaseResponse.cookies.set>[2])
-          );
-        },
-      },
-    }
+/**
+ * Decode a Supabase session JWT without using any Node.js APIs.
+ * Returns the payload or null if the token is missing / expired / malformed.
+ * Safe for Vercel Edge Runtime (only uses atob and JSON.parse).
+ */
+function getSessionFromCookies(request: NextRequest): { exp: number } | null {
+  // Supabase stores the session in a cookie named sb-<project_ref>-auth-token
+  // or sb-<project_ref>-auth-token.0 (chunked) — check all cookies for the pattern.
+  const sessionCookie = request.cookies.getAll().find(
+    (c) => /^sb-.+-auth-token(\.0)?$/.test(c.name)
   );
+  if (!sessionCookie) return null;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    // The cookie value is a JSON string: {"access_token":"...","..."}
+    // or a raw JWT depending on the @supabase/ssr version.
+    let raw = sessionCookie.value;
 
+    // Try JSON first (newer @supabase/ssr serialises the whole session object)
+    if (raw.startsWith("{") || raw.startsWith("%7B")) {
+      raw = decodeURIComponent(raw);
+      const parsed = JSON.parse(raw) as { access_token?: string };
+      if (parsed.access_token) raw = parsed.access_token;
+      else return null;
+    }
+
+    // raw should now be a JWT (header.payload.signature)
+    const parts = raw.split(".");
+    if (parts.length !== 3) return null;
+
+    // base64url → base64 → JSON
+    const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const json = JSON.parse(atob(b64));
+    return json as { exp: number };
+  } catch {
+    return null;
+  }
+}
+
+export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
-  // Offentlige ruter som ikke krever innlogging
-  const publicPaths = ["/login", "/auth/callback", "/auth/update-password", "/auth/session", "/api/health"];
-  const isPublic = publicPaths.some((p) => pathname.startsWith(p));
+  const session = getSessionFromCookies(request);
+  const now = Math.floor(Date.now() / 1000);
+  // Allow a 60-second clock skew
+  const isAuthenticated = session !== null && session.exp > now - 60;
 
-  if (!user && !isPublic) {
+  if (!isAuthenticated && !isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && pathname === "/login") {
+  if (isAuthenticated && pathname === "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 
-  return supabaseResponse;
+  return NextResponse.next({ request });
 }

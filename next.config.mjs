@@ -144,19 +144,6 @@ const nextConfig = {
   experimental: {
     instrumentationHook: true,
   },
-  webpack(config, { nextRuntime, webpack }) {
-    // Vercel Edge Runtime exposes `process` but throws when code accesses
-    // `process.version`. @supabase/supabase-js reads it at module init time
-    // (to build a telemetry header), causing MIDDLEWARE_INVOCATION_FAILED.
-    // DefinePlugin replaces the literal `process.version` token in the Edge
-    // bundle so the trap is never hit at runtime.
-    if (nextRuntime === "edge") {
-      config.plugins.push(
-        new webpack.DefinePlugin({ "process.version": JSON.stringify("v18.0.0") })
-      );
-    }
-    return config;
-  },
   async headers() {
     return [
       {
