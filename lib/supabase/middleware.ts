@@ -31,13 +31,15 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname, searchParams } = request.nextUrl;
 
-  // Supabase PKCE magic link: ?code= lander på rot-URL → send til /auth/callback
   const code = searchParams.get("code");
-  if (code && pathname !== "/auth/callback") {
+  const tokenHash = searchParams.get("token_hash");
+  const type = searchParams.get("type");
+  if ((code || tokenHash) && pathname !== "/auth/callback") {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/callback";
-    url.searchParams.set("code", code);
-    url.searchParams.set("next", "/dashboard");
+    if (!url.searchParams.has("next")) {
+      url.searchParams.set("next", type === "recovery" ? "/auth/update-password" : "/dashboard");
+    }
     return NextResponse.redirect(url);
   }
 
