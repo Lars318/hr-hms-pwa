@@ -160,6 +160,7 @@ enum LeaveRequestType {
   VACATION
   SICK_LEAVE
   CARE_LEAVE
+  EGENMELDING
   PARENTAL_LEAVE
   UNPAID_LEAVE
   OTHER
@@ -331,6 +332,8 @@ model Profile {
   signatureRequests      SignatureRequest[]  @relation("SignatureRequestSigner")
 
   inspectionRecords InspectionRecord[] @relation("InspectionPerformedBy")
+  internkontrollAnsvar         InternkontrollOmrade[]  @relation("InternkontrollAnsvarlig")
+  internkontrollUtfort         InternkontrollLogg[]    @relation("InternkontrollUtfort")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -1384,4 +1387,49 @@ model InspectionResponse {
 
   @@unique([recordId, itemId])
   @@index([recordId])
+}
+
+enum InternkontrollKategori {
+  BRANNVERN
+  EL_SIKKERHET
+  ARBEIDSMILJO
+  KJORETOY
+  STOFFKARTOTEK
+  ANNET
+}
+
+model InternkontrollOmrade {
+  id            String                 @id @default(cuid())
+  kategori      InternkontrollKategori
+  tittel        String
+  beskrivelse   String?
+  intervalDager Int
+  ansvarligId   String?
+  locationId    String?
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+
+  ansvarlig Profile?               @relation("InternkontrollAnsvarlig", fields: [ansvarligId], references: [id])
+  logg      InternkontrollLogg[]
+
+  @@index([kategori])
+  @@index([locationId])
+}
+
+model InternkontrollLogg {
+  id           String   @id @default(cuid())
+  omradeId     String
+  utfortAvId   String
+  utfortDato   DateTime
+  nesteFrist   DateTime
+  godkjent     Boolean  @default(true)
+  merknad      String?
+  dokumentUrl  String?
+  createdAt    DateTime @default(now())
+
+  omrade    InternkontrollOmrade @relation(fields: [omradeId], references: [id], onDelete: Cascade)
+  utfortAv  Profile              @relation("InternkontrollUtfort", fields: [utfortAvId], references: [id])
+
+  @@index([omradeId])
+  @@index([nesteFrist])
 }

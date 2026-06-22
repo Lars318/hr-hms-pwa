@@ -19,7 +19,7 @@ import type { LeaveRequestType } from "@prisma/client";
 const schema = z
   .object({
     type: z.enum([
-      "VACATION", "SICK_LEAVE", "CARE_LEAVE",
+      "VACATION", "SICK_LEAVE", "CARE_LEAVE", "EGENMELDING",
       "PARENTAL_LEAVE", "UNPAID_LEAVE", "OTHER",
     ] as const),
     startDate: z.string().min(1, "Startdato er påkrevd"),
@@ -76,6 +76,7 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
 
   const watchedType = watch("type");
   const needsReason = requiresReason(watchedType as LeaveRequestType);
+  const isEgenmelding = watchedType === "EGENMELDING";
 
   const createMutation = trpc.leaveRequest.create.useMutation({
     onSuccess: (req) => {
@@ -111,23 +112,28 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
     <form onSubmit={handleSubmit(onSubmit)} className="max-w-lg space-y-5">
       <div className="space-y-1">
         <Label htmlFor="type">Type fravær *</Label>
-        <Select id="type" {...register("type")}>
+        <Select id="type" className="rounded-xl" {...register("type")}>
           {(Object.entries(LEAVE_TYPE_LABELS) as [LeaveRequestType, string][]).map(([v, l]) => (
             <option key={v} value={v}>{l}</option>
           ))}
         </Select>
         {errors.type && <p className="text-xs text-destructive">{errors.type.message}</p>}
+        {isEgenmelding && (
+          <p className="text-xs text-muted-foreground bg-muted rounded p-2">
+            Egenmelding teller alltid som 3 dager, uavhengig av faktisk varighet. Du har inntil 4 egenmeldinger per kalenderår.
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
           <Label htmlFor="startDate">Fra dato *</Label>
-          <Input id="startDate" type="date" {...register("startDate")} />
+          <Input id="startDate" type="date" className="rounded-xl" {...register("startDate")} />
           {errors.startDate && <p className="text-xs text-destructive">{errors.startDate.message}</p>}
         </div>
         <div className="space-y-1">
           <Label htmlFor="endDate">Til dato *</Label>
-          <Input id="endDate" type="date" {...register("endDate")} />
+          <Input id="endDate" type="date" className="rounded-xl" {...register("endDate")} />
           {errors.endDate && <p className="text-xs text-destructive">{errors.endDate.message}</p>}
         </div>
       </div>
@@ -138,7 +144,7 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
           <select
             id="locationId"
             {...register("locationId")}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
           >
             <option value="">Ikke spesifisert</option>
             {locations.map((l) => (
@@ -155,6 +161,7 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
         <Textarea
           id="reason"
           rows={3}
+          className="rounded-xl"
           placeholder={needsReason ? "Begrunnelse er påkrevd for denne typen fravær" : "Legg til begrunnelse hvis ønskelig"}
           {...register("reason")}
         />
@@ -164,10 +171,10 @@ export function LeaveRequestForm({ mode, existing }: LeaveRequestFormProps) {
       {serverError && <p className="text-sm text-destructive">{serverError}</p>}
 
       <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className="rounded-xl">
           {isSubmitting ? "Sender…" : mode === "create" ? "Send søknad" : "Lagre endringer"}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.back()}>
+        <Button type="button" variant="outline" className="rounded-xl" onClick={() => router.back()}>
           Avbryt
         </Button>
       </div>

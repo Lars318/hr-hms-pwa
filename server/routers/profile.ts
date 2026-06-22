@@ -96,6 +96,38 @@ export const profileRouter = router({
       });
     }),
 
+  // Alle innloggede: hent aktive ansatte gruppert per avdeling
+  byDepartment: profileProcedure.query(async ({ ctx }) => {
+    const profiles = await ctx.db.profile.findMany({
+      where: { status: "ACTIVE" },
+      select: {
+        id: true,
+        fullName: true,
+        title: true,
+        phone: true,
+        email: true,
+        avatarUrl: true,
+        role: true,
+        department: { select: { id: true, name: true } },
+        profileAssignments: {
+          where: { isPrimary: true, endDate: null },
+          select: { location: { select: { name: true } } },
+          take: 1,
+        },
+      },
+      orderBy: { fullName: "asc" },
+    });
+
+    const map = new Map<string, { deptId: string; deptName: string; members: typeof profiles }>();
+    for (const p of profiles) {
+      const key = p.department?.id ?? "__none__";
+      const name = p.department?.name ?? "Ingen avdeling";
+      if (!map.has(key)) map.set(key, { deptId: key, deptName: name, members: [] });
+      map.get(key)!.members.push(p);
+    }
+    return Array.from(map.values()).sort((a, b) => a.deptName.localeCompare(b.deptName, "nb"));
+  }),
+
   // Innlogget bruker oppdaterer seg selv (begrenset felt)
   update: profileProcedure
     .input(

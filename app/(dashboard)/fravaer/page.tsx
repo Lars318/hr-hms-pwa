@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { LeaveListClient } from "@/features/leave/LeaveListClient";
+import { LeaveBalanceCards } from "@/features/leave/LeaveBalanceCards";
 
 export const metadata = { title: "Fravær – HR/HMS" };
 
@@ -45,6 +46,8 @@ export default async function FravaerPage() {
           </Button>
         </div>
       </div>
+
+      <LeaveBalanceCards />
 
       <LeaveListClient viewerRole={profile.role} />
     </div>

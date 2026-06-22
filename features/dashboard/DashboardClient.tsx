@@ -6,6 +6,7 @@ import { ManagerDashboard } from "./ManagerDashboard";
 import { HrDashboard } from "./HrDashboard";
 import { HmsDashboard } from "./HmsDashboard";
 import { AdminDashboard } from "./AdminDashboard";
+import { PersonalizedDashboard } from "./PersonalizedDashboard";
 import type { Role } from "@prisma/client";
 
 interface DashboardClientProps {
