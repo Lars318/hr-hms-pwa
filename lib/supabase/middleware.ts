@@ -49,12 +49,25 @@ function getSessionFromCookies(request: NextRequest): { exp: number } | null {
 }
 
 export async function updateSession(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Forward magic link / PKCE auth params to the callback handler.
+  // Supabase sends users back with ?code= or ?token_hash= — these arrive
+  // before any session cookie exists, so we must route them to auth/callback
+  // before checking authentication.
+  const code = searchParams.get("code");
+  const tokenHash = searchParams.get("token_hash");
+  if ((code || tokenHash) && pathname !== "/auth/callback") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    if (!url.searchParams.has("next")) url.searchParams.set("next", "/dashboard");
+    return NextResponse.redirect(url);
+  }
+
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
   const session = getSessionFromCookies(request);
   const now = Math.floor(Date.now() / 1000);
-  // Allow a 60-second clock skew
   const isAuthenticated = session !== null && session.exp > now - 60;
 
   if (!isAuthenticated && !isPublic) {
