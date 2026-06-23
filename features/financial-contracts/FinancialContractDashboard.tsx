@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Download } from "lucide-react";
 import { FinancialContractKpiCards } from "./FinancialContractKpiCards";
 import { MonthlyCostChart } from "./MonthlyCostChart";
 import { ContractTypeDistribution } from "./ContractTypeDistribution";
@@ -79,10 +79,22 @@ export function FinancialContractDashboard() {
             Økonomi- og leiekontrakter for hele organisasjonen
           </p>
         </div>
-        <Button className="min-h-[44px]" onClick={() => setNewOpen(true)}>
-          <Plus className="h-4 w-4 sm:mr-2" />
-          <span className="hidden sm:inline">Ny kontrakt</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="min-h-[44px]"
+            onClick={() => {
+              window.location.href = "/api/financial-contracts/export";
+            }}
+          >
+            <Download className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Eksporter</span>
+          </Button>
+          <Button className="min-h-[44px]" onClick={() => setNewOpen(true)}>
+            <Plus className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Ny kontrakt</span>
+          </Button>
+        </div>
       </div>
 
       <FinancialContractKpiCards summary={summary} isLoading={summaryLoading} />
