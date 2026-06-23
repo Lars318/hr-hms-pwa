@@ -157,7 +157,6 @@ export function NewFinancialContractDialog({
         name: ex.name ?? f.name,
         supplierName: ex.supplierName ?? f.supplierName,
         type: (ex.type as FinancialContractType) ?? f.type,
-        centerName: ex.locationName ?? f.centerName,
         startDate: ex.startDate ?? f.startDate,
         endDate: ex.endDate ?? f.endDate,
         monthlyAmount:
