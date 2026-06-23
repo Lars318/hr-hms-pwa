@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc/client";
@@ -27,7 +27,19 @@ export function MonthlyCostChart() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
   const [hovered, setHovered] = useState<number | null>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [W, setW] = useState(560);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width;
+      if (w && w > 0) setW(Math.round(w));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const { data: summary } = trpc.financialContract.getSummary.useQuery({ year });
   const rows = summary?.monthlyCostByMonth ?? [];
@@ -37,8 +49,7 @@ export function MonthlyCostChart() {
   const axisMax = ticks[ticks.length - 1] ?? 1;
   const hasData = values.some((v) => v > 0);
 
-  // Compute points dynamically from container width via viewBox
-  const W = 560;
+  // Plot dimensions derived from measured container width
   const innerW = W - PAD.left - PAD.right;
   const innerH = H - PAD.top - PAD.bottom;
 
@@ -80,14 +91,17 @@ export function MonthlyCostChart() {
       </CardHeader>
 
       <CardContent className="px-0 pb-4 pt-1">
+        <div ref={containerRef} className="w-full">
         {!hasData ? (
-          <p className="text-sm text-muted-foreground py-4">Ingen data for {year}.</p>
+          <p className="text-sm text-muted-foreground py-4 px-4">Ingen data for {year}.</p>
         ) : (
           <svg
-            ref={svgRef}
             viewBox={`0 0 ${W} ${H}`}
-            className="w-full"
-            style={{ height: H, display: "block" }}
+            width={W}
+            height={H}
+            preserveAspectRatio="none"
+            className="block"
+            style={{ width: "100%", height: H }}
             onMouseLeave={() => setHovered(null)}
           >
             <defs>
@@ -185,6 +199,7 @@ export function MonthlyCostChart() {
             })()}
           </svg>
         )}
+        </div>
       </CardContent>
     </Card>
   );
