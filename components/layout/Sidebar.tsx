@@ -19,14 +19,14 @@ import { PulsfolloLogo } from "@/components/PulsfolloLogo";
 import type { ElementType } from "react";
 import type { Role } from "@prisma/client";
 
-interface NavItem {
+export interface NavItem {
   href: string;
   label: string;
   icon: ElementType;
   roles: Role[];
 }
 
-interface NavGroup {
+export interface NavGroup {
   label: string;
   icon: ElementType;
   roles: Role[];
@@ -34,11 +34,11 @@ interface NavGroup {
 }
 
 // Single top-level link (no group)
-const topItems: NavItem[] = [
+export const topItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
 ];
 
-const navGroups: NavGroup[] = [
+export const navGroups: NavGroup[] = [
   {
     label: "Personal",
     icon: CalendarDays,
@@ -127,7 +127,7 @@ interface SidebarProps {
   role: Role;
 }
 
-function isActive(href: string, pathname: string) {
+export function isActive(href: string, pathname: string) {
   if (pathname === href) return true;
   if (href === "/fravaer") return pathname.startsWith("/fravaer/") && !pathname.startsWith("/fravaer/kalender");
   return pathname.startsWith(href + "/");
