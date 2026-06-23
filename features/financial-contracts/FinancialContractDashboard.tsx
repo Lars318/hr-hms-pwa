@@ -114,6 +114,7 @@ export function FinancialContractDashboard() {
             <FinancialContractDetailPanel
               contractId={selectedId}
               onClose={() => setSelectedId(undefined)}
+              locations={locations}
             />
           </div>
         )}

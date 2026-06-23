@@ -4,7 +4,8 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { X, Download, Ban, FileText } from "lucide-react";
+import { X, Download, Ban, FileText, Pencil } from "lucide-react";
+import { EditFinancialContractDialog } from "./EditFinancialContractDialog";
 import {
   TYPE_LABELS,
   STATUS_LABELS,
@@ -34,11 +35,14 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
 export function FinancialContractDetailPanel({
   contractId,
   onClose,
+  locations = [],
 }: {
   contractId: string;
   onClose: () => void;
+  locations?: { id: string; name: string }[];
 }) {
   const [tab, setTab] = useState<Tab>("oversikt");
+  const [editOpen, setEditOpen] = useState(false);
   const utils = trpc.useUtils();
   const { data: c, isLoading } = trpc.financialContract.getById.useQuery({
     id: contractId,
@@ -59,6 +63,15 @@ export function FinancialContractDetailPanel({
   });
 
   return (
+    <>
+    {c && editOpen && (
+      <EditFinancialContractDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        contract={c}
+        locations={locations}
+      />
+    )}
     <div className="flex h-full flex-col bg-card border-l">
       <div className="flex items-start justify-between gap-2 border-b p-4">
         <div className="min-w-0">
@@ -76,12 +89,20 @@ export function FinancialContractDetailPanel({
             </span>
           )}
         </div>
-        <button
-          onClick={onClose}
-          className="rounded-md p-1.5 text-muted-foreground hover:bg-accent"
-        >
-          <X className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-1 shrink-0">
+          {c && c.status !== "TERMINATED" && (
+            <Button size="sm" variant="outline" onClick={() => setEditOpen(true)}>
+              <Pencil className="h-3.5 w-3.5 mr-1.5" />
+              Rediger
+            </Button>
+          )}
+          <button
+            onClick={onClose}
+            className="rounded-md p-1.5 text-muted-foreground hover:bg-accent"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="flex border-b text-sm">
@@ -196,5 +217,6 @@ export function FinancialContractDetailPanel({
         )}
       </div>
     </div>
+    </>
   );
 }
