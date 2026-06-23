@@ -20,11 +20,13 @@ import type {
 } from "@prisma/client";
 
 const PULS_LOCATIONS = [
-  "Puls Kantor",
   "Puls Bøleråsen",
   "Puls Greverud",
+  "Puls Kantor",
+  "Puls Langhus",
   "Puls Marikollen",
   "Puls Tomter",
+  "Puls Trollåsen",
 ];
 
 const AREA_TYPES: FinancialContractType[] = ["HUSLEIE", "OTHER"];

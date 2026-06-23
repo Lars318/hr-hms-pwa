@@ -16,11 +16,13 @@ import { Loader2 } from "lucide-react";
 import { TYPE_OPTIONS, STATUS_OPTIONS } from "./labels";
 
 const PULS_LOCATIONS = [
-  "Puls Kantor",
   "Puls Bøleråsen",
   "Puls Greverud",
+  "Puls Kantor",
+  "Puls Langhus",
   "Puls Marikollen",
   "Puls Tomter",
+  "Puls Trollåsen",
 ];
 
 const AREA_TYPES: FinancialContractType[] = ["HUSLEIE", "OTHER"];
