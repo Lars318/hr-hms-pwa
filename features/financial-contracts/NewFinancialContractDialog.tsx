@@ -19,6 +19,16 @@ import type {
   FinancialContractStatus,
 } from "@prisma/client";
 
+const PULS_LOCATIONS = [
+  "Puls Kantor",
+  "Puls Bøleråsen",
+  "Puls Greverud",
+  "Puls Marikollen",
+  "Puls Tomter",
+];
+
+const AREA_TYPES: FinancialContractType[] = ["HUSLEIE", "RENT", "LEASE", "OTHER"];
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -30,7 +40,6 @@ interface FormState {
   type: FinancialContractType;
   supplierName: string;
   locationId: string;
-  centerName: string;
   status: FinancialContractStatus;
   startDate: string;
   endDate: string;
@@ -48,7 +57,6 @@ const EMPTY: FormState = {
   type: "RENT",
   supplierName: "",
   locationId: "",
-  centerName: "",
   status: "DRAFT",
   startDate: "",
   endDate: "",
@@ -185,7 +193,7 @@ export function NewFinancialContractDialog({
       type: form.type,
       supplierName: form.supplierName.trim(),
       locationId: form.locationId || null,
-      centerName: form.centerName || null,
+      centerName: null,
       status: form.status,
       startDate: form.startDate || null,
       endDate: form.endDate || null,
@@ -336,18 +344,19 @@ export function NewFinancialContractDialog({
                 onChange={(e) => set("locationId", e.target.value)}
               >
                 <option value="">– velg senter –</option>
-                {locations.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name}
-                  </option>
-                ))}
+                <optgroup label="Puls-sentre">
+                  {PULS_LOCATIONS.map((name) => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
+                </optgroup>
+                {locations.length > 0 && (
+                  <optgroup label="Andre lokasjoner">
+                    {locations.map((l) => (
+                      <option key={l.id} value={l.id}>{l.name}</option>
+                    ))}
+                  </optgroup>
+                )}
               </Select>
-            </Field>
-            <Field label="Senternavn (fritekst)">
-              <Input
-                value={form.centerName}
-                onChange={(e) => set("centerName", e.target.value)}
-              />
             </Field>
             <Field label="Startdato">
               <Input
@@ -384,13 +393,15 @@ export function NewFinancialContractDialog({
                 onChange={(e) => set("totalValue", e.target.value)}
               />
             </Field>
-            <Field label="Areal (m²)">
-              <Input
-                inputMode="decimal"
-                value={form.areaSqm}
-                onChange={(e) => set("areaSqm", e.target.value)}
-              />
-            </Field>
+            {AREA_TYPES.includes(form.type) && (
+              <Field label="Areal (m²)">
+                <Input
+                  inputMode="decimal"
+                  value={form.areaSqm}
+                  onChange={(e) => set("areaSqm", e.target.value)}
+                />
+              </Field>
+            )}
             <Field label="Oppsigelse (mnd)">
               <Input
                 inputMode="numeric"
