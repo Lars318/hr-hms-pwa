@@ -7,7 +7,7 @@ import { trpc } from "@/lib/trpc/client";
 import { MONTH_LABELS, formatNOK } from "./labels";
 
 const H = 180;
-const PAD = { top: 20, right: 8, bottom: 28, left: 4 };
+const PAD = { top: 20, right: 22, bottom: 28, left: 22 };
 
 function yTicks(max: number): number[] {
   if (max === 0) return [0];
