@@ -27,7 +27,7 @@ const PULS_LOCATIONS = [
   "Puls Tomter",
 ];
 
-const AREA_TYPES: FinancialContractType[] = ["HUSLEIE", "RENT", "LEASE", "OTHER"];
+const AREA_TYPES: FinancialContractType[] = ["HUSLEIE", "OTHER"];
 
 interface Props {
   open: boolean;

@@ -23,7 +23,7 @@ const PULS_LOCATIONS = [
   "Puls Tomter",
 ];
 
-const AREA_TYPES: FinancialContractType[] = ["HUSLEIE", "RENT", "LEASE", "OTHER"];
+const AREA_TYPES: FinancialContractType[] = ["HUSLEIE", "OTHER"];
 import type { FinancialContractType, FinancialContractStatus } from "@prisma/client";
 
 interface ContractData {
