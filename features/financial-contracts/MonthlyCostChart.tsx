@@ -31,8 +31,7 @@ export function MonthlyCostChart() {
           </span>
           <button
             onClick={() => setYear((y) => y + 1)}
-            disabled={year >= currentYear}
-            className="rounded p-1 hover:bg-muted transition-colors disabled:opacity-30"
+            className="rounded p-1 hover:bg-muted transition-colors"
             aria-label="Neste år"
           >
             <ChevronRight className="h-4 w-4" />
