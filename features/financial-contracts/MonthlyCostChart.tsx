@@ -7,7 +7,7 @@ import { trpc } from "@/lib/trpc/client";
 import { MONTH_LABELS, formatNOK } from "./labels";
 
 const H = 180;
-const PAD = { top: 12, right: 8, bottom: 28, left: 52 };
+const PAD = { top: 20, right: 8, bottom: 28, left: 4 };
 
 function yTicks(max: number): number[] {
   if (max === 0) return [0];
@@ -79,7 +79,7 @@ export function MonthlyCostChart() {
         </div>
       </CardHeader>
 
-      <CardContent className="px-3 pb-4 pt-1">
+      <CardContent className="px-0 pb-4 pt-1">
         {!hasData ? (
           <p className="text-sm text-muted-foreground py-4">Ingen data for {year}.</p>
         ) : (
@@ -97,9 +97,10 @@ export function MonthlyCostChart() {
               </linearGradient>
             </defs>
 
-            {/* Y-axis grid + labels */}
-            {ticks.map((t) => {
+            {/* Y-axis grid + floating labels */}
+            {ticks.map((t, ti) => {
               const y = PAD.top + innerH - (t / axisMax) * innerH;
+              const isBottom = ti === 0;
               return (
                 <g key={t}>
                   <line
@@ -107,8 +108,9 @@ export function MonthlyCostChart() {
                     stroke="#00000018" strokeWidth="1"
                   />
                   <text
-                    x={PAD.left - 6} y={y + 4}
-                    textAnchor="end" fontSize="11" fill="#888"
+                    x={PAD.left + 4}
+                    y={isBottom ? y - 3 : y + 11}
+                    textAnchor="start" fontSize="10" fill="#aaa"
                   >
                     {fmtK(t)}
                   </text>
