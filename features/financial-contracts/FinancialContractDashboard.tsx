@@ -88,7 +88,7 @@ export function FinancialContractDashboard() {
       <FinancialContractKpiCards summary={summary} isLoading={summaryLoading} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <MonthlyCostChart data={summary?.monthlyCostByMonth} />
+        <MonthlyCostChart />
         <ContractTypeDistribution data={summary?.valueByType} />
       </div>
 

@@ -157,8 +157,11 @@ export const financialContractRouter = router({
     }),
 
   // ── getSummary (KPI) ──────────────────────────────────────────────────────
-  getSummary: adminProcedure.query(async ({ ctx }) => {
+  getSummary: adminProcedure
+    .input(z.object({ year: z.number().int().optional() }).optional())
+    .query(async ({ ctx, input }) => {
     const now = new Date();
+    const chartYear = input?.year ?? now.getFullYear();
     const in90Days = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
 
     const active = await ctx.db.financialContract.findMany({
@@ -188,7 +191,17 @@ export const financialContractRouter = router({
         (c.monthlyAmount != null ? c.monthlyAmount * 12 : 0);
       totalContractValue += value;
       valueByTypeMap.set(c.type, (valueByTypeMap.get(c.type) ?? 0) + value);
-      for (let m = 0; m < 12; m++) monthlyByMonth[m] += monthly;
+
+      // Add monthly cost only for months the contract was active in chartYear
+      for (let m = 0; m < 12; m++) {
+        const monthStart = new Date(Date.UTC(chartYear, m, 1));
+        const monthEnd = new Date(Date.UTC(chartYear, m + 1, 0, 23, 59, 59));
+        const start = c.startDate ? new Date(c.startDate) : null;
+        const end = c.endDate ? new Date(c.endDate) : null;
+        const activeInMonth =
+          (!start || start <= monthEnd) && (!end || end >= monthStart);
+        if (activeInMonth) monthlyByMonth[m] += monthly;
+      }
     }
 
     const expiringCount = await ctx.db.financialContract.count({

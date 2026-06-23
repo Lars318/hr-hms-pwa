@@ -1,25 +1,47 @@
 "use client";
 
+import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { trpc } from "@/lib/trpc/client";
 import { MONTH_LABELS, formatNOK } from "./labels";
 
-interface Row {
-  monthIndex: number;
-  value: number;
-}
+export function MonthlyCostChart() {
+  const currentYear = new Date().getFullYear();
+  const [year, setYear] = useState(currentYear);
 
-export function MonthlyCostChart({ data }: { data?: Row[] }) {
-  const rows = data ?? [];
+  const { data: summary } = trpc.financialContract.getSummary.useQuery({ year });
+  const rows = summary?.monthlyCostByMonth ?? [];
   const max = Math.max(1, ...rows.map((r) => r.value));
 
   return (
     <Card className="rounded-2xl">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-base">Månedlig kostnadsutvikling</CardTitle>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setYear((y) => y - 1)}
+            className="rounded p-1 hover:bg-muted transition-colors"
+            aria-label="Forrige år"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <span className="w-12 text-center text-sm font-medium tabular-nums">
+            {year}
+          </span>
+          <button
+            onClick={() => setYear((y) => y + 1)}
+            disabled={year >= currentYear}
+            className="rounded p-1 hover:bg-muted transition-colors disabled:opacity-30"
+            aria-label="Neste år"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
       </CardHeader>
       <CardContent>
-        {rows.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Ingen data ennå.</p>
+        {rows.every((r) => r.value === 0) ? (
+          <p className="text-sm text-muted-foreground">Ingen data for {year}.</p>
         ) : (
           <div className="flex items-end gap-1.5 h-40">
             {rows.map((r) => (
@@ -30,7 +52,7 @@ export function MonthlyCostChart({ data }: { data?: Row[] }) {
               >
                 <div
                   className="w-full rounded-t bg-primary/80 group-hover:bg-primary transition-colors"
-                  style={{ height: `${(r.value / max) * 100}%`, minHeight: "2px" }}
+                  style={{ height: `${(r.value / max) * 100}%`, minHeight: r.value > 0 ? "2px" : "0" }}
                 />
                 <span className="text-[10px] text-muted-foreground">
                   {MONTH_LABELS[r.monthIndex]}
