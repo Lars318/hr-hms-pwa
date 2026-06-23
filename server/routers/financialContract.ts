@@ -204,10 +204,11 @@ export const financialContractRouter = router({
       }
     }
 
+    const yearEnd = new Date(Date.UTC(chartYear, 11, 31, 23, 59, 59));
     const expiringCount = await ctx.db.financialContract.count({
       where: {
         status: { in: ["ACTIVE", "EXPIRES_SOON"] },
-        endDate: { gte: now, lte: in90Days },
+        endDate: { gte: now, lte: yearEnd },
       },
     });
 
