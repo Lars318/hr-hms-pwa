@@ -36,7 +36,7 @@ export function FinancialContractKpiCards({
     {
       label: "Utløper snart",
       value: summary ? String(summary.expiringCount) : "–",
-      hint: "Innen 90 dager",
+      hint: `Utløper i ${new Date().getFullYear()}`,
       icon: AlertTriangle,
       tone: "text-orange-600",
     },
