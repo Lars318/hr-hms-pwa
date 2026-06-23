@@ -1,16 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc/client";
 import { MONTH_LABELS, formatNOK } from "./labels";
 
-const W = 600;
-const H = 160;
-const PAD = { top: 16, right: 16, bottom: 28, left: 56 };
-const INNER_W = W - PAD.left - PAD.right;
-const INNER_H = H - PAD.top - PAD.bottom;
+const H = 180;
+const PAD = { top: 12, right: 8, bottom: 28, left: 52 };
 
 function yTicks(max: number): number[] {
   if (max === 0) return [0];
@@ -30,6 +27,7 @@ export function MonthlyCostChart() {
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
   const [hovered, setHovered] = useState<number | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const { data: summary } = trpc.financialContract.getSummary.useQuery({ year });
   const rows = summary?.monthlyCostByMonth ?? [];
@@ -37,29 +35,32 @@ export function MonthlyCostChart() {
   const dataMax = Math.max(0, ...values);
   const ticks = yTicks(dataMax);
   const axisMax = ticks[ticks.length - 1] ?? 1;
+  const hasData = values.some((v) => v > 0);
 
-  // Map month index → SVG coordinates
+  // Compute points dynamically from container width via viewBox
+  const W = 560;
+  const innerW = W - PAD.left - PAD.right;
+  const innerH = H - PAD.top - PAD.bottom;
+
   const pts = rows.map((r, i) => ({
-    x: PAD.left + (i / 11) * INNER_W,
-    y: PAD.top + INNER_H - (r.value / axisMax) * INNER_H,
+    x: PAD.left + (rows.length > 1 ? (i / (rows.length - 1)) : 0.5) * innerW,
+    y: PAD.top + innerH - (axisMax > 0 ? (r.value / axisMax) * innerH : 0),
     value: r.value,
     monthIndex: r.monthIndex,
   }));
 
   const polyline = pts.map((p) => `${p.x},${p.y}`).join(" ");
   const area = pts.length
-    ? `M${pts[0].x},${PAD.top + INNER_H} ` +
+    ? `M${pts[0].x},${PAD.top + innerH} ` +
       pts.map((p) => `L${p.x},${p.y}`).join(" ") +
-      ` L${pts[pts.length - 1].x},${PAD.top + INNER_H} Z`
+      ` L${pts[pts.length - 1].x},${PAD.top + innerH} Z`
     : "";
-
-  const hasData = values.some((v) => v > 0);
 
   return (
     <Card className="rounded-2xl">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader className="flex flex-row items-center justify-between pb-1 pt-4 px-4">
         <CardTitle className="text-base">Månedlig kostnadsutvikling</CardTitle>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <button
             onClick={() => setYear((y) => y - 1)}
             className="rounded p-1 hover:bg-muted transition-colors"
@@ -78,112 +79,109 @@ export function MonthlyCostChart() {
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="px-3 pb-4 pt-1">
         {!hasData ? (
-          <p className="text-sm text-muted-foreground">Ingen data for {year}.</p>
+          <p className="text-sm text-muted-foreground py-4">Ingen data for {year}.</p>
         ) : (
-          <div className="relative w-full">
-            <svg
-              viewBox={`0 0 ${W} ${H}`}
-              className="w-full"
-              style={{ height: H }}
-              onMouseLeave={() => setHovered(null)}
-            >
-              <defs>
-                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="currentColor" stopOpacity="0.15" className="text-primary" />
-                  <stop offset="100%" stopColor="currentColor" stopOpacity="0" className="text-primary" />
-                </linearGradient>
-              </defs>
+          <svg
+            ref={svgRef}
+            viewBox={`0 0 ${W} ${H}`}
+            className="w-full"
+            style={{ height: H, display: "block" }}
+            onMouseLeave={() => setHovered(null)}
+          >
+            <defs>
+              <linearGradient id="fcAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#4a7c59" stopOpacity="0.18" />
+                <stop offset="100%" stopColor="#4a7c59" stopOpacity="0.01" />
+              </linearGradient>
+            </defs>
 
-              {/* Y-axis grid + labels */}
-              {ticks.map((t) => {
-                const y = PAD.top + INNER_H - (t / axisMax) * INNER_H;
-                return (
-                  <g key={t}>
-                    <line
-                      x1={PAD.left} y1={y} x2={PAD.left + INNER_W} y2={y}
-                      stroke="currentColor" strokeOpacity="0.08" strokeWidth="1"
-                      className="text-foreground"
-                    />
-                    <text
-                      x={PAD.left - 6} y={y + 4}
-                      textAnchor="end" fontSize="10" fill="currentColor" fillOpacity="0.45"
-                      className="text-foreground"
-                    >
-                      {fmtK(t)}
-                    </text>
-                  </g>
-                );
-              })}
-
-              {/* Area fill */}
-              {area && (
-                <path d={area} fill="url(#areaGrad)" />
-              )}
-
-              {/* Line */}
-              <polyline
-                points={polyline}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                className="text-primary"
-              />
-
-              {/* Hover zones + dots */}
-              {pts.map((p, i) => (
-                <g key={i} onMouseEnter={() => setHovered(i)}>
-                  {/* invisible hit area */}
-                  <rect
-                    x={p.x - INNER_W / 24}
-                    y={PAD.top}
-                    width={INNER_W / 12}
-                    height={INNER_H}
-                    fill="transparent"
+            {/* Y-axis grid + labels */}
+            {ticks.map((t) => {
+              const y = PAD.top + innerH - (t / axisMax) * innerH;
+              return (
+                <g key={t}>
+                  <line
+                    x1={PAD.left} y1={y} x2={PAD.left + innerW} y2={y}
+                    stroke="#00000018" strokeWidth="1"
                   />
-                  {/* dot */}
-                  <circle
-                    cx={p.x} cy={p.y} r={hovered === i ? 5 : 3}
-                    fill="currentColor"
-                    className="text-primary"
-                    style={{ transition: "r 0.1s" }}
-                  />
-                  {/* X label */}
                   <text
-                    x={p.x} y={H - 4}
-                    textAnchor="middle" fontSize="10"
-                    fill="currentColor" fillOpacity="0.45"
-                    className="text-foreground"
+                    x={PAD.left - 6} y={y + 4}
+                    textAnchor="end" fontSize="11" fill="#888"
                   >
-                    {MONTH_LABELS[p.monthIndex]}
+                    {fmtK(t)}
                   </text>
                 </g>
-              ))}
+              );
+            })}
 
-              {/* Tooltip */}
-              {hovered !== null && pts[hovered] && (() => {
-                const p = pts[hovered];
-                const label = formatNOK(p.value);
-                const tw = label.length * 7 + 16;
-                const tx = Math.min(Math.max(p.x - tw / 2, PAD.left), PAD.left + INNER_W - tw);
-                const ty = p.y - 36;
-                return (
-                  <g>
-                    <rect x={tx} y={ty} width={tw} height={22} rx="4"
-                      fill="currentColor" className="text-foreground" fillOpacity="0.9" />
-                    <text x={tx + tw / 2} y={ty + 14.5}
-                      textAnchor="middle" fontSize="11" fontWeight="500"
-                      fill="currentColor" className="text-background">
-                      {label}
-                    </text>
-                  </g>
-                );
-              })()}
-            </svg>
-          </div>
+            {/* Area */}
+            {area && <path d={area} fill="url(#fcAreaGrad)" />}
+
+            {/* Line */}
+            <polyline
+              points={polyline}
+              fill="none"
+              stroke="#4a7c59"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+
+            {/* Dots + hover zones + x-labels */}
+            {pts.map((p, i) => (
+              <g key={i} onMouseEnter={() => setHovered(i)}>
+                <rect
+                  x={p.x - innerW / (2 * 12)}
+                  y={PAD.top}
+                  width={innerW / 12}
+                  height={innerH}
+                  fill="transparent"
+                />
+                <circle
+                  cx={p.x} cy={p.y}
+                  r={hovered === i ? 5.5 : 3.5}
+                  fill="#4a7c59"
+                  style={{ transition: "r 0.1s" }}
+                />
+                <text
+                  x={p.x} y={H - 4}
+                  textAnchor="middle" fontSize="11" fill="#888"
+                >
+                  {MONTH_LABELS[p.monthIndex]}
+                </text>
+              </g>
+            ))}
+
+            {/* Tooltip */}
+            {hovered !== null && pts[hovered] && (() => {
+              const p = pts[hovered];
+              const label = formatNOK(p.value);
+              const tw = label.length * 7.5 + 18;
+              const th = 24;
+              const tx = Math.min(
+                Math.max(p.x - tw / 2, PAD.left),
+                PAD.left + innerW - tw
+              );
+              const ty = Math.max(p.y - th - 8, PAD.top);
+              return (
+                <g style={{ pointerEvents: "none" }}>
+                  <rect
+                    x={tx} y={ty} width={tw} height={th} rx="5"
+                    fill="#1a2e1f" fillOpacity="0.88"
+                  />
+                  <text
+                    x={tx + tw / 2} y={ty + 15.5}
+                    textAnchor="middle" fontSize="12" fontWeight="600"
+                    fill="#ffffff"
+                  >
+                    {label}
+                  </text>
+                </g>
+              );
+            })()}
+          </svg>
         )}
       </CardContent>
     </Card>
