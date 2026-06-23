@@ -32,6 +32,8 @@ import { employmentRecordRouter } from "./employmentRecord";
 import { announcementRouter } from "./announcement";
 import { assistantRouter } from "./assistant";
 import { documentCategoryRouter } from "./documentCategory";
+import { internkontrollRouter } from "./internkontroll";
+import { financialContractRouter } from "./financialContract";
 
 export const appRouter = router({
   profile: profileRouter,
@@ -67,6 +69,8 @@ export const appRouter = router({
   announcement: announcementRouter,
   assistant: assistantRouter,
   documentCategory: documentCategoryRouter,
+  internkontroll: internkontrollRouter,
+  financialContract: financialContractRouter,
 });
 
 export type AppRouter = typeof appRouter;

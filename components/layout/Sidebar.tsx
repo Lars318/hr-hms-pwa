@@ -9,7 +9,7 @@ import {
   ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2,
   Activity, BookOpen, Clock, Shield, AlertTriangle, GraduationCap,
   FlaskConical, ClipboardList, MessageSquare, FileWarning, FileText,
-  KeyRound, ChevronDown,
+  KeyRound, ChevronDown, Receipt,
 } from "lucide-react";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { cn } from "@/lib/utils";
@@ -40,6 +40,7 @@ const navItems: NavItem[] = [
   { href: "/fravaer",         label: "Fravær",            icon: CalendarDays,    roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/overtid",         label: "Overtid",           icon: Clock,           roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/avvik",           label: "Avvik",             icon: ShieldAlert,     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/internkontroll",  label: "Internkontroll",    icon: ClipboardList,   roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/personalhandbok", label: "Personalhåndbok",   icon: BookOpen,        roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/kollegaer",       label: "Kollegaer",         icon: Users,           roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
   { href: "/dokumenter",      label: "Dokumenter",        icon: FolderOpen,      roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
@@ -71,6 +72,7 @@ const navItems: NavItem[] = [
   { href: "/admin/compliance",     label: "Compliance",           icon: Shield,        roles: ["ADMIN", "HR"] },
   { href: "/personvern",           label: "Personvern",           icon: Shield,        roles: ["ADMIN", "HR"] },
   { href: "/personvern/foresporsler", label: "GDPR-forespørsler", icon: Shield,        roles: ["ADMIN", "HR"] },
+  { href: "/okonomi/kontrakter",   label: "Kontrakter (Økonomi)", icon: Receipt,       roles: ["ADMIN"] },
   { href: "/admin/system",         label: "Systemstatus",         icon: Activity,      roles: ["ADMIN"] },
   { href: "/admin/reset-passord",  label: "Tilbakestill passord", icon: KeyRound,      roles: ["ADMIN"] },
 ];

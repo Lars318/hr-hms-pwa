@@ -241,6 +241,7 @@ model Location {
   chemicals           Chemical[]
   onboardingTemplates OnboardingTemplate[]
   inspectionRecords   InspectionRecord[]
+  financialContracts  FinancialContract[]
 
   @@index([safetyRepresentativeId])
   @@index([hseManagerId])
@@ -379,7 +380,11 @@ model Profile {
   sickLeaveStepsCompleted SickLeaveFollowUpStep[]   @relation("StepCompletedBy")
   employmentRecords       EmploymentRecord[]        @relation("EmploymentRecordProfile")
   createdEmploymentRecords EmploymentRecord[]       @relation("EmploymentRecordCreator")
-  webAuthnCredentials     WebAuthnCredential[]
+  webAuthnCredentials          WebAuthnCredential[]
+  internkontrollAnsvar         InternkontrollOmrade[]  @relation("InternkontrollAnsvarlig")
+  internkontrollUtfort         InternkontrollLogg[]    @relation("InternkontrollUtfort")
+  financialContractsCreated    FinancialContract[]           @relation("FinancialContractCreatedBy")
+  financialContractAttachments FinancialContractAttachment[] @relation("FinancialContractAttachmentUploadedBy")
 
   @@index([supabaseUserId])
   @@index([email])
@@ -1569,4 +1574,134 @@ model WebAuthnCredential {
   profileId String
 
   @@index([profileId])
+}
+
+// ─── Internkontroll ──────────────────────────────────────────────────────────
+
+enum InternkontrollKategori {
+  BRANNVERN
+  EL_SIKKERHET
+  ARBEIDSMILJO
+  KJORETOY
+  STOFFKARTOTEK
+  ANNET
+}
+
+enum InternkontrollStatus {
+  OK
+  FORFALLER_SNART   // < 30 dager
+  FORFALT
+  IKKE_SATT
+}
+
+model InternkontrollOmrade {
+  id            String                    @id @default(cuid())
+  kategori      InternkontrollKategori
+  tittel        String
+  beskrivelse   String?
+  intervalDager Int                       // hvor ofte kontroll skal gjøres
+  ansvarligId   String?
+  locationId    String?
+  createdAt     DateTime                  @default(now())
+  updatedAt     DateTime                  @updatedAt
+
+  ansvarlig Profile?               @relation("InternkontrollAnsvarlig", fields: [ansvarligId], references: [id])
+  logg      InternkontrollLogg[]
+
+  @@index([kategori])
+  @@index([locationId])
+}
+
+model InternkontrollLogg {
+  id           String   @id @default(cuid())
+  omradeId     String
+  utfortAvId   String
+  utfortDato   DateTime
+  nesteFrist   DateTime
+  godkjent     Boolean  @default(true)
+  merknad      String?
+  dokumentUrl  String?
+  createdAt    DateTime @default(now())
+
+  omrade    InternkontrollOmrade @relation(fields: [omradeId], references: [id], onDelete: Cascade)
+  utfortAv  Profile              @relation("InternkontrollUtfort", fields: [utfortAvId], references: [id])
+
+  @@index([omradeId])
+  @@index([nesteFrist])
+}
+
+// ─── Økonomi / Kontrakter (admin-only) ───────────────────────────────────────
+
+enum FinancialContractType {
+  RENT
+  LEASE
+  HUSLEIE
+  SERVICE_AGREEMENT
+  SUBSCRIPTION
+  INSURANCE
+  SUPPLIER
+  OTHER
+}
+
+enum FinancialContractStatus {
+  ACTIVE
+  EXPIRES_SOON
+  EXPIRED
+  TERMINATED
+  DRAFT
+}
+
+model FinancialContract {
+  id                  String                        @id @default(cuid())
+  name                String
+  contractNumber      String?
+  type                FinancialContractType
+  supplierName        String
+  locationId          String?
+  centerName          String?
+  areaSqm             Float?
+  startDate           DateTime?
+  endDate             DateTime?
+  durationMonths      Int?
+  monthlyAmount       Float?
+  annualAmount        Float?
+  totalValue          Float?
+  currency            String                        @default("NOK")
+  status              FinancialContractStatus       @default(DRAFT)
+  renewalOption       Boolean                       @default(false)
+  noticePeriodMonths  Int?
+  description         String?                       @db.Text
+  notes               String?                       @db.Text
+  terminatedAt        DateTime?
+  createdByProfileId  String
+  createdAt           DateTime                      @default(now())
+  updatedAt           DateTime                      @updatedAt
+
+  location            Location?                     @relation(fields: [locationId], references: [id])
+  createdBy           Profile                       @relation("FinancialContractCreatedBy", fields: [createdByProfileId], references: [id])
+  attachments         FinancialContractAttachment[]
+
+  @@index([type])
+  @@index([status])
+  @@index([locationId])
+  @@index([createdByProfileId])
+  @@index([endDate])
+}
+
+model FinancialContractAttachment {
+  id                    String            @id @default(cuid())
+  financialContractId   String
+  documentId            String?
+  fileName              String
+  filePath              String
+  mimeType              String
+  sizeBytes             Int
+  uploadedByProfileId   String
+  createdAt             DateTime          @default(now())
+
+  financialContract     FinancialContract @relation(fields: [financialContractId], references: [id], onDelete: Cascade)
+  uploadedBy            Profile           @relation("FinancialContractAttachmentUploadedBy", fields: [uploadedByProfileId], references: [id])
+
+  @@index([financialContractId])
+  @@index([uploadedByProfileId])
 }
