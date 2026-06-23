@@ -153,10 +153,10 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
 
 function NavGroupSection({ group, role, pathname }: { group: NavGroup; role: Role; pathname: string }) {
   const visibleItems = group.items.filter((i) => i.roles.includes(role));
-  if (visibleItems.length === 0) return null;
-
   const hasActive = visibleItems.some((i) => isActive(i.href, pathname));
   const [open, setOpen] = useState(hasActive);
+
+  if (visibleItems.length === 0) return null;
 
   return (
     <div>
