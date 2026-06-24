@@ -4,6 +4,13 @@
  * This file is merged into the generated public/sw.js at build time.
  */
 
+// Lar klienten be en ventende SW om å aktivere umiddelbart (auto-oppdatering).
+self.addEventListener("message", function (event) {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("push", function (event) {
   if (!event.data) return;
 

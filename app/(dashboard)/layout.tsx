@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { OnlineStatusBanner } from "@/features/pwa/OnlineStatusBanner";
+import { ServiceWorkerUpdater } from "@/features/pwa/ServiceWorkerUpdater";
 import { AssistantButton } from "@/components/assistant/AssistantButton";
 
 export default async function DashboardLayout({
@@ -39,6 +40,9 @@ export default async function DashboardLayout({
 
       {/* BottomNav — kun synlig under lg */}
       <BottomNav role={role} />
+
+      {/* Auto-oppdatering når ny app-versjon er deployet */}
+      <ServiceWorkerUpdater />
 
       {/* Global assistent — skjult hvis ASSISTANT_ENABLED=false */}
       {process.env.ASSISTANT_ENABLED !== "false" && <AssistantButton />}
