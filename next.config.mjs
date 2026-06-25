@@ -66,7 +66,15 @@ const withPWA = nextPwa({
         expiration: { maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 },
       },
     },
-    // App navigation pages – Network First with offline fallback
+    // App-navigasjon (HTML-dokumenter) – ALDRI cache.
+    // Sider er rolle-/auth-sensitive (server-renderes med innlogget brukers
+    // rolle), så en cachet side kan vise feil tilstand for en annen sesjon.
+    // Derfor alltid ferskt fra nettverk.
+    {
+      urlPattern: ({ request }) => request.mode === "navigate",
+      handler: "NetworkOnly",
+    },
+    // Øvrige same-origin GET-ressurser – Network First med kort cache.
     {
       urlPattern: /^https?:\/\/.*\/(?!api\/).*/,
       handler: "NetworkFirst",
