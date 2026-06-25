@@ -66,7 +66,27 @@ export const EL_SIKKERHET: Fagmodul = {
   ],
 };
 
-export const FAGMODULER: Fagmodul[] = [BRANNVERN, EL_SIKKERHET];
+export const ARBEIDSMILJO: Fagmodul = {
+  kategori: "ARBEIDSMILJO",
+  slug: "arbeidsmiljo",
+  navn: "Arbeidsmiljø",
+  beskrivelse:
+    "Vernerunde og kartlegging av arbeidsmiljøet etter arbeidsmiljøloven kap. 4. Fysiske, ergonomiske og psykososiale forhold gjennomgås jevnlig.",
+  anbefaltIntervalDager: 365,
+  punkter: [
+    { id: "ergonomi", label: "Arbeidsstillinger og ergonomi er tilfredsstillende", hjelp: "Tilpassede arbeidsplasser, hjelpemidler ved tunge løft." },
+    { id: "inneklima", label: "Inneklima og ventilasjon er tilfredsstillende" },
+    { id: "belysning", label: "Tilstrekkelig belysning på arbeidsplassene" },
+    { id: "stoy", label: "Støynivået er akseptabelt" },
+    { id: "orden", label: "Orden og renhold – ingen snuble- eller klemfarer" },
+    { id: "forstehjelp", label: "Førstehjelpsutstyr er på plass og oppdatert" },
+    { id: "verneutstyr", label: "Nødvendig verneutstyr er tilgjengelig og i bruk" },
+    { id: "psykososialt", label: "Psykososialt arbeidsmiljø er vurdert", hjelp: "Trivsel, arbeidsbelastning, konflikter, varslingsrutiner." },
+    { id: "avvik_lukket", label: "Tidligere avvik fra vernerunde er fulgt opp" },
+  ],
+};
+
+export const FAGMODULER: Fagmodul[] = [BRANNVERN, EL_SIKKERHET, ARBEIDSMILJO];
 
 export function fagmodulForKategori(kategori: string): Fagmodul | undefined {
   return FAGMODULER.find((m) => m.kategori === kategori);

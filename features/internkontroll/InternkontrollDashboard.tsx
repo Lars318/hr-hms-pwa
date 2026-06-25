@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
+import { InternkontrollAarshjul } from "./InternkontrollAarshjul";
 
 const KATEGORI_META: Record<string, { label: string; icon: React.ElementType; href: string }> = {
   BRANNVERN:    { label: "Brannvern",      icon: Flame,         href: "/internkontroll/brannvern" },
@@ -43,10 +44,11 @@ export function InternkontrollDashboard() {
   return (
     <div className="space-y-6">
       {/* Fagmoduler — dedikerte moduler med egne sjekklister */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           { href: "/internkontroll/brannvern", label: "Brannvern", desc: "Rømningsveier, slokkeutstyr, brannøvelse", icon: Flame },
           { href: "/internkontroll/el-sikkerhet", label: "El-sikkerhet", desc: "El-kontroll, termografering, dokumentasjon", icon: Zap },
+          { href: "/internkontroll/arbeidsmiljo", label: "Arbeidsmiljø", desc: "Vernerunde, ergonomi, psykososialt", icon: ShieldCheck },
         ].map(({ href, label, desc, icon: Icon }) => (
           <Link
             key={href}
@@ -154,6 +156,13 @@ export function InternkontrollDashboard() {
             <ClipboardList className="h-6 w-6" />
             <span className="text-sm font-medium">Legg til område</span>
           </Link>
+        </div>
+      )}
+
+      {/* Årshjul — visuell oversikt over når kontroller forfaller */}
+      {!!omrader?.length && (
+        <div className="pt-2">
+          <InternkontrollAarshjul />
         </div>
       )}
     </div>
