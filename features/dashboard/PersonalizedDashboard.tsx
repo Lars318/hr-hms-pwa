@@ -10,6 +10,7 @@ import { AnnouncementCards } from "@/features/announcements/AnnouncementCards";
 import { AnnouncementList } from "@/features/announcements/AnnouncementList";
 import { AnnouncementForm } from "@/features/announcements/AnnouncementForm";
 import { QuickEgenmelding } from "./QuickEgenmelding";
+import { DashboardComplianceWidget } from "./DashboardComplianceWidget";
 import { NextVacation } from "./NextVacation";
 import { LeaveBalanceCards } from "@/features/leave/LeaveBalanceCards";
 import type { Role } from "@prisma/client";
@@ -60,6 +61,9 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms }: Persona
         <section>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-3">Oversikt</h2>
           <LeaveBalanceCards />
+          <div className="mt-4">
+            <DashboardComplianceWidget viewerRole={viewerRole} />
+          </div>
           <div className="mt-4">
             <DashboardClient viewerRole={viewerRole} viewerName={viewerName} isHms={isHms} />
           </div>
@@ -117,6 +121,7 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms }: Persona
           <QuickEgenmelding />
           <NextVacation />
           <LeaveBalanceCards />
+          <DashboardComplianceWidget viewerRole={viewerRole} />
           <DashboardClient viewerRole={viewerRole} viewerName={viewerName} isHms={isHms} />
         </div>
       )}

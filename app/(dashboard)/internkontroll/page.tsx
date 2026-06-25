@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InternkontrollDashboard } from "@/features/internkontroll/InternkontrollDashboard";
+import { InternkontrollExportButtons } from "@/features/internkontroll/InternkontrollExportButtons";
 
 export const metadata = { title: "Internkontroll – Truls HR" };
 
@@ -26,12 +27,15 @@ export default async function InternkontrollPage() {
           <p className="text-sm text-muted-foreground">Lovpålagte HMS-kontroller og dokumentasjon</p>
         </div>
         {canEdit && (
-          <Button asChild className="min-h-[44px]">
-            <Link href="/internkontroll/ny">
-              <Plus className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Nytt område</span>
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <InternkontrollExportButtons />
+            <Button asChild className="min-h-[44px]">
+              <Link href="/internkontroll/ny">
+                <Plus className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Nytt område</span>
+              </Link>
+            </Button>
+          </div>
         )}
       </div>
 
