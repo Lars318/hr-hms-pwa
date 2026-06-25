@@ -43,22 +43,21 @@ export async function extractFinancialContract(
 ): Promise<ExtractedFinancialContract> {
   if (!isFinancialContractAiEnabled()) return {};
 
-  // Dynamisk import slik at bygg ikke krever pakken når AI er av.
-  // Typene er bevisst løse for å unngå hard avhengighet til SDK-en i build.
-  let Anthropic: new (opts: { apiKey?: string }) => {
+  // Dynamisk import (lastes kun når AI er på), men med statisk modulnavn slik
+  // at Next/Vercel sin fil-tracer inkluderer pakken i serverless-bundelen.
+  type AnthropicCtor = new (opts: { apiKey?: string }) => {
     messages: {
       create: (args: unknown) => Promise<{
         content: Array<{ type: string; text?: string }>;
       }>;
     };
   };
+  let Anthropic: AnthropicCtor;
   try {
-    const mod = (await import(
-      /* webpackIgnore: true */ "@anthropic-ai/sdk" as string
-    )) as { default: typeof Anthropic };
+    const mod = (await import("@anthropic-ai/sdk")) as unknown as { default: AnthropicCtor };
     Anthropic = mod.default;
   } catch {
-    return { warnings: ["AI-pakken (@anthropic-ai/sdk) er ikke installert."] };
+    return { warnings: ["AI-pakken (@anthropic-ai/sdk) kunne ikke lastes."] };
   }
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });

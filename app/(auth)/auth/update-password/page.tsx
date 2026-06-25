@@ -15,23 +15,34 @@ export default function UpdatePasswordPage() {
   useEffect(() => {
     const supabase = createClient();
 
-    // Parse access_token from hash and set session manually
+    // 1) Implicit flow: access_token/refresh_token ligger i URL-hashen.
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
     const accessToken = params.get("access_token");
     const refreshToken = params.get("refresh_token");
 
     if (accessToken && refreshToken) {
-      supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken }).then(() => {
-        setReady(true);
-      });
-    } else {
-      // Fallback: listen for PASSWORD_RECOVERY event
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-        if (event === "PASSWORD_RECOVERY") setReady(true);
-      });
-      return () => subscription.unsubscribe();
+      supabase.auth
+        .setSession({ access_token: accessToken, refresh_token: refreshToken })
+        .then(() => setReady(true));
+      return;
     }
+
+    // 2) PKCE-flow: /auth/callback har allerede etablert sesjonen via cookies
+    //    (ingen hash-tokens). Sjekk om vi har en gyldig sesjon nå.
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (active && data.session) setReady(true);
+    });
+
+    // 3) Fallback: lytt på PASSWORD_RECOVERY (implicit) eller SIGNED_IN.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) setReady(true);
+    });
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
