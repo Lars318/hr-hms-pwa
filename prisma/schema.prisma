@@ -1626,6 +1626,7 @@ model InternkontrollLogg {
   godkjent     Boolean  @default(true)
   merknad      String?
   dokumentUrl  String?
+  sjekkpunkter Json?    // strukturerte sjekkliste-resultater for fagmoduler
   createdAt    DateTime @default(now())
 
   omrade    InternkontrollOmrade @relation(fields: [omradeId], references: [id], onDelete: Cascade)

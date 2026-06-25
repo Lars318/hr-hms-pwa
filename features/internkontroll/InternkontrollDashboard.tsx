@@ -42,6 +42,29 @@ export function InternkontrollDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Fagmoduler — dedikerte moduler med egne sjekklister */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {[
+          { href: "/internkontroll/brannvern", label: "Brannvern", desc: "Rømningsveier, slokkeutstyr, brannøvelse", icon: Flame },
+          { href: "/internkontroll/el-sikkerhet", label: "El-sikkerhet", desc: "El-kontroll, termografering, dokumentasjon", icon: Zap },
+        ].map(({ href, label, desc, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            className="rounded-2xl border bg-card p-4 hover:shadow-sm transition-shadow active:scale-[0.99] flex items-center gap-3"
+          >
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Icon className="h-5 w-5 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm">{label}</p>
+              <p className="text-xs text-muted-foreground truncate">{desc}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-auto" />
+          </Link>
+        ))}
+      </div>
+
       {/* Statusoppsummering */}
       {oversikt && (
         <div className="grid grid-cols-4 gap-3">

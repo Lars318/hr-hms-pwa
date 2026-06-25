@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { trpc } from "@/lib/trpc/client";
 import { ChevronLeft, Loader2 } from "lucide-react";
@@ -24,9 +24,23 @@ const INTERVALLER = [
   { dager: 730, label: "Hvert 2. år" },
 ];
 
+const GYLDIGE_KATEGORIER = KATEGORIER.map((k) => k.value);
+
 export default function NyttOmradePage() {
+  return (
+    <Suspense fallback={null}>
+      <NyttOmradeForm />
+    </Suspense>
+  );
+}
+
+function NyttOmradeForm() {
   const router = useRouter();
-  const [kategori, setKategori] = useState("BRANNVERN");
+  const searchParams = useSearchParams();
+  const initialKategori = searchParams.get("kategori");
+  const [kategori, setKategori] = useState(
+    initialKategori && GYLDIGE_KATEGORIER.includes(initialKategori) ? initialKategori : "BRANNVERN"
+  );
   const [tittel, setTittel] = useState("");
   const [beskrivelse, setBeskrivelse] = useState("");
   const [intervalDager, setIntervalDager] = useState(365);

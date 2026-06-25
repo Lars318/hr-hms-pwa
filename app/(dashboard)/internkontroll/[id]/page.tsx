@@ -53,7 +53,7 @@ export default async function InternkontrollDetaljPage({ params }: { params: { i
         <p className="text-sm text-muted-foreground">{omrade.beskrivelse}</p>
       )}
 
-      {canEdit && <RegistrerKontrollForm omradeId={omrade.id} />}
+      {canEdit && <RegistrerKontrollForm omradeId={omrade.id} kategori={omrade.kategori} />}
 
       {/* Logg */}
       <div>
@@ -81,6 +81,23 @@ export default async function InternkontrollDetaljPage({ params }: { params: { i
                     </span>
                   </div>
                   {logg.merknad && <p className="text-sm text-muted-foreground mt-0.5">{logg.merknad}</p>}
+                  {Array.isArray(logg.sjekkpunkter) && (() => {
+                    const punkter = logg.sjekkpunkter as unknown as { id: string; label: string; ok: boolean; merknad?: string }[];
+                    const avvik = punkter.filter((p) => !p.ok);
+                    if (avvik.length === 0) {
+                      return <p className="text-xs text-green-600 mt-1">Alle {punkter.length} sjekkpunkter OK</p>;
+                    }
+                    return (
+                      <ul className="mt-1 space-y-0.5">
+                        {avvik.map((p) => (
+                          <li key={p.id} className="text-xs text-red-600 flex gap-1.5">
+                            <XCircle className="h-3 w-3 shrink-0 mt-0.5" />
+                            <span>{p.label}{p.merknad ? ` – ${p.merknad}` : ""}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  })()}
                   <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1"><User className="h-3 w-3" />{logg.utfortAv.fullName}</span>
                     <span className="flex items-center gap-1">

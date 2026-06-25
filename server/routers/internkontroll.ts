@@ -14,10 +14,22 @@ function beregnStatus(nesteFrist: Date | null): "OK" | "FORFALLER_SNART" | "FORF
 export const internkontrollRouter = router({
   // Alle områder med siste logg og beregnet status
   listeOmrader: profileProcedure
-    .input(z.object({ locationId: z.string().optional() }).optional())
+    .input(
+      z
+        .object({
+          locationId: z.string().optional(),
+          kategori: z
+            .enum(["BRANNVERN", "EL_SIKKERHET", "ARBEIDSMILJO", "KJORETOY", "STOFFKARTOTEK", "ANNET"])
+            .optional(),
+        })
+        .optional()
+    )
     .query(async ({ input }) => {
       const omrader = await db.internkontrollOmrade.findMany({
-        where: input?.locationId ? { locationId: input.locationId } : undefined,
+        where: {
+          ...(input?.locationId ? { locationId: input.locationId } : {}),
+          ...(input?.kategori ? { kategori: input.kategori } : {}),
+        },
         include: {
           ansvarlig: { select: { id: true, fullName: true, avatarUrl: true } },
           logg: {
@@ -73,6 +85,16 @@ export const internkontrollRouter = router({
       godkjent: z.boolean().default(true),
       merknad: z.string().optional(),
       dokumentUrl: z.string().optional(),
+      sjekkpunkter: z
+        .array(
+          z.object({
+            id: z.string(),
+            label: z.string(),
+            ok: z.boolean(),
+            merknad: z.string().optional(),
+          })
+        )
+        .optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const omrade = await db.internkontrollOmrade.findUniqueOrThrow({
@@ -82,15 +104,21 @@ export const internkontrollRouter = router({
       const utfortDato = new Date(input.utfortDato);
       const nesteFrist = addDays(utfortDato, omrade.intervalDager);
 
+      // Når en sjekkliste er fylt ut, avledes godkjent av at alle punkter er OK.
+      const godkjent = input.sjekkpunkter
+        ? input.sjekkpunkter.every((p) => p.ok)
+        : input.godkjent;
+
       return db.internkontrollLogg.create({
         data: {
           omradeId: input.omradeId,
           utfortAvId: ctx.profile.id,
           utfortDato,
           nesteFrist,
-          godkjent: input.godkjent,
+          godkjent,
           merknad: input.merknad,
           dokumentUrl: input.dokumentUrl,
+          sjekkpunkter: input.sjekkpunkter ?? undefined,
         },
       });
     }),
