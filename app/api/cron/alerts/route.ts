@@ -12,7 +12,7 @@ export async function GET(req: Request) {
 
   const now = new Date();
   const year = now.getFullYear();
-  const results = { probation: 0, training: 0, birthday: 0, contract: 0, vernerunde: 0, incidentEscalation: 0 };
+  const results = { probation: 0, training: 0, birthday: 0, contract: 0, vernerunde: 0, incidentEscalation: 0, internkontroll: 0 };
 
   // ── 1. Prøvetid utløper innen 14 dager ───────────────────────────────────
   const probationWindow = new Date(now);
@@ -351,6 +351,58 @@ export async function GET(req: Request) {
       await db.sentAlert.create({ data: { type: threshold.type, entityId: incident.id, year } });
       results.incidentEscalation++;
     }
+  }
+
+  // ── 9. Forfalte internkontroller ─────────────────────────────────────────
+  // Et område er forfalt når siste kontroll sin nesteFrist er passert.
+  // Varsler ansvarlig + HMS-ansvarlige (ADMIN/HR). Dedup per frist, slik at en
+  // ny påminnelse går ut hvis kontroll registreres og den nye fristen forfaller.
+  const ikController = await db.internkontrollOmrade.findMany({
+    include: {
+      ansvarlig: { select: { id: true } },
+      logg: { orderBy: { utfortDato: "desc" }, take: 1 },
+    },
+  });
+
+  const hmsAnsvarlige = await db.profile.findMany({
+    where: { status: "ACTIVE", role: { in: ["ADMIN", "HR"] } },
+    select: { id: true },
+  });
+
+  for (const omrade of ikController) {
+    const sisteFrist = omrade.logg[0]?.nesteFrist;
+    if (!sisteFrist || sisteFrist >= now) continue; // ikke forfalt
+
+    const fristISO = sisteFrist.toISOString().slice(0, 10);
+    const entityId = `${omrade.id}:${fristISO}`;
+    const already = await db.sentAlert.findUnique({
+      where: { type_entityId_year: { type: "INTERNKONTROLL_OVERDUE", entityId, year } },
+    });
+    if (already) continue;
+
+    const dagerForsinket = Math.floor((now.getTime() - sisteFrist.getTime()) / 86_400_000);
+
+    // Mottakere: ansvarlig + HMS-ansvarlige (uten duplikater).
+    const recipientIds = new Set<string>(hmsAnsvarlige.map((p) => p.id));
+    if (omrade.ansvarlig?.id) recipientIds.add(omrade.ansvarlig.id);
+
+    for (const rid of Array.from(recipientIds)) {
+      await db.notification.create({
+        data: {
+          recipientId: rid, type: "SYSTEM",
+          title: "Internkontroll forfalt",
+          message: `«${omrade.tittel}» skulle vært kontrollert innen ${sisteFrist.toLocaleDateString("nb-NO")} (forsinket ${dagerForsinket} dag${dagerForsinket !== 1 ? "er" : ""}).`,
+          linkUrl: `/internkontroll/${omrade.id}`,
+        },
+      });
+      await sendPushToProfile(db, rid, {
+        title: "Internkontroll forfalt",
+        body: `«${omrade.tittel}» – forsinket ${dagerForsinket} dager.`,
+        url: `/internkontroll/${omrade.id}`,
+      });
+    }
+    await db.sentAlert.create({ data: { type: "INTERNKONTROLL_OVERDUE", entityId, year } });
+    results.internkontroll++;
   }
 
   return NextResponse.json({ ok: true, sent: results });

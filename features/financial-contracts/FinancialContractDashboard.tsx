@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
-import { Plus, Download } from "lucide-react";
+import { Plus, Download, FileText, Loader2 } from "lucide-react";
+import { exportContractsPdf } from "./exportPdf";
 import { FinancialContractKpiCards } from "./FinancialContractKpiCards";
 import { MonthlyCostChart } from "./MonthlyCostChart";
 import { ContractTypeDistribution } from "./ContractTypeDistribution";
@@ -25,6 +26,20 @@ export function FinancialContractDashboard() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [selectedId, setSelectedId] = useState<string | undefined>();
   const [newOpen, setNewOpen] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  async function handlePdf() {
+    setExportError(null);
+    setPdfLoading(true);
+    try {
+      await exportContractsPdf();
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : "PDF-eksport feilet.");
+    } finally {
+      setPdfLoading(false);
+    }
+  }
 
   const { data: summary, isLoading: summaryLoading } =
     trpc.financialContract.getSummary.useQuery();
@@ -88,7 +103,20 @@ export function FinancialContractDashboard() {
             }}
           >
             <Download className="h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline">Eksporter</span>
+            <span className="hidden sm:inline">CSV</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="min-h-[44px]"
+            disabled={pdfLoading}
+            onClick={handlePdf}
+          >
+            {pdfLoading ? (
+              <Loader2 className="h-4 w-4 sm:mr-2 animate-spin" />
+            ) : (
+              <FileText className="h-4 w-4 sm:mr-2" />
+            )}
+            <span className="hidden sm:inline">PDF</span>
           </Button>
           <Button className="min-h-[44px]" onClick={() => setNewOpen(true)}>
             <Plus className="h-4 w-4 sm:mr-2" />
@@ -96,6 +124,10 @@ export function FinancialContractDashboard() {
           </Button>
         </div>
       </div>
+
+      {exportError && (
+        <p className="text-sm text-destructive">{exportError}</p>
+      )}
 
       <FinancialContractKpiCards summary={summary} isLoading={summaryLoading} />
 

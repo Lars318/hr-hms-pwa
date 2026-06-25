@@ -32,6 +32,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const yearParam = url.searchParams.get("year");
   const year = yearParam ? Number(yearParam) : undefined;
+  const format = url.searchParams.get("format") ?? "csv";
 
   const contracts = await db.financialContract.findMany({
     where:
@@ -89,8 +90,17 @@ export async function GET(req: Request) {
     },
   });
 
-  const csv = buildCsv(headers, rows);
   const date = new Date().toISOString().slice(0, 10);
+
+  // JSON-variant — brukes av klient-side PDF-generering.
+  if (format === "json") {
+    return Response.json(
+      { headers, rows, year: year ?? null, generatedAt: date, count: rows.length },
+      { headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
+  const csv = buildCsv(headers, rows);
   const filename = `okonomikontrakter${year ? `-${year}` : ""}-${date}.csv`;
 
   return new Response(csv, {
