@@ -1,12 +1,12 @@
 {
-  "name": "HR/HMS Portalen",
-  "short_name": "HR/HMS",
-  "description": "Intern HR og HMS-løsning for ansatte",
+  "name": "Truls HR",
+  "short_name": "Truls HR",
+  "description": "HR og HMS for Pulsfollo — fravær, avvik, internkontroll og mer.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "background_color": "#faf7f2",
+  "theme_color": "#456237",
   "orientation": "portrait-primary",
   "lang": "nb",
   "icons": [
