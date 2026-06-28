@@ -53,7 +53,9 @@ export async function updateSession(request: NextRequest) {
     "/api/auth/webauthn/auth-options",
     "/api/auth/webauthn/auth-verify",
   ];
-  const isPublic = publicPaths.some((p) => pathname.startsWith(p));
+  // "/" (landingssiden) er offentlig — eksakt match, ellers ville startsWith("/")
+  // gjort hele appen åpen.
+  const isPublic = pathname === "/" || publicPaths.some((p) => pathname.startsWith(p));
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
