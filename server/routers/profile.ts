@@ -115,9 +115,77 @@ export const profileRouter = router({
             include: { location: { select: { id: true, name: true, city: true } } },
             take: 1,
           },
+          extraDepartments: {
+            include: { department: { select: { id: true, name: true } } },
+          },
         },
         orderBy: { fullName: "asc" },
       });
+    }),
+
+  // HR/ADMIN: masse-endring av flere ansatte samtidig.
+  bulkUpdate: hrProcedure
+    .input(
+      z.object({
+        ids: z.array(z.string()).min(1).max(500),
+        departmentId: z.string().optional(), // primær avdeling
+        addDepartmentId: z.string().optional(), // tilleggsavdeling
+        locationId: z.string().optional(), // primær lokasjon
+        role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]).optional(),
+        status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { ids, departmentId, addDepartmentId, locationId, role, status } = input;
+
+      // 1) Direkte Profile-felter (primær avdeling, rolle, status).
+      const profileData: Record<string, unknown> = {};
+      if (departmentId !== undefined) profileData.departmentId = departmentId || null;
+      if (role) profileData.role = role;
+      if (status) profileData.status = status;
+      if (Object.keys(profileData).length > 0) {
+        await ctx.db.profile.updateMany({ where: { id: { in: ids } }, data: profileData });
+      }
+
+      // 2) Tilleggsavdeling — opprett kobling for hver (hopper over duplikater).
+      if (addDepartmentId) {
+        await ctx.db.profileDepartment.createMany({
+          data: ids.map((profileId) => ({ profileId, departmentId: addDepartmentId })),
+          skipDuplicates: true,
+        });
+      }
+
+      // 3) Primær lokasjon — oppdater eksisterende primær-tilknytning, ellers opprett.
+      if (locationId) {
+        for (const profileId of ids) {
+          const primary = await ctx.db.profileAssignment.findFirst({
+            where: { profileId, isPrimary: true, endDate: null },
+            select: { id: true },
+          });
+          if (primary) {
+            await ctx.db.profileAssignment.update({ where: { id: primary.id }, data: { locationId } });
+          } else {
+            await ctx.db.profileAssignment.create({
+              data: { profileId, locationId, isPrimary: true },
+            });
+          }
+        }
+      }
+
+      await ctx.db.auditLog.create({
+        data: {
+          entityType: "Profile",
+          entityId: "bulk-update",
+          action: "PROFILE_BULK_UPDATE",
+          actorId: ctx.profile.id,
+          metadata: {
+            count: ids.length,
+            fields: { departmentId, addDepartmentId, locationId, role, status },
+          },
+        },
+      });
+
+      return { count: ids.length };
     }),
 
   // HR/ADMIN: hent én profil

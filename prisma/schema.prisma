@@ -291,11 +291,26 @@ model Department {
   actions            Action[]
   leaveRequests      LeaveRequest[]
   profileAssignments ProfileAssignment[]
+  profileDepartments ProfileDepartment[]
   overtimeEntries    OvertimeEntry[]
   whistleblowingCases WhistleblowingCase[]
   chemicals           Chemical[]
 
   @@index([locationId])
+}
+
+// Tilleggsavdelinger for en ansatt (primær ligger på Profile.departmentId).
+model ProfileDepartment {
+  id           String @id @default(cuid())
+  profileId    String
+  departmentId String
+  createdAt    DateTime @default(now())
+
+  profile    Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, departmentId])
+  @@index([departmentId])
 }
 
 model Profile {
@@ -318,6 +333,9 @@ model Profile {
 
   department   Department? @relation(fields: [departmentId], references: [id])
   departmentId String?
+
+  // Tilleggsavdelinger (i tillegg til primær department over)
+  extraDepartments ProfileDepartment[]
 
   manager      Profile?  @relation("ProfileManager", fields: [managerId], references: [id])
   managerId    String?

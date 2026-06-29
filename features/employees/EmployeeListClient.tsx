@@ -5,6 +5,7 @@ import { trpc } from "@/lib/trpc/client";
 import { EmployeeFilters } from "./EmployeeFilters";
 import { EmployeeCards } from "./EmployeeCards";
 import { EmployeeTable } from "./EmployeeTable";
+import { BulkActionBar } from "./BulkActionBar";
 import type { Department, Location } from "@prisma/client";
 import { ListCardSkeleton, TableSkeleton } from "@/components/ui/skeleton";
 
@@ -21,6 +22,7 @@ export function EmployeeListClient({ departments, locations }: EmployeeListClien
     departmentId: "",
     locationId: "",
   });
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const { data: employees = [], isLoading } = trpc.profile.list.useQuery({
     search: filters.search || undefined,
@@ -30,6 +32,21 @@ export function EmployeeListClient({ departments, locations }: EmployeeListClien
     locationId: filters.locationId || undefined,
   });
 
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll(checked: boolean) {
+    setSelected(checked ? new Set(employees.map((e) => e.id)) : new Set());
+  }
+
+  const clearSelection = () => setSelected(new Set());
+
   return (
     <div className="space-y-4">
       <EmployeeFilters
@@ -38,6 +55,17 @@ export function EmployeeListClient({ departments, locations }: EmployeeListClien
         locations={locations}
         onChange={setFilters}
       />
+
+      {selected.size > 0 && (
+        <BulkActionBar
+          selectedIds={Array.from(selected)}
+          departments={departments}
+          locations={locations}
+          onDone={clearSelection}
+          onClear={clearSelection}
+        />
+      )}
+
       {isLoading ? (
         <>
           <div className="md:hidden"><ListCardSkeleton count={4} /></div>
@@ -48,9 +76,12 @@ export function EmployeeListClient({ departments, locations }: EmployeeListClien
           <div className="md:hidden">
             <EmployeeCards employees={employees as Parameters<typeof EmployeeCards>[0]["employees"]} />
           </div>
-          <div className="hidden md:block">
-            <EmployeeTable employees={employees as Parameters<typeof EmployeeTable>[0]["employees"]} />
-          </div>
+          <EmployeeTable
+            employees={employees as Parameters<typeof EmployeeTable>[0]["employees"]}
+            selectedIds={selected}
+            onToggle={toggle}
+            onToggleAll={toggleAll}
+          />
         </>
       )}
       <p className="text-xs text-muted-foreground">{employees.length} ansatte</p>

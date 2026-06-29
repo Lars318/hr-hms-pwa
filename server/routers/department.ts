@@ -24,7 +24,12 @@ export const departmentRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Avdeling ikke funnet." });
       }
       const employees = await ctx.db.profile.findMany({
-        where: { departmentId: input.id },
+        where: {
+          OR: [
+            { departmentId: input.id },
+            { extraDepartments: { some: { departmentId: input.id } } },
+          ],
+        },
         select: {
           id: true,
           fullName: true,
