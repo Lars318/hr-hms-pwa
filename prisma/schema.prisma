@@ -1566,6 +1566,9 @@ model Announcement {
   id           String               @id @default(cuid())
   title        String
   body         String
+  category     String?              // ikon-kategori: INFO, EVENT, DOCUMENT, ALERT, CELEBRATION
+  linkUrl      String?              // valgfri lenke (dokument, side, ekstern URL)
+  linkLabel    String?              // tekst på lenkeknappen
   target       AnnouncementTarget   @default(ALL)
   departmentId String?
   locationId   String?
