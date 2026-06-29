@@ -21,6 +21,10 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
   const [locationId, setLocationId] = useState("");
   const [role, setRole] = useState("");
   const [status, setStatus] = useState("");
+  const [titleSelect, setTitleSelect] = useState("");
+  const [customTitle, setCustomTitle] = useState("");
+
+  const effectiveTitle = titleSelect === "__custom__" ? customTitle.trim() : titleSelect;
 
   const bulk = trpc.profile.bulkUpdate.useMutation({
     onSuccess: () => {
@@ -33,9 +37,10 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
 
   function reset() {
     setDepartmentId(""); setAddDepartmentId(""); setLocationId(""); setRole(""); setStatus("");
+    setTitleSelect(""); setCustomTitle("");
   }
 
-  const hasChange = departmentId || addDepartmentId || locationId || role || status;
+  const hasChange = departmentId || addDepartmentId || locationId || role || status || effectiveTitle;
 
   function apply() {
     if (!hasChange) return;
@@ -46,6 +51,7 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
       locationId: locationId || undefined,
       role: (role as "ADMIN" | "HR" | "MANAGER" | "EMPLOYEE") || undefined,
       status: (status as "ACTIVE" | "INACTIVE") || undefined,
+      title: effectiveTitle || undefined,
     });
   }
 
@@ -90,6 +96,24 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
           <option value="ACTIVE">Aktiv</option>
           <option value="INACTIVE">Inaktiv</option>
         </select>
+
+        <select value={titleSelect} onChange={(e) => setTitleSelect(e.target.value)} className={selectClass}>
+          <option value="">Sett tittel …</option>
+          <option value="Personlig Trener">Personlig Trener</option>
+          <option value="Instruktør">Instruktør</option>
+          <option value="Resepsjonist">Resepsjonist</option>
+          <option value="__custom__">Egendefinert …</option>
+        </select>
+
+        {titleSelect === "__custom__" && (
+          <input
+            type="text"
+            value={customTitle}
+            onChange={(e) => setCustomTitle(e.target.value)}
+            placeholder="Skriv tittel"
+            className="h-9 rounded-lg border bg-background px-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          />
+        )}
 
         <Button size="sm" onClick={apply} disabled={!hasChange || bulk.isPending} className="h-9">
           {bulk.isPending ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Check className="h-4 w-4 mr-1.5" />}

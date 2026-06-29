@@ -133,16 +133,18 @@ export const profileRouter = router({
         locationId: z.string().optional(), // primær lokasjon
         role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]).optional(),
         status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+        title: z.string().max(120).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { ids, departmentId, addDepartmentId, locationId, role, status } = input;
+      const { ids, departmentId, addDepartmentId, locationId, role, status, title } = input;
 
-      // 1) Direkte Profile-felter (primær avdeling, rolle, status).
+      // 1) Direkte Profile-felter (primær avdeling, rolle, status, tittel).
       const profileData: Record<string, unknown> = {};
       if (departmentId !== undefined) profileData.departmentId = departmentId || null;
       if (role) profileData.role = role;
       if (status) profileData.status = status;
+      if (title !== undefined && title.trim()) profileData.title = title.trim();
       if (Object.keys(profileData).length > 0) {
         await ctx.db.profile.updateMany({ where: { id: { in: ids } }, data: profileData });
       }
