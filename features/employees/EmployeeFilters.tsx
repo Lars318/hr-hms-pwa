@@ -10,6 +10,7 @@ interface Filters {
   status: string;
   departmentId: string;
   locationId: string;
+  title: string;
 }
 
 interface Department { id: string; name: string }
@@ -28,6 +29,13 @@ const ROLE_CHIPS = [
   { value: "HR", label: "HR" },
   { value: "MANAGER", label: "Leder" },
   { value: "EMPLOYEE", label: "Ansatt" },
+];
+
+const TITLE_CHIPS = [
+  { value: "", label: "Alle titler" },
+  { value: "Resepsjonist", label: "Resepsjonist" },
+  { value: "Instruktør", label: "Instruktør" },
+  { value: "Personlig Trener", label: "Personlig Trener" },
 ];
 
 export function EmployeeFilters({ filters, departments, locations, onChange }: EmployeeFiltersProps) {
@@ -76,6 +84,24 @@ export function EmployeeFilters({ filters, departments, locations, onChange }: E
             className={cn(
               "shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
               filters.role === chip.value
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            )}
+          >
+            {chip.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tittel-chips */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {TITLE_CHIPS.map((chip) => (
+          <button
+            key={chip.value}
+            onClick={() => set("title", filters.title === chip.value ? "" : chip.value)}
+            className={cn(
+              "shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
+              filters.title === chip.value
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             )}

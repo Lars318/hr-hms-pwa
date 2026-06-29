@@ -21,6 +21,7 @@ export function EmployeeListClient({ departments, locations }: EmployeeListClien
     status: "",
     departmentId: "",
     locationId: "",
+    title: "",
   });
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -30,6 +31,7 @@ export function EmployeeListClient({ departments, locations }: EmployeeListClien
     status: (filters.status as "ACTIVE" | "INACTIVE") || undefined,
     departmentId: filters.departmentId || undefined,
     locationId: filters.locationId || undefined,
+    title: filters.title || undefined,
   });
 
   function toggle(id: string) {

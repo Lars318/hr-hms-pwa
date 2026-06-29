@@ -86,10 +86,11 @@ export const profileRouter = router({
         status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
         departmentId: z.string().optional(),
         locationId: z.string().optional(),
+        title: z.string().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { search, role, status, departmentId, locationId } = input;
+      const { search, role, status, departmentId, locationId, title } = input;
       return ctx.db.profile.findMany({
         where: {
           ...(search
@@ -103,6 +104,7 @@ export const profileRouter = router({
           ...(role ? { role } : {}),
           ...(status ? { status } : {}),
           ...(departmentId ? { departmentId } : {}),
+          ...(title ? { title: { equals: title, mode: "insensitive" } } : {}),
           ...(locationId
             ? { profileAssignments: { some: { locationId, endDate: null } } }
             : {}),
