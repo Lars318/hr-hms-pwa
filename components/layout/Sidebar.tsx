@@ -94,6 +94,7 @@ export const navGroups: NavGroup[] = [
     roles: ["ADMIN", "HR"],
     items: [
       { href: "/ansatte",               label: "Ansatte",          icon: Users,         roles: ["ADMIN", "HR"] },
+      { href: "/ansatte/import",        label: "Importer ansatte", icon: Users,         roles: ["ADMIN", "HR"] },
       { href: "/admin/avdelinger",      label: "Avdelinger",       icon: Building2,     roles: ["ADMIN", "HR"] },
       { href: "/lokasjoner",            label: "Lokasjoner",       icon: MapPin,        roles: ["ADMIN", "HR"] },
       { href: "/kontrakter",            label: "Kontrakter",       icon: FileText,      roles: ["ADMIN", "HR"] },

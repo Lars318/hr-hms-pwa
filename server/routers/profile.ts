@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { randomUUID } from "node:crypto";
 import { router, profileProcedure, hrProcedure } from "@/server/trpc/trpc";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const profileUpdateSchema = z.object({
   fullName: z.string().min(2, "Navn må ha minst 2 tegn").max(100),
@@ -187,5 +189,119 @@ export const profileRouter = router({
         where: { id: ctx.profile.id },
         data: input,
       });
+    }),
+
+  // Bulk-import av ansatte fra CSV (engangsmigrering). Oppretter auth-bruker
+  // + profil per rad. Eksisterende e-poster hoppes over. Avdelinger matches på
+  // navn (opprettes hvis de mangler). Ansatte setter eget passord via
+  // "glemt passord" senere — vi setter et tilfeldig midlertidig passord.
+  bulkImport: hrProcedure
+    .input(
+      z.object({
+        rows: z
+          .array(
+            z.object({
+              email: z.string().email().max(200),
+              fullName: z.string().min(2).max(120),
+              title: z.string().max(120).optional().nullable(),
+              phone: z.string().max(40).optional().nullable(),
+              departmentName: z.string().max(120).optional().nullable(),
+              role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]).optional(),
+              dateOfBirth: z.string().optional().nullable(),
+            })
+          )
+          .min(1)
+          .max(1000),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const admin = createAdminClient();
+      const results: { email: string; status: "created" | "skipped" | "error"; message?: string }[] = [];
+      const deptCache = new Map<string, string>(); // navn(lowercase) -> id
+
+      async function resolveDepartmentId(name?: string | null): Promise<string | undefined> {
+        const trimmed = name?.trim();
+        if (!trimmed) return undefined;
+        const key = trimmed.toLowerCase();
+        const cached = deptCache.get(key);
+        if (cached) return cached;
+        const existing = await ctx.db.department.findFirst({
+          where: { name: { equals: trimmed, mode: "insensitive" } },
+          select: { id: true },
+        });
+        const id = existing?.id ?? (await ctx.db.department.create({ data: { name: trimmed } })).id;
+        deptCache.set(key, id);
+        return id;
+      }
+
+      for (const row of input.rows) {
+        const email = row.email.trim().toLowerCase();
+        try {
+          const existing = await ctx.db.profile.findUnique({ where: { email }, select: { id: true } });
+          if (existing) {
+            results.push({ email, status: "skipped", message: "Finnes allerede" });
+            continue;
+          }
+
+          const departmentId = await resolveDepartmentId(row.departmentName);
+
+          const dob = row.dateOfBirth?.trim() ? new Date(row.dateOfBirth) : null;
+
+          // Opprett auth-bruker (bekreftet e-post, tilfeldig passord).
+          const { data: created, error: authErr } = await admin.auth.admin.createUser({
+            email,
+            password: randomUUID() + randomUUID(),
+            email_confirm: true,
+          });
+          if (authErr || !created?.user) {
+            results.push({ email, status: "error", message: authErr?.message ?? "Kunne ikke opprette innlogging" });
+            continue;
+          }
+
+          try {
+            await ctx.db.profile.create({
+              data: {
+                supabaseUserId: created.user.id,
+                email,
+                fullName: row.fullName.trim(),
+                title: row.title?.trim() || null,
+                phone: row.phone?.trim() || null,
+                role: row.role ?? "EMPLOYEE",
+                departmentId: departmentId ?? null,
+                dateOfBirth: dob && !isNaN(dob.getTime()) ? dob : null,
+              },
+            });
+            results.push({ email, status: "created" });
+          } catch (profileErr) {
+            // Rull tilbake auth-brukeren hvis profilen feiler.
+            await admin.auth.admin.deleteUser(created.user.id).catch(() => {});
+            results.push({
+              email,
+              status: "error",
+              message: profileErr instanceof Error ? profileErr.message : "Kunne ikke opprette profil",
+            });
+          }
+        } catch (e) {
+          results.push({ email, status: "error", message: e instanceof Error ? e.message : "Ukjent feil" });
+        }
+      }
+
+      const summary = {
+        created: results.filter((r) => r.status === "created").length,
+        skipped: results.filter((r) => r.status === "skipped").length,
+        errors: results.filter((r) => r.status === "error").length,
+      };
+
+      await ctx.db.auditLog.create({
+        data: {
+          entityType: "Profile",
+          entityId: "bulk-import",
+          action: "PROFILE_BULK_IMPORT",
+          actorId: ctx.profile.id,
+          metadata: summary,
+        },
+      });
+
+      return { results, summary };
     }),
 });
