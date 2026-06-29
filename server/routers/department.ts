@@ -12,6 +12,33 @@ export const departmentRouter = router({
     return departments;
   }),
 
+  // HR/ADMIN: ansatte i én avdeling (for oppsummering)
+  employees: hrProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const department = await ctx.db.department.findUnique({
+        where: { id: input.id },
+        select: { id: true, name: true },
+      });
+      if (!department) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Avdeling ikke funnet." });
+      }
+      const employees = await ctx.db.profile.findMany({
+        where: { departmentId: input.id },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          title: true,
+          employeeNumber: true,
+          role: true,
+          status: true,
+        },
+        orderBy: [{ status: "asc" }, { fullName: "asc" }],
+      });
+      return { department, employees };
+    }),
+
   // HR/ADMIN: opprett avdeling
   create: hrProcedure
     .input(z.object({ name: z.string().min(1, "Navn er påkrevd").max(100) }))

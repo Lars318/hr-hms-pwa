@@ -9,7 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/shared/EmptyState";
-import { Building2, Pencil, Trash2, Plus, X, Check } from "lucide-react";
+import { Building2, Pencil, Trash2, Plus, X, Check, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { DepartmentEmployees } from "./DepartmentEmployees";
 
 interface SimpleLocation { id: string; name: string; }
 
@@ -44,6 +46,7 @@ export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation
   const [editLocationId, setEditLocationId] = useState<string>("");
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   function startEdit(id: string, currentName: string, currentLocationId: string | null) {
     setEditId(id);
@@ -114,7 +117,8 @@ export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation
       ) : (
         <div className="rounded-md border divide-y">
           {departments.map((dept) => (
-            <div key={dept.id} className="flex items-center gap-3 px-4 py-3">
+            <div key={dept.id}>
+            <div className="flex items-center gap-3 px-4 py-3">
               {editId === dept.id ? (
                 <form onSubmit={handleUpdate} className="flex flex-1 flex-col gap-2">
                   <div className="flex items-center gap-2">
@@ -145,14 +149,27 @@ export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation
                 </form>
               ) : (
                 <>
-                  <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{dept.name}</p>
-                    {dept.location && <p className="text-xs text-muted-foreground">{dept.location.name}</p>}
-                  </div>
-                  <Badge variant="secondary" className="text-xs">
-                    {dept._count.employees} ansatte
-                  </Badge>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId((id) => (id === dept.id ? null : dept.id))}
+                    className="flex flex-1 items-center gap-3 min-w-0 text-left"
+                    aria-expanded={expandedId === dept.id}
+                  >
+                    <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">{dept.name}</p>
+                      {dept.location && <p className="text-xs text-muted-foreground">{dept.location.name}</p>}
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {dept._count.employees} ansatte
+                    </Badge>
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 text-muted-foreground shrink-0 transition-transform",
+                        expandedId === dept.id && "rotate-180"
+                      )}
+                    />
+                  </button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -171,6 +188,10 @@ export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation
                   </Button>
                 </>
               )}
+            </div>
+            {expandedId === dept.id && editId !== dept.id && (
+              <DepartmentEmployees departmentId={dept.id} />
+            )}
             </div>
           ))}
         </div>
