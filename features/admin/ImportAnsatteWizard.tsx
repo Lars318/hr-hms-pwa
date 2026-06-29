@@ -29,6 +29,7 @@ export function ImportAnsatteWizard() {
   const [mapping, setMapping] = useState<Record<ImportFieldKey, number>>();
   const [fileName, setFileName] = useState<string>();
   const [parseError, setParseError] = useState<string | null>(null);
+  const [fixedDept, setFixedDept] = useState("");
 
   const importMut = trpc.profile.bulkImport.useMutation();
   const utils = trpc.useUtils();
@@ -89,13 +90,13 @@ export function ImportAnsatteWizard() {
         fullName,
         title: get(r, "title") || null,
         phone: get(r, "phone") || null,
-        departmentName: get(r, "departmentName") || null,
+        departmentName: fixedDept.trim() || get(r, "departmentName") || null,
         role: normalizeRole(get(r, "role")),
         dateOfBirth: get(r, "dateOfBirth") || null,
       });
     });
     return { valid, invalid };
-  }, [rows, mapping]);
+  }, [rows, mapping, fixedDept]);
 
   function runImport() {
     if (built.valid.length === 0) return;
@@ -222,6 +223,23 @@ export function ImportAnsatteWizard() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Fast avdeling for alle (når fila mangler avdelingskolonne) */}
+      <div className="rounded-xl border bg-muted/20 p-3 space-y-1">
+        <label className="text-xs font-medium text-muted-foreground">
+          Avdeling for alle
+        </label>
+        <input
+          type="text"
+          value={fixedDept}
+          onChange={(e) => setFixedDept(e.target.value)}
+          placeholder="F.eks. Puls Trollåsen"
+          className="w-full sm:max-w-xs rounded-lg border bg-background px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        />
+        <p className="text-[11px] text-muted-foreground">
+          Settes på alle radene og overstyrer avdelingskolonnen. La stå tom for å bruke kolonnen.
+        </p>
       </div>
 
       {/* Oppsummering av validering */}
