@@ -303,6 +303,7 @@ model Profile {
   supabaseUserId String        @unique
   email          String        @unique
   fullName       String
+  employeeNumber String?
   title          String?
   phone          String?
   avatarUrl      String?

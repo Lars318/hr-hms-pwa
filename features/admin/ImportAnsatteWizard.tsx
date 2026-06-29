@@ -13,6 +13,7 @@ import {
 interface ImportRow {
   email: string;
   fullName: string;
+  employeeNumber?: string | null;
   title?: string | null;
   phone?: string | null;
   departmentName?: string | null;
@@ -88,6 +89,7 @@ export function ImportAnsatteWizard() {
       valid.push({
         email,
         fullName,
+        employeeNumber: get(r, "employeeNumber") || null,
         title: get(r, "title") || null,
         phone: get(r, "phone") || null,
         departmentName: fixedDept.trim() || get(r, "departmentName") || null,
@@ -259,6 +261,7 @@ export function ImportAnsatteWizard() {
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-xs text-muted-foreground">
             <tr>
+              <th className="text-left px-3 py-2 font-medium">Ansattnr</th>
               <th className="text-left px-3 py-2 font-medium">E-post</th>
               <th className="text-left px-3 py-2 font-medium">Navn</th>
               <th className="text-left px-3 py-2 font-medium">Stilling</th>
@@ -269,6 +272,7 @@ export function ImportAnsatteWizard() {
           <tbody className="divide-y">
             {built.valid.slice(0, 8).map((r, i) => (
               <tr key={i}>
+                <td className="px-3 py-2 text-muted-foreground">{r.employeeNumber ?? "–"}</td>
                 <td className="px-3 py-2">{r.email}</td>
                 <td className="px-3 py-2">{r.fullName}</td>
                 <td className="px-3 py-2 text-muted-foreground">{r.title ?? "–"}</td>

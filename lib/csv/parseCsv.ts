@@ -78,6 +78,7 @@ export function parseCsv(text: string): ParsedCsv {
 export const IMPORT_FIELDS = [
   { key: "email", label: "E-post", required: true, aliases: ["e-post", "epost", "email", "e-postadresse", "mail", "e post"] },
   { key: "fullName", label: "Fullt navn", required: true, aliases: ["navn", "fullt navn", "fullname", "name", "ansatt", "fornavn etternavn"] },
+  { key: "employeeNumber", label: "Ansattnummer", required: false, aliases: ["ansattnummer", "ansattnr", "ansatt-nr", "ansatt nr", "employeenumber", "employee number", "ansattnr."] },
   { key: "title", label: "Stilling", required: false, aliases: ["stilling", "tittel", "title", "rolle/stilling"] },
   { key: "phone", label: "Telefon", required: false, aliases: ["telefon", "tlf", "mobil", "phone", "mobile", "mobilnummer"] },
   { key: "departmentName", label: "Avdeling", required: false, aliases: ["avdeling", "department", "seksjon", "team"] },

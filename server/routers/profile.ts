@@ -203,6 +203,7 @@ export const profileRouter = router({
             z.object({
               email: z.string().email().max(200),
               fullName: z.string().min(2).max(120),
+              employeeNumber: z.string().max(40).optional().nullable(),
               title: z.string().max(120).optional().nullable(),
               phone: z.string().max(40).optional().nullable(),
               departmentName: z.string().max(120).optional().nullable(),
@@ -264,6 +265,7 @@ export const profileRouter = router({
                 supabaseUserId: created.user.id,
                 email,
                 fullName: row.fullName.trim(),
+                employeeNumber: row.employeeNumber?.trim() || null,
                 title: row.title?.trim() || null,
                 phone: row.phone?.trim() || null,
                 role: row.role ?? "EMPLOYEE",
