@@ -27,10 +27,6 @@ export default async function LokasjonDetailPage({ params }: { params: { id: str
     include: {
       safetyRepresentative: { select: { id: true, fullName: true, email: true } },
       hseManager: { select: { id: true, fullName: true, email: true } },
-      departments: {
-        select: { id: true, name: true, _count: { select: { employees: true } } },
-        orderBy: { name: "asc" },
-      },
       profileAssignments: {
         where: { endDate: null },
         include: {
@@ -38,7 +34,7 @@ export default async function LokasjonDetailPage({ params }: { params: { id: str
           department: { select: { id: true, name: true } },
         },
         orderBy: [{ isPrimary: "desc" }, { startDate: "asc" }],
-        take: 20,
+        take: 200,
       },
       incidents: {
         where: { status: { notIn: ["RESOLVED", "CLOSED"] } },
@@ -100,26 +96,6 @@ export default async function LokasjonDetailPage({ params }: { params: { id: str
             <p className="text-xs text-muted-foreground">HMS-ansvarlig</p>
             <p className="text-sm font-medium">{location.hseManager?.fullName ?? "Ikke satt"}</p>
           </div>
-        </div>
-      </div>
-
-      {/* Avdelinger */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Avdelinger</h2>
-        <div className="rounded-2xl border bg-card divide-y">
-          {location.departments.length === 0 ? (
-            <div className="px-4 py-6 text-sm text-muted-foreground text-center">Ingen avdelinger</div>
-          ) : (
-            location.departments.map((dept) => (
-              <div key={dept.id} className="flex items-center gap-3 px-4 py-3.5 min-h-[52px]">
-                <Briefcase className="h-4 w-4 text-muted-foreground shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{dept.name}</p>
-                  <p className="text-xs text-muted-foreground">{dept._count.employees} ansatte</p>
-                </div>
-              </div>
-            ))
-          )}
         </div>
       </div>
 

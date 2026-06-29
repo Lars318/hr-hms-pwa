@@ -13,9 +13,7 @@ import { Building2, Pencil, Trash2, Plus, X, Check, ChevronDown } from "lucide-r
 import { cn } from "@/lib/utils";
 import { DepartmentEmployees } from "./DepartmentEmployees";
 
-interface SimpleLocation { id: string; name: string; }
-
-export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation[] }) {
+export function DepartmentAdmin() {
   const utils = trpc.useUtils();
   const { data: departments = [], isLoading } = trpc.department.list.useQuery();
 
@@ -43,15 +41,13 @@ export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation
   const [newName, setNewName] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
-  const [editLocationId, setEditLocationId] = useState<string>("");
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  function startEdit(id: string, currentName: string, currentLocationId: string | null) {
+  function startEdit(id: string, currentName: string) {
     setEditId(id);
     setEditName(currentName);
-    setEditLocationId(currentLocationId ?? "");
   }
 
   function handleCreate(e: FormEvent) {
@@ -61,7 +57,7 @@ export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation
 
   function handleUpdate(e: FormEvent) {
     e.preventDefault();
-    if (editId && editName.trim()) updateMutation.mutate({ id: editId, name: editName.trim(), locationId: editLocationId || null });
+    if (editId && editName.trim()) updateMutation.mutate({ id: editId, name: editName.trim() });
   }
 
   if (isLoading) {
@@ -129,16 +125,6 @@ export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation
                       className="h-8 flex-1"
                       placeholder="Avdelingsnavn"
                     />
-                    <select
-                      value={editLocationId}
-                      onChange={(e) => setEditLocationId(e.target.value)}
-                      className="h-8 rounded-md border border-input bg-background px-2 text-sm flex-1"
-                    >
-                      <option value="">Ingen lokasjon</option>
-                      {locations.map((l) => (
-                        <option key={l.id} value={l.id}>{l.name}</option>
-                      ))}
-                    </select>
                     <Button type="submit" size="sm" disabled={updateMutation.isPending}>
                       <Check className="h-4 w-4" />
                     </Button>
@@ -158,7 +144,6 @@ export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation
                     <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{dept.name}</p>
-                      {dept.location && <p className="text-xs text-muted-foreground">{dept.location.name}</p>}
                     </div>
                     <Badge variant="secondary" className="text-xs">
                       {dept._count.employees} ansatte
@@ -174,7 +159,7 @@ export function DepartmentAdmin({ locations = [] }: { locations?: SimpleLocation
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => startEdit(dept.id, dept.name, dept.location?.id ?? null)}
+                    onClick={() => startEdit(dept.id, dept.name)}
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>

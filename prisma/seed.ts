@@ -43,13 +43,12 @@ async function main() {
   const vestbyDepts: Record<string, Awaited<ReturnType<typeof db.department.create>>> = {};
   const deptNames = ["Resepsjon", "PT", "Gruppeinstruktør", "Renhold"];
 
+  // Avdelinger er globale (ikke knyttet til lokasjon) — samme avdeling brukes
+  // på tvers av sentre. Hvor man jobber styres av lokasjon (ProfileAssignment).
   for (const deptName of deptNames) {
-    skiDepts[deptName] = await db.department.create({
-      data: { name: deptName, locationId: locationSki.id },
-    });
-    vestbyDepts[deptName] = await db.department.create({
-      data: { name: deptName, locationId: locationVestby.id },
-    });
+    const dept = await db.department.create({ data: { name: deptName } });
+    skiDepts[deptName] = dept;
+    vestbyDepts[deptName] = dept;
   }
 
   // Behold eksisterende avdeling for bakoverkompatibilitet

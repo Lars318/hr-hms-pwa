@@ -15,8 +15,6 @@ export default async function AvdelingerPage() {
     redirect("/ingen-tilgang");
   }
 
-  const locations = await db.location.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } });
-
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
@@ -29,7 +27,7 @@ export default async function AvdelingerPage() {
         </p>
       </div>
 
-      <DepartmentAdmin locations={locations} />
+      <DepartmentAdmin />
     </div>
   );
 }

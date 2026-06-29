@@ -13,7 +13,6 @@ export const locationRouter = router({
         include: {
           safetyRepresentative: { select: { id: true, fullName: true, email: true } },
           hseManager: { select: { id: true, fullName: true, email: true } },
-          departments: { select: { id: true, name: true } },
           _count: { select: { incidents: true, profileAssignments: true } },
         },
       });
@@ -32,7 +31,6 @@ export const locationRouter = router({
       include: {
         safetyRepresentative: { select: { id: true, fullName: true, email: true } },
         hseManager: { select: { id: true, fullName: true, email: true } },
-        departments: { select: { id: true, name: true } },
         _count: { select: { incidents: true, profileAssignments: true } },
       },
     });
@@ -47,10 +45,6 @@ export const locationRouter = router({
         include: {
           safetyRepresentative: { select: { id: true, fullName: true, email: true, avatarUrl: true } },
           hseManager: { select: { id: true, fullName: true, email: true, avatarUrl: true } },
-          departments: {
-            select: { id: true, name: true, _count: { select: { employees: true } } },
-            orderBy: { name: "asc" },
-          },
           profileAssignments: {
             where: { endDate: null },
             include: {

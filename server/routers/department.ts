@@ -7,7 +7,7 @@ export const departmentRouter = router({
   list: profileProcedure.query(async ({ ctx }) => {
     const departments = await ctx.db.department.findMany({
       orderBy: { name: "asc" },
-      include: { _count: { select: { employees: true } }, location: { select: { id: true, name: true } } },
+      include: { _count: { select: { employees: true } } },
     });
     return departments;
   }),
@@ -57,12 +57,12 @@ export const departmentRouter = router({
 
   // HR/ADMIN: oppdater avdeling
   update: hrProcedure
-    .input(z.object({ id: z.string(), name: z.string().min(1).max(100), locationId: z.string().optional().nullable() }))
+    .input(z.object({ id: z.string(), name: z.string().min(1).max(100) }))
     .mutation(async ({ ctx, input }) => {
-      const { id, ...data } = input;
+      const { id, name } = input;
       const exists = await ctx.db.department.findUnique({ where: { id } });
       if (!exists) throw new TRPCError({ code: "NOT_FOUND", message: "Avdeling ikke funnet." });
-      return ctx.db.department.update({ where: { id }, data });
+      return ctx.db.department.update({ where: { id }, data: { name } });
     }),
 
   // ADMIN: slett avdeling (kun hvis ingen ansatte tilknyttet)

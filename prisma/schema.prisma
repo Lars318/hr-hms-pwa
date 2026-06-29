@@ -235,7 +235,6 @@ model Location {
   hseManager   Profile? @relation("LocationHseManager", fields: [hseManagerId], references: [id])
   hseManagerId String?
 
-  departments      Department[]
   incidents        Incident[]
   riskAssessments  RiskAssessment[]
   actions          Action[]
@@ -282,8 +281,8 @@ model Department {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  location   Location? @relation(fields: [locationId], references: [id])
-  locationId String?
+  // Avdelinger er felles/globale — knyttes ikke til en bestemt lokasjon.
+  // Hvor en ansatt jobber styres av lokasjon (ProfileAssignment).
 
   employees          Profile[]
   incidents          Incident[]
@@ -295,8 +294,6 @@ model Department {
   overtimeEntries    OvertimeEntry[]
   whistleblowingCases WhistleblowingCase[]
   chemicals           Chemical[]
-
-  @@index([locationId])
 }
 
 // Tilleggsavdelinger for en ansatt (primær ligger på Profile.departmentId).

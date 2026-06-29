@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { MapPin, Plus, Users, ShieldAlert, Shield, Briefcase } from "lucide-react";
+import { MapPin, Plus, Users, ShieldAlert, Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,6 @@ export default async function LokasjonerPage() {
     include: {
       safetyRepresentative: { select: { id: true, fullName: true } },
       hseManager: { select: { id: true, fullName: true } },
-      departments: { select: { id: true, name: true } },
       _count: {
         select: {
           incidents: { where: { status: { notIn: ["RESOLVED", "CLOSED"] } } },
@@ -85,10 +84,6 @@ export default async function LokasjonerPage() {
                 <div className="flex items-center gap-2">
                   <Users className="h-3.5 w-3.5 shrink-0" />
                   <span>{loc._count.profileAssignments} ansatte tilknyttet</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Briefcase className="h-3.5 w-3.5 shrink-0" />
-                  <span>{loc.departments.length} avdelinger</span>
                 </div>
                 {loc.safetyRepresentative && (
                   <div className="flex items-center gap-2">
