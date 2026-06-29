@@ -31,6 +31,7 @@ export function ImportAnsatteWizard() {
   const [fileName, setFileName] = useState<string>();
   const [parseError, setParseError] = useState<string | null>(null);
   const [fixedDept, setFixedDept] = useState("");
+  const [updateExisting, setUpdateExisting] = useState(true);
 
   const importMut = trpc.profile.bulkImport.useMutation();
   const utils = trpc.useUtils();
@@ -103,7 +104,7 @@ export function ImportAnsatteWizard() {
   function runImport() {
     if (built.valid.length === 0) return;
     importMut.mutate(
-      { rows: built.valid },
+      { rows: built.valid, updateExisting },
       { onSuccess: () => utils.profile.list.invalidate() }
     );
   }
@@ -147,10 +148,11 @@ export function ImportAnsatteWizard() {
     const { summary, results } = importMut.data;
     return (
       <div className="space-y-4">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Opprettet", value: summary.created, cls: "text-green-600 bg-green-50 border-green-200" },
-            { label: "Hoppet over", value: summary.skipped, cls: "text-muted-foreground bg-muted/30 border-border" },
+            { label: "Oppdatert", value: summary.updated, cls: "text-blue-600 bg-blue-50 border-blue-200" },
+            { label: "Uendret", value: summary.skipped, cls: "text-muted-foreground bg-muted/30 border-border" },
             { label: "Feil", value: summary.errors, cls: "text-red-600 bg-red-50 border-red-200" },
           ].map((c) => (
             <div key={c.label} className={cn("rounded-xl border p-4 text-center", c.cls)}>
@@ -162,7 +164,7 @@ export function ImportAnsatteWizard() {
 
         {(summary.skipped > 0 || summary.errors > 0) && (
           <div className="rounded-xl border divide-y max-h-72 overflow-y-auto">
-            {results.filter((r) => r.status !== "created").map((r, i) => (
+            {results.filter((r) => r.status === "skipped" || r.status === "error").map((r, i) => (
               <div key={i} className="flex items-center gap-2 px-3 py-2 text-sm">
                 {r.status === "skipped" ? (
                   <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
@@ -243,6 +245,23 @@ export function ImportAnsatteWizard() {
           Settes på alle radene og overstyrer avdelingskolonnen. La stå tom for å bruke kolonnen.
         </p>
       </div>
+
+      {/* Oppdater eksisterende */}
+      <label className="flex items-start gap-2.5 rounded-xl border p-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={updateExisting}
+          onChange={(e) => setUpdateExisting(e.target.checked)}
+          className="h-4 w-4 mt-0.5 rounded border-input"
+        />
+        <span className="text-sm">
+          <span className="font-medium">Oppdater eksisterende ansatte</span>
+          <span className="block text-[11px] text-muted-foreground mt-0.5">
+            Matcher på e-post. Felter med ny verdi oppdateres; tomme felter rører ikke eksisterende data.
+            Slå av for kun å opprette nye.
+          </span>
+        </span>
+      </label>
 
       {/* Oppsummering av validering */}
       <div className="flex flex-wrap gap-2 text-sm">

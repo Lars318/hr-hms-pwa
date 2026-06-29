@@ -213,11 +213,12 @@ export const profileRouter = router({
           )
           .min(1)
           .max(1000),
+        updateExisting: z.boolean().default(true),
       })
     )
     .mutation(async ({ ctx, input }) => {
       const admin = createAdminClient();
-      const results: { email: string; status: "created" | "skipped" | "error"; message?: string }[] = [];
+      const results: { email: string; status: "created" | "updated" | "skipped" | "error"; message?: string }[] = [];
       const deptCache = new Map<string, string>(); // navn(lowercase) -> id
 
       async function resolveDepartmentId(name?: string | null): Promise<string | undefined> {
@@ -238,15 +239,46 @@ export const profileRouter = router({
       for (const row of input.rows) {
         const email = row.email.trim().toLowerCase();
         try {
-          const existing = await ctx.db.profile.findUnique({ where: { email }, select: { id: true } });
+          const departmentId = await resolveDepartmentId(row.departmentName);
+          const rawDob = row.dateOfBirth?.trim() ? new Date(row.dateOfBirth) : null;
+          const dob = rawDob && !isNaN(rawDob.getTime()) ? rawDob : null;
+
+          const existing = await ctx.db.profile.findUnique({
+            where: { email },
+            select: {
+              id: true, fullName: true, employeeNumber: true, title: true,
+              phone: true, departmentId: true, dateOfBirth: true, role: true,
+            },
+          });
+
           if (existing) {
-            results.push({ email, status: "skipped", message: "Finnes allerede" });
+            if (!input.updateExisting) {
+              results.push({ email, status: "skipped", message: "Finnes allerede" });
+              continue;
+            }
+            // Oppdater kun felter som faktisk har endret seg (tomme felter i
+            // importen rører ikke eksisterende verdier).
+            const data: Record<string, unknown> = {};
+            const newName = row.fullName.trim();
+            if (newName && newName !== existing.fullName) data.fullName = newName;
+            const en = row.employeeNumber?.trim();
+            if (en && en !== existing.employeeNumber) data.employeeNumber = en;
+            const t = row.title?.trim();
+            if (t && t !== existing.title) data.title = t;
+            const ph = row.phone?.trim();
+            if (ph && ph !== existing.phone) data.phone = ph;
+            if (departmentId && departmentId !== existing.departmentId) data.departmentId = departmentId;
+            if (dob && (!existing.dateOfBirth || dob.getTime() !== existing.dateOfBirth.getTime())) data.dateOfBirth = dob;
+            if (row.role && row.role !== existing.role) data.role = row.role;
+
+            if (Object.keys(data).length === 0) {
+              results.push({ email, status: "skipped", message: "Uendret" });
+              continue;
+            }
+            await ctx.db.profile.update({ where: { id: existing.id }, data });
+            results.push({ email, status: "updated" });
             continue;
           }
-
-          const departmentId = await resolveDepartmentId(row.departmentName);
-
-          const dob = row.dateOfBirth?.trim() ? new Date(row.dateOfBirth) : null;
 
           // Opprett auth-bruker (bekreftet e-post, tilfeldig passord).
           const { data: created, error: authErr } = await admin.auth.admin.createUser({
@@ -290,6 +322,7 @@ export const profileRouter = router({
 
       const summary = {
         created: results.filter((r) => r.status === "created").length,
+        updated: results.filter((r) => r.status === "updated").length,
         skipped: results.filter((r) => r.status === "skipped").length,
         errors: results.filter((r) => r.status === "error").length,
       };
