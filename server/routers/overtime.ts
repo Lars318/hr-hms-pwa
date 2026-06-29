@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import type { PrismaClient } from "@prisma/client";
 import { router, profileProcedure, hrProcedure } from "@/server/trpc/trpc";
+import { assertNotContractor } from "@/server/trpc/guards";
 import { createNotificationsForRoles } from "@/lib/notifications";
 
 const overtimeTypes = ["OVERTIME", "TIME_OFF", "ON_CALL", "TRAVEL_TIME"] as const;
@@ -137,6 +138,7 @@ export const overtimeRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const { profile, db } = ctx;
+      assertNotContractor(profile);
 
       let resolvedLocationId = input.locationId ?? null;
       if (!resolvedLocationId) {
@@ -175,6 +177,7 @@ export const overtimeRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const { profile, db } = ctx;
+      assertNotContractor(profile);
       const entry = await db.overtimeEntry.findUnique({ where: { id: input.id } });
       if (!entry) throw new TRPCError({ code: "NOT_FOUND" });
       if (entry.employeeId !== profile.id) throw new TRPCError({ code: "FORBIDDEN" });
@@ -199,6 +202,7 @@ export const overtimeRouter = router({
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const { profile, db } = ctx;
+      assertNotContractor(profile);
       const entry = await db.overtimeEntry.findUnique({ where: { id: input.id } });
       if (!entry) throw new TRPCError({ code: "NOT_FOUND" });
       if (entry.employeeId !== profile.id) throw new TRPCError({ code: "FORBIDDEN" });

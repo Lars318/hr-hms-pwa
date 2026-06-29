@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { router, profileProcedure } from "@/server/trpc/trpc";
+import { assertNotContractor } from "@/server/trpc/guards";
 import {
   createNotification,
   createNotificationsForRoles,
@@ -115,6 +116,7 @@ export const leaveRequestRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const { profile, db } = ctx;
+      assertNotContractor(profile);
 
       const start = new Date(input.startDate);
       const end = new Date(input.endDate);
@@ -224,6 +226,7 @@ export const leaveRequestRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const { profile, db } = ctx;
+      assertNotContractor(profile);
       const req = await db.leaveRequest.findUnique({ where: { id: input.id } });
       if (!req) throw new TRPCError({ code: "NOT_FOUND", message: "Søknad ikke funnet." });
       if (req.status !== "PENDING") throw new TRPCError({ code: "FORBIDDEN", message: "Kun PENDING søknader kan redigeres." });
