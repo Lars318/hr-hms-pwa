@@ -23,11 +23,12 @@ export default async function DashboardLayout({
   const profile = await db.profile.findUnique({ where: { supabaseUserId: user.id } });
 
   const role = profile?.role ?? "EMPLOYEE";
+  const isContractor = profile?.employmentType === "SELF_EMPLOYED";
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar — kun synlig fra lg */}
-      <Sidebar role={role} />
+      <Sidebar role={role} isContractor={isContractor} />
 
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         <OnlineStatusBanner />
@@ -39,7 +40,7 @@ export default async function DashboardLayout({
       </div>
 
       {/* BottomNav — kun synlig under lg */}
-      <BottomNav role={role} />
+      <BottomNav role={role} isContractor={isContractor} />
 
       {/* Auto-oppdatering når ny app-versjon er deployet */}
       <ServiceWorkerUpdater />

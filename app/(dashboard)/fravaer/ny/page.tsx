@@ -15,6 +15,7 @@ export default async function NyFravaerPage() {
 
   const profile = await db.profile.findUnique({ where: { supabaseUserId: user.id } });
   if (!profile) redirect("/ingen-tilgang");
+  if (profile.employmentType === "SELF_EMPLOYED") redirect("/ingen-tilgang");
 
   return (
     <div className="space-y-6 max-w-lg mx-auto">

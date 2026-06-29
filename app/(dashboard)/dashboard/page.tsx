@@ -28,6 +28,7 @@ export default async function DashboardPage() {
         viewerRole={profile.role}
         viewerName={profile.fullName}
         isHms={isHms}
+        isContractor={profile.employmentType === "SELF_EMPLOYED"}
       />
       </div>
     </div>

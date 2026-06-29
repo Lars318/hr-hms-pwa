@@ -20,18 +20,20 @@ const isMorePath = (pathname: string) =>
 
 interface BottomNavProps {
   role: Role;
+  isContractor?: boolean;
 }
 
 // Sammenleggbar gruppe i app-menyen — speiler desktop-sidemenyen.
 function DrawerGroup({
-  group, role, pathname, onNavigate,
+  group, role, pathname, onNavigate, isContractor,
 }: {
   group: NavGroup;
   role: Role;
   pathname: string;
   onNavigate: () => void;
+  isContractor?: boolean;
 }) {
-  const visibleItems = group.items.filter((i) => i.roles.includes(role));
+  const visibleItems = group.items.filter((i) => i.roles.includes(role) && !(isContractor && i.employeeOnly));
   const hasActive = visibleItems.some((i) => isNavActive(i.href, pathname));
   const [open, setOpen] = useState(hasActive);
 
@@ -86,7 +88,7 @@ function DrawerLink({
   );
 }
 
-export function BottomNav({ role }: BottomNavProps) {
+export function BottomNav({ role, isContractor }: BottomNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -163,6 +165,7 @@ export function BottomNav({ role }: BottomNavProps) {
                 role={role}
                 pathname={pathname}
                 onNavigate={() => setOpen(false)}
+                isContractor={isContractor}
               />
             ))}
           </div>

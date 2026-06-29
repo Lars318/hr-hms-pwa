@@ -27,9 +27,10 @@ interface PersonalizedDashboardProps {
   viewerRole: Role;
   viewerName: string;
   isHms: boolean;
+  isContractor?: boolean;
 }
 
-export function PersonalizedDashboard({ viewerRole, viewerName, isHms }: PersonalizedDashboardProps) {
+export function PersonalizedDashboard({ viewerRole, viewerName, isHms, isContractor }: PersonalizedDashboardProps) {
   const [tab, setTab] = useState<TabId>("hjem");
   const canCreateAnnouncement = viewerRole === "ADMIN" || viewerRole === "HR" || viewerRole === "MANAGER";
 
@@ -60,7 +61,7 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms }: Persona
         {/* Rollebasert innhold */}
         <section>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-3">Oversikt</h2>
-          <LeaveBalanceCards />
+          {!isContractor && <LeaveBalanceCards />}
           <div className="mt-4">
             <DashboardComplianceWidget viewerRole={viewerRole} />
           </div>
@@ -80,8 +81,12 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms }: Persona
 
       {/* Sidebar — 1/3 */}
       <div className="space-y-5">
-        <QuickEgenmelding />
-        <NextVacation />
+        {!isContractor && (
+          <>
+            <QuickEgenmelding />
+            <NextVacation />
+          </>
+        )}
 
         <section>
           <div className="flex items-center justify-between mb-3">
@@ -118,9 +123,13 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms }: Persona
 
       {tab === "hjem" && (
         <div className="space-y-5">
-          <QuickEgenmelding />
-          <NextVacation />
-          <LeaveBalanceCards />
+          {!isContractor && (
+            <>
+              <QuickEgenmelding />
+              <NextVacation />
+              <LeaveBalanceCards />
+            </>
+          )}
           <DashboardComplianceWidget viewerRole={viewerRole} />
           <DashboardClient viewerRole={viewerRole} viewerName={viewerName} isHms={isHms} />
         </div>

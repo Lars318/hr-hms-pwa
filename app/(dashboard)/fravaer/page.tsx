@@ -16,6 +16,8 @@ export default async function FravaerPage() {
 
   const profile = await db.profile.findUnique({ where: { supabaseUserId: user.id } });
   if (!profile) redirect("/ingen-tilgang");
+  // Fravær er en ansatt-ytelse — ikke for selvstendig næringsdrivende.
+  if (profile.employmentType === "SELF_EMPLOYED") redirect("/ingen-tilgang");
 
   const description =
     profile.role === "EMPLOYEE"

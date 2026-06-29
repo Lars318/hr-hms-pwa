@@ -27,6 +27,7 @@ export default async function MedarbeidersamtalerPage() {
 
   const profile = await db.profile.findUnique({ where: { supabaseUserId: user.id } });
   if (!profile) redirect("/ingen-tilgang");
+  if (profile.employmentType === "SELF_EMPLOYED") redirect("/ingen-tilgang");
 
   const isHrAdmin = profile.role === "ADMIN" || profile.role === "HR";
   const isManager = profile.role === "MANAGER";

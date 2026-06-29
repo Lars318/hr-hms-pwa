@@ -24,6 +24,8 @@ export interface NavItem {
   label: string;
   icon: ElementType;
   roles: Role[];
+  /** Skjules for selvstendig næringsdrivende (ansatt-spesifikk HR-funksjon). */
+  employeeOnly?: boolean;
 }
 
 export interface NavGroup {
@@ -44,11 +46,11 @@ export const navGroups: NavGroup[] = [
     icon: CalendarDays,
     roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"],
     items: [
-      { href: "/fravaer",          label: "Fravær",                icon: CalendarDays,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
-      { href: "/overtid",          label: "Overtid",               icon: Clock,         roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+      { href: "/fravaer",          label: "Fravær",                icon: CalendarDays,  roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"], employeeOnly: true },
+      { href: "/overtid",          label: "Overtid",               icon: Clock,         roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"], employeeOnly: true },
       { href: "/fravaer/kalender", label: "Fraværskalender",       icon: CalendarRange, roles: ["ADMIN", "HR", "MANAGER"] },
       { href: "/sykefravaer",      label: "Sykefraværsoppfølging", icon: Activity,      roles: ["ADMIN", "HR", "MANAGER"] },
-      { href: "/medarbeidersamtaler", label: "Medarbeidersamtaler",icon: MessageSquare, roles: ["ADMIN", "HR", "MANAGER"] },
+      { href: "/medarbeidersamtaler", label: "Medarbeidersamtaler",icon: MessageSquare, roles: ["ADMIN", "HR", "MANAGER"], employeeOnly: true },
       { href: "/admin/personalsaker", label: "Personalsaker",      icon: FileWarning,   roles: ["ADMIN", "HR", "MANAGER"] },
     ],
   },
@@ -126,6 +128,7 @@ export const navGroups: NavGroup[] = [
 
 interface SidebarProps {
   role: Role;
+  isContractor?: boolean;
 }
 
 export function isActive(href: string, pathname: string) {
@@ -152,8 +155,8 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   );
 }
 
-function NavGroupSection({ group, role, pathname }: { group: NavGroup; role: Role; pathname: string }) {
-  const visibleItems = group.items.filter((i) => i.roles.includes(role));
+function NavGroupSection({ group, role, pathname, isContractor }: { group: NavGroup; role: Role; pathname: string; isContractor?: boolean }) {
+  const visibleItems = group.items.filter((i) => i.roles.includes(role) && !(isContractor && i.employeeOnly));
   const hasActive = visibleItems.some((i) => isActive(i.href, pathname));
   const [open, setOpen] = useState(hasActive);
 
@@ -187,7 +190,7 @@ function NavGroupSection({ group, role, pathname }: { group: NavGroup; role: Rol
   );
 }
 
-export function Sidebar({ role }: SidebarProps) {
+export function Sidebar({ role, isContractor }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -226,7 +229,7 @@ export function Sidebar({ role }: SidebarProps) {
 
         <div className="pt-1 space-y-0.5">
           {visibleGroups.map((group) => (
-            <NavGroupSection key={group.label} group={group} role={role} pathname={pathname} />
+            <NavGroupSection key={group.label} group={group} role={role} pathname={pathname} isContractor={isContractor} />
           ))}
         </div>
       </nav>
