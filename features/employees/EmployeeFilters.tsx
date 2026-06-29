@@ -11,6 +11,7 @@ interface Filters {
   departmentId: string;
   locationId: string;
   title: string;
+  employmentType: string;
 }
 
 interface Department { id: string; name: string }
@@ -45,7 +46,7 @@ export function EmployeeFilters({ filters, departments, locations, onChange }: E
     onChange({ ...filters, [key]: value });
   }
 
-  const hasAdvancedFilter = !!filters.departmentId || !!filters.locationId || !!filters.status;
+  const hasAdvancedFilter = !!filters.departmentId || !!filters.locationId || !!filters.status || !!filters.employmentType;
 
   return (
     <div className="space-y-3">
@@ -149,7 +150,7 @@ export function EmployeeFilters({ filters, departments, locations, onChange }: E
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Filtre</span>
             {hasAdvancedFilter && (
               <button
-                onClick={() => onChange({ ...filters, departmentId: "", locationId: "", status: "" })}
+                onClick={() => onChange({ ...filters, departmentId: "", locationId: "", status: "", employmentType: "" })}
                 className="flex items-center gap-1 text-xs text-destructive hover:underline"
               >
                 <X className="h-3 w-3" /> Nullstill
@@ -168,6 +169,19 @@ export function EmployeeFilters({ filters, departments, locations, onChange }: E
                 <option value="">Alle</option>
                 <option value="ACTIVE">Aktiv</option>
                 <option value="INACTIVE">Inaktiv</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs text-muted-foreground">Tilknytning</label>
+              <select
+                value={filters.employmentType}
+                onChange={(e) => set("employmentType", e.target.value)}
+                className="flex h-9 w-full rounded-lg border border-input bg-background px-3 text-sm"
+              >
+                <option value="">Alle</option>
+                <option value="EMPLOYEE">Ansatt</option>
+                <option value="SELF_EMPLOYED">Selvstendig næringsdrivende</option>
               </select>
             </div>
 

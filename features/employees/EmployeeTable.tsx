@@ -101,7 +101,16 @@ export function EmployeeTable({ employees, selectedIds, onToggle, onToggleAll }:
                 <td className="px-4 py-3 text-muted-foreground hidden xl:table-cell">
                   {emp.title ?? <span className="text-muted-foreground/50">—</span>}
                 </td>
-                <td className="px-4 py-3"><StatusBadge status={emp.status} /></td>
+                <td className="px-4 py-3">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <StatusBadge status={emp.status} />
+                    {emp.employmentType === "SELF_EMPLOYED" && (
+                      <span className="inline-flex items-center rounded-full bg-orange-100 text-orange-700 px-2 py-0.5 text-[10px] font-medium whitespace-nowrap">
+                        Selvstendig
+                      </span>
+                    )}
+                  </div>
+                </td>
                 <td className="px-4 py-3">
                   <Link href={`/ansatte/${emp.id}`}>
                     <Button variant="ghost" size="icon" className="h-7 w-7">

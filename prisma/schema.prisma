@@ -316,6 +316,10 @@ model Profile {
   email          String        @unique
   fullName       String
   employeeNumber String?
+  // Tilknytningsform: "EMPLOYEE" (ansatt) eller "SELF_EMPLOYED" (selvstendig
+  // næringsdrivende/oppdragstaker). Styrer ikke tilgang (det gjør role), men
+  // skiller juridisk og brukes til å skjule ansatt-spesifikke HR-funksjoner.
+  employmentType String        @default("EMPLOYEE")
   title          String?
   phone          String?
   avatarUrl      String?

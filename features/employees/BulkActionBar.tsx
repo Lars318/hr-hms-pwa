@@ -23,6 +23,7 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
   const [status, setStatus] = useState("");
   const [titleSelect, setTitleSelect] = useState("");
   const [customTitle, setCustomTitle] = useState("");
+  const [employmentType, setEmploymentType] = useState("");
 
   const effectiveTitle = titleSelect === "__custom__" ? customTitle.trim() : titleSelect;
 
@@ -37,10 +38,10 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
 
   function reset() {
     setDepartmentId(""); setAddDepartmentId(""); setLocationId(""); setRole(""); setStatus("");
-    setTitleSelect(""); setCustomTitle("");
+    setTitleSelect(""); setCustomTitle(""); setEmploymentType("");
   }
 
-  const hasChange = departmentId || addDepartmentId || locationId || role || status || effectiveTitle;
+  const hasChange = departmentId || addDepartmentId || locationId || role || status || effectiveTitle || employmentType;
 
   function apply() {
     if (!hasChange) return;
@@ -52,6 +53,7 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
       role: (role as "ADMIN" | "HR" | "MANAGER" | "EMPLOYEE") || undefined,
       status: (status as "ACTIVE" | "INACTIVE") || undefined,
       title: effectiveTitle || undefined,
+      employmentType: (employmentType as "EMPLOYEE" | "SELF_EMPLOYED") || undefined,
     });
   }
 
@@ -95,6 +97,12 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
           <option value="">Sett status …</option>
           <option value="ACTIVE">Aktiv</option>
           <option value="INACTIVE">Inaktiv</option>
+        </select>
+
+        <select value={employmentType} onChange={(e) => setEmploymentType(e.target.value)} className={selectClass}>
+          <option value="">Sett tilknytning …</option>
+          <option value="EMPLOYEE">Ansatt</option>
+          <option value="SELF_EMPLOYED">Selvstendig næringsdrivende</option>
         </select>
 
         <select value={titleSelect} onChange={(e) => setTitleSelect(e.target.value)} className={selectClass}>

@@ -87,10 +87,11 @@ export const profileRouter = router({
         departmentId: z.string().optional(),
         locationId: z.string().optional(),
         title: z.string().optional(),
+        employmentType: z.enum(["EMPLOYEE", "SELF_EMPLOYED"]).optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { search, role, status, departmentId, locationId, title } = input;
+      const { search, role, status, departmentId, locationId, title, employmentType } = input;
       return ctx.db.profile.findMany({
         where: {
           ...(search
@@ -104,6 +105,7 @@ export const profileRouter = router({
           ...(role ? { role } : {}),
           ...(status ? { status } : {}),
           ...(departmentId ? { departmentId } : {}),
+          ...(employmentType ? { employmentType } : {}),
           ...(title ? { title: { equals: title, mode: "insensitive" } } : {}),
           ...(locationId
             ? { profileAssignments: { some: { locationId, endDate: null } } }
@@ -136,10 +138,11 @@ export const profileRouter = router({
         role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]).optional(),
         status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
         title: z.string().max(120).optional(),
+        employmentType: z.enum(["EMPLOYEE", "SELF_EMPLOYED"]).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { ids, departmentId, addDepartmentId, locationId, role, status, title } = input;
+      const { ids, departmentId, addDepartmentId, locationId, role, status, title, employmentType } = input;
 
       // 1) Direkte Profile-felter (primær avdeling, rolle, status, tittel).
       const profileData: Record<string, unknown> = {};
@@ -147,6 +150,7 @@ export const profileRouter = router({
       if (role) profileData.role = role;
       if (status) profileData.status = status;
       if (title !== undefined && title.trim()) profileData.title = title.trim();
+      if (employmentType) profileData.employmentType = employmentType;
       if (Object.keys(profileData).length > 0) {
         await ctx.db.profile.updateMany({ where: { id: { in: ids } }, data: profileData });
       }

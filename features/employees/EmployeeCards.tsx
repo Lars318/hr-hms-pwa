@@ -15,6 +15,7 @@ type EmployeeWithRelations = {
   avatarUrl: string | null;
   role: string;
   status: string;
+  employmentType: string;
   employedAt: Date;
   department: { name: string } | null;
   profileAssignments: { location: { id: string; name: string; city: string | null } | null }[];
@@ -93,12 +94,19 @@ export function EmployeeCards({ employees }: EmployeeCardsProps) {
                   )}
                 </div>
 
-                <span className={cn(
-                  "shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
-                  cfg.badgeCls
-                )}>
-                  {cfg.label}
-                </span>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <span className={cn(
+                    "rounded-full px-3 py-1 text-xs font-semibold",
+                    cfg.badgeCls
+                  )}>
+                    {cfg.label}
+                  </span>
+                  {emp.employmentType === "SELF_EMPLOYED" && (
+                    <span className="rounded-full bg-orange-100 text-orange-700 px-2 py-0.5 text-[10px] font-medium whitespace-nowrap">
+                      Selvstendig
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Footer row */}
