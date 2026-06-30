@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { ContractorOverview } from "@/features/employees/ContractorOverview";
 
-export const metadata = { title: "Oppdragstakere – Truls HR" };
+export const metadata = { title: "Selvstendig næringsdrivende – Truls HR" };
 
 export default async function OppdragstakerePage() {
   const supabase = createClient();
@@ -22,9 +22,9 @@ export default async function OppdragstakerePage() {
           <Briefcase className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Oppdragstakere</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Selvstendig næringsdrivende</h1>
           <p className="text-sm text-muted-foreground">
-            Selvstendig næringsdrivende — oppdragsavtale, egenerklæring og HMS-bekreftelser
+            Oppdragsavtale, egenerklæring og HMS-bekreftelser
           </p>
         </div>
       </div>
