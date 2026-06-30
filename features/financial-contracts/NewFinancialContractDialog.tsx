@@ -157,11 +157,22 @@ export function NewFinancialContractDialog({
       const matchedCenter = loc
         ? PULS_LOCATIONS.find((c) => loc.includes(c.toLowerCase()) || c.toLowerCase().includes(loc))
         : undefined;
+      // Status utledes av sluttdato: forfalt → EXPIRED, < 90 dager → EXPIRES_SOON, ellers ACTIVE.
+      const derivedStatus = ((): FinancialContractStatus | undefined => {
+        if (!ex.endDate) return undefined;
+        const end = new Date(ex.endDate);
+        if (isNaN(end.getTime())) return undefined;
+        const days = Math.ceil((end.getTime() - Date.now()) / 86_400_000);
+        if (days < 0) return "EXPIRED";
+        if (days <= 90) return "EXPIRES_SOON";
+        return "ACTIVE";
+      })();
       setForm((f) => ({
         ...f,
         name: ex.name ?? f.name,
         supplierName: ex.supplierName ?? f.supplierName,
         type: (ex.type as FinancialContractType) ?? f.type,
+        status: derivedStatus ?? f.status,
         locationId: matchedCenter ?? f.locationId,
         startDate: ex.startDate ?? f.startDate,
         endDate: ex.endDate ?? f.endDate,

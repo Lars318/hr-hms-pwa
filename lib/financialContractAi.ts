@@ -9,6 +9,7 @@ export type ExtractedFinancialContract = {
   locationName?: string;
   startDate?: string; // ISO
   endDate?: string; // ISO
+  durationMonths?: number; // avtaleperiode i måneder
   monthlyAmount?: number;
   annualAmount?: number;
   totalValue?: number;
@@ -33,18 +34,20 @@ ABSOLUTTE REGLER:
 - Datoer i ISO-8601 (YYYY-MM-DD).
 
 FELT-VEILEDNING:
+- name = kort, beskrivende navn på avtalen, typisk dokumentets tittel/overskrift (f.eks. "Leasingavtale #1075"). Dette feltet skal ALLTID fylles ut.
 - monthlyAmount = den faste månedlige avgiften (f.eks. "Månedsavgift", "Kr X per måned", "leasingbeløp pr mnd"). IKKE regn dette ut fra total.
 - totalValue = oppgitt total kjøpesum/avtalesum hvis den står (f.eks. "Kjøpesummen … totalt på kr 60 000").
-- annualAmount = kun hvis et årlig beløp står eksplisitt. Ikke regn månedlig × 12 selv.
-- endDate = beregn KUN hvis startdato OG periode i måneder begge står (f.eks. start 01.12.2023 + "60 måneder" → 2028-12-01). Ellers utelat.
+- durationMonths = avtaleperioden i antall måneder hvis den står (f.eks. "Periode: 60 måneder" → 60).
+- startDate = oppgitt startdato. (endDate trenger du ikke regne ut – systemet beregner sluttdato fra startDate + durationMonths.)
+- locationName = leverings-/leveranseadresse eller senter/lokasjon nevnt i avtalen (f.eks. "Puls Kantor AS").
 - noticePeriodMonths = oppsigelsestid i hele måneder hvis oppgitt.
 - supplierName = leverandøren/utleier (ikke kunden).
 
 Sett "confidence" lavt hvis du er usikker, og forklar usikkerhet i "warnings". Det er bedre å utelate et felt enn å gjette.`;
 
-const USER_PROMPT = `Les hele dokumentet nøye og trekk ut kontraktdata. Returner JSON med disse feltene (alle valgfrie – utelat det som ikke står ordrett):
+const USER_PROMPT = `Les hele dokumentet nøye og trekk ut kontraktdata. Returner JSON med disse feltene (utelat det som ikke står ordrett, men "name" skal alltid fylles ut):
 name, supplierName, type (en av RENT, LEASE, HUSLEIE, SERVICE_AGREEMENT, SUBSCRIPTION, INSURANCE, SUPPLIER, OTHER),
-locationName, startDate, endDate, monthlyAmount, annualAmount, totalValue, areaSqm, noticePeriodMonths,
+locationName, startDate, durationMonths, monthlyAmount, totalValue, areaSqm, noticePeriodMonths,
 renewalOption (boolean), amountsExVat (boolean), summary, confidence (high|medium|low), warnings (array of string).
 
 VIKTIG om mva: Sett "amountsExVat" til true HVIS beløpene i dokumentet er oppgitt eksklusiv mva
@@ -117,12 +120,25 @@ export async function extractFinancialContract(
       const withVat = (v?: number) =>
         typeof v === "number" ? Math.round(v * 1.25 * 100) / 100 : v;
       parsed.monthlyAmount = withVat(parsed.monthlyAmount);
-      parsed.annualAmount = withVat(parsed.annualAmount);
       parsed.totalValue = withVat(parsed.totalValue);
       parsed.warnings = [
         ...(parsed.warnings ?? []),
         "Beløp var oppgitt eks. mva og er omregnet til inkl. mva (×1,25).",
       ];
+    }
+
+    // Årlig beløp = månedlig × 12 (utledes alltid fra månedlig hvis det finnes).
+    if (typeof parsed.monthlyAmount === "number") {
+      parsed.annualAmount = Math.round(parsed.monthlyAmount * 12 * 100) / 100;
+    }
+
+    // Sluttdato = startdato + periode (måneder) hvis sluttdato ikke alt er satt.
+    if (!parsed.endDate && parsed.startDate && typeof parsed.durationMonths === "number") {
+      const d = new Date(parsed.startDate);
+      if (!isNaN(d.getTime())) {
+        d.setMonth(d.getMonth() + parsed.durationMonths);
+        parsed.endDate = d.toISOString().slice(0, 10);
+      }
     }
 
     return parsed;
