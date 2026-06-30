@@ -37,17 +37,18 @@ FELT-VEILEDNING:
 - name = avtalens fulle tittel/overskrift slik den står, INKLUDERT eventuelt avtale-/kontraktnummer (f.eks. "Leasingavtale #1075", ikke bare "Leasingavtale"). Dette feltet skal ALLTID fylles ut.
 - monthlyAmount = den faste månedlige avgiften (f.eks. "Månedsavgift", "Kr X per måned", "leasingbeløp pr mnd"). IKKE regn dette ut fra total.
 - totalValue = oppgitt total kjøpesum/avtalesum hvis den står (f.eks. "Kjøpesummen … totalt på kr 60 000").
-- durationMonths = avtaleperioden i antall måneder hvis den står (f.eks. "Periode: 60 måneder" → 60).
+- durationMonths = avtaleperioden i antall måneder. Let bredt: "Periode", "Avtaleperiode", "Leieperiode", "Finansieringsperiode", "Bindingstid", "Varighet". Står det i ÅR, gang med 12 (f.eks. "5 år" → 60). Står det "X måneder", bruk X.
 - startDate = oppgitt startdato. (endDate trenger du ikke regne ut – systemet beregner sluttdato fra startDate + durationMonths.)
+- endDate = ta med KUN hvis en eksplisitt sluttdato står i dokumentet.
 - locationName = leverings-/leveranseadresse eller senter/lokasjon nevnt i avtalen (f.eks. "Puls Kantor AS").
-- noticePeriodMonths = oppsigelsestid i hele måneder hvis oppgitt.
+- noticePeriodMonths = oppsigelsestid i hele måneder. Let etter "oppsigelsestid", "oppsigelse", "X måneders oppsigelse", "si opp … X måneder".
 - supplierName = leverandøren/utleier (ikke kunden).
 
 Sett "confidence" lavt hvis du er usikker, og forklar usikkerhet i "warnings". Det er bedre å utelate et felt enn å gjette.`;
 
 const USER_PROMPT = `Les hele dokumentet nøye og trekk ut kontraktdata. Returner JSON med disse feltene (utelat det som ikke står ordrett, men "name" skal alltid fylles ut):
 name, supplierName, type (en av RENT, LEASE, HUSLEIE, SERVICE_AGREEMENT, SUBSCRIPTION, INSURANCE, SUPPLIER, OTHER),
-locationName, startDate, durationMonths, monthlyAmount, totalValue, areaSqm, noticePeriodMonths,
+locationName, startDate, endDate, durationMonths, monthlyAmount, totalValue, areaSqm, noticePeriodMonths,
 renewalOption (boolean), amountsExVat (boolean), summary, confidence (high|medium|low), warnings (array of string).
 
 VIKTIG om mva: Sett "amountsExVat" til true HVIS beløpene i dokumentet er oppgitt eksklusiv mva
