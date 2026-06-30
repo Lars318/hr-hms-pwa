@@ -152,11 +152,17 @@ export function NewFinancialContractDialog({
     setAiWarnings([]);
     try {
       const ex = await extract.mutateAsync({ filePath: uploadedPath });
+      // Match AI-ens lokasjonstekst (f.eks. "Puls Kantor AS") mot et Puls-senter.
+      const loc = ex.locationName?.toLowerCase();
+      const matchedCenter = loc
+        ? PULS_LOCATIONS.find((c) => loc.includes(c.toLowerCase()) || c.toLowerCase().includes(loc))
+        : undefined;
       setForm((f) => ({
         ...f,
         name: ex.name ?? f.name,
         supplierName: ex.supplierName ?? f.supplierName,
         type: (ex.type as FinancialContractType) ?? f.type,
+        locationId: matchedCenter ?? f.locationId,
         startDate: ex.startDate ?? f.startDate,
         endDate: ex.endDate ?? f.endDate,
         monthlyAmount:

@@ -15,6 +15,7 @@ export type ExtractedFinancialContract = {
   areaSqm?: number;
   noticePeriodMonths?: number;
   renewalOption?: boolean;
+  amountsExVat?: boolean; // true hvis beløpene i dokumentet er oppgitt eks. mva
   summary?: string;
   confidence?: "high" | "medium" | "low";
   warnings?: string[];
@@ -44,7 +45,10 @@ Sett "confidence" lavt hvis du er usikker, og forklar usikkerhet i "warnings". D
 const USER_PROMPT = `Les hele dokumentet nøye og trekk ut kontraktdata. Returner JSON med disse feltene (alle valgfrie – utelat det som ikke står ordrett):
 name, supplierName, type (en av RENT, LEASE, HUSLEIE, SERVICE_AGREEMENT, SUBSCRIPTION, INSURANCE, SUPPLIER, OTHER),
 locationName, startDate, endDate, monthlyAmount, annualAmount, totalValue, areaSqm, noticePeriodMonths,
-renewalOption (boolean), summary, confidence (high|medium|low), warnings (array of string).
+renewalOption (boolean), amountsExVat (boolean), summary, confidence (high|medium|low), warnings (array of string).
+
+VIKTIG om mva: Sett "amountsExVat" til true HVIS beløpene i dokumentet er oppgitt eksklusiv mva
+(f.eks. "eks. Mva", "eks mva", "ekskl. mva", "+ mva"). Behold beløpene slik de står (eks. mva) – systemet legger på mva selv.
 Svar kun med JSON.`;
 
 export function isFinancialContractAiEnabled(): boolean {
@@ -105,7 +109,23 @@ export async function extractFinancialContract(
       .replace(/\s*```$/i, "")
       .trim();
 
-    return JSON.parse(jsonText) as ExtractedFinancialContract;
+    const parsed = JSON.parse(jsonText) as ExtractedFinancialContract;
+
+    // Beløp i dokumentet er ofte eks. mva. Legg på 25 % mva deterministisk i
+    // kode (ikke i modellen) så lagrede beløp er inkl. mva.
+    if (parsed.amountsExVat) {
+      const withVat = (v?: number) =>
+        typeof v === "number" ? Math.round(v * 1.25 * 100) / 100 : v;
+      parsed.monthlyAmount = withVat(parsed.monthlyAmount);
+      parsed.annualAmount = withVat(parsed.annualAmount);
+      parsed.totalValue = withVat(parsed.totalValue);
+      parsed.warnings = [
+        ...(parsed.warnings ?? []),
+        "Beløp var oppgitt eks. mva og er omregnet til inkl. mva (×1,25).",
+      ];
+    }
+
+    return parsed;
   } catch (err) {
     return {
       warnings: [
