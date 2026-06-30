@@ -34,7 +34,7 @@ ABSOLUTTE REGLER:
 - Datoer i ISO-8601 (YYYY-MM-DD).
 
 FELT-VEILEDNING:
-- name = kort, beskrivende navn på avtalen, typisk dokumentets tittel/overskrift (f.eks. "Leasingavtale #1075"). Dette feltet skal ALLTID fylles ut.
+- name = avtalens fulle tittel/overskrift slik den står, INKLUDERT eventuelt avtale-/kontraktnummer (f.eks. "Leasingavtale #1075", ikke bare "Leasingavtale"). Dette feltet skal ALLTID fylles ut.
 - monthlyAmount = den faste månedlige avgiften (f.eks. "Månedsavgift", "Kr X per måned", "leasingbeløp pr mnd"). IKKE regn dette ut fra total.
 - totalValue = oppgitt total kjøpesum/avtalesum hvis den står (f.eks. "Kjøpesummen … totalt på kr 60 000").
 - durationMonths = avtaleperioden i antall måneder hvis den står (f.eks. "Periode: 60 måneder" → 60).

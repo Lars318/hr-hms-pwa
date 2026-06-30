@@ -167,9 +167,15 @@ export function NewFinancialContractDialog({
         if (days <= 90) return "EXPIRES_SOON";
         return "ACTIVE";
       })();
+      // Navn: bruk AI-navnet, men la filnavnet vinne hvis det har et
+      // avtalenummer (f.eks. "#1075") som AI-navnet mangler.
+      const fileBase = uploadedFile?.name.replace(/\.pdf$/i, "").trim();
+      const aiName = ex.name?.trim();
+      const hasNum = (s?: string) => !!s && /\d/.test(s);
+      const bestName = hasNum(fileBase) && !hasNum(aiName) ? fileBase : aiName || fileBase;
       setForm((f) => ({
         ...f,
-        name: ex.name ?? f.name,
+        name: bestName ?? f.name,
         supplierName: ex.supplierName ?? f.supplierName,
         type: (ex.type as FinancialContractType) ?? f.type,
         status: derivedStatus ?? f.status,
