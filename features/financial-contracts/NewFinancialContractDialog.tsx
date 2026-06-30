@@ -189,12 +189,15 @@ export function NewFinancialContractDialog({
       setError("Navn og leverandør er påkrevd.");
       return;
     }
+    // Puls-sentrene er hardkodede navn (ikke ekte Location-rader) → lagres som
+    // centerName. Reelle lokasjoner fra `locations` lagres som locationId.
+    const isPulsCenter = PULS_LOCATIONS.includes(form.locationId);
     create.mutate({
       name: form.name.trim(),
       type: form.type,
       supplierName: form.supplierName.trim(),
-      locationId: form.locationId || null,
-      centerName: null,
+      locationId: !isPulsCenter && form.locationId ? form.locationId : null,
+      centerName: isPulsCenter ? form.locationId : null,
       status: form.status,
       startDate: form.startDate || null,
       endDate: form.endDate || null,

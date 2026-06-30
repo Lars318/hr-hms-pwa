@@ -94,7 +94,7 @@ function contractToForm(c: ContractData): FormState {
     contractNumber: c.contractNumber ?? "",
     type: c.type,
     supplierName: c.supplierName,
-    locationId: c.locationId ?? "",
+    locationId: c.locationId ?? c.centerName ?? "",
     centerName: c.centerName ?? "",
     status: c.status,
     startDate: toDateStr(c.startDate),
@@ -151,14 +151,15 @@ export function EditFinancialContractDialog({ open, onOpenChange, contract, loca
       setError("Navn og leverandør er påkrevd.");
       return;
     }
+    const isPulsCenter = PULS_LOCATIONS.includes(form.locationId);
     update.mutate({
       id: contract.id,
       name: form.name.trim(),
       contractNumber: form.contractNumber || null,
       type: form.type,
       supplierName: form.supplierName.trim(),
-      locationId: form.locationId || null,
-      centerName: null,
+      locationId: !isPulsCenter && form.locationId ? form.locationId : null,
+      centerName: isPulsCenter ? form.locationId : null,
       status: form.status,
       startDate: form.startDate || null,
       endDate: form.endDate || null,
