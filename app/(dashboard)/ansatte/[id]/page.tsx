@@ -92,6 +92,8 @@ export default async function AnsattDetaljPage({ params }: Props) {
         avatarUrl={profile.avatarUrl}
         role={profile.role}
         status={profile.status}
+        employmentType={profile.employmentType}
+        employeeNumber={profile.employeeNumber}
         department={profile.department}
         manager={profile.manager}
         employedAt={profile.employedAt}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
-import { Mail, Phone, Building2, UserCheck, Calendar, GraduationCap, FileText, CheckCircle2, MapPin } from "lucide-react";
+import { Mail, Phone, Building2, UserCheck, Calendar, GraduationCap, FileText, CheckCircle2, MapPin, Briefcase, Hash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RoleBadge } from "@/components/shared/RoleBadge";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -45,6 +45,8 @@ interface ProfileTabsProps {
   avatarUrl: string | null;
   role: Role;
   status: ProfileStatus;
+  employmentType: string;
+  employeeNumber: string | null;
   department: { name: string } | null;
   manager: { id: string; fullName: string; email: string } | null;
   employedAt: Date;
@@ -73,9 +75,11 @@ function Initials({ name }: { name: string }) {
 
 export function ProfileTabs({
   profileId, fullName, email, phone, title, avatarUrl, role, status,
+  employmentType, employeeNumber,
   department, manager, employedAt, terminatedAt, courses, documents, assignments,
   canEdit, editHref,
 }: ProfileTabsProps) {
+  const isSelfEmployed = employmentType === "SELF_EMPLOYED";
   const [tab, setTab] = useState<Tab>("oversikt");
 
   return (
@@ -98,6 +102,11 @@ export function ProfileTabs({
             <div className="flex gap-2 mt-2 flex-wrap">
               <RoleBadge role={role} />
               <StatusBadge status={status} />
+              {isSelfEmployed && (
+                <span className="inline-flex items-center rounded-full bg-orange-100 text-orange-700 px-2.5 py-0.5 text-xs font-medium">
+                  Selvstendig næringsdrivende
+                </span>
+              )}
             </div>
           </div>
           {canEdit && (
@@ -134,6 +143,12 @@ export function ProfileTabs({
         <div className="rounded-2xl border bg-card p-5 space-y-4">
           <InfoRow icon={Mail} label={email} />
           {phone && <InfoRow icon={Phone} label={phone} />}
+          {employeeNumber && <InfoRow icon={Hash} label={employeeNumber} sublabel="Ansattnummer" />}
+          <InfoRow
+            icon={Briefcase}
+            label={isSelfEmployed ? "Selvstendig næringsdrivende" : "Ansatt"}
+            sublabel="Tilknytningsform"
+          />
           {department && <InfoRow icon={Building2} label={department.name} />}
           {manager && (
             <InfoRow

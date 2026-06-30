@@ -12,6 +12,8 @@ const profileUpdateSchema = z.object({
   managerId: z.string().optional().nullable(),
   role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]).optional(),
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+  employmentType: z.enum(["EMPLOYEE", "SELF_EMPLOYED"]).optional(),
+  employeeNumber: z.string().max(40).optional().nullable(),
   dateOfBirth: z.string().optional().nullable(),
   probationEndsAt: z.string().optional().nullable(),
   employedAt: z.string().optional(),
@@ -21,6 +23,65 @@ const profileUpdateSchema = z.object({
 export const profileRouter = router({
   // Innlogget bruker henter sin egen profil
   me: profileProcedure.query(({ ctx }) => ctx.profile),
+
+  // HR/ADMIN: oversikt over selvstendig næringsdrivende (oppdragstakere) med
+  // kontrakt-/egenerklæring-status og HMS-dokumentbekreftelser.
+  contractors: hrProcedure.query(async ({ ctx }) => {
+    const totalDocs = await ctx.db.document.count({ where: { visibility: "PUBLIC" } });
+
+    const people = await ctx.db.profile.findMany({
+      where: { employmentType: "SELF_EMPLOYED" },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        title: true,
+        status: true,
+        contractSignedAt: true,
+        selfDeclarationAt: true,
+        profileAssignments: {
+          where: { isPrimary: true, endDate: null },
+          select: { location: { select: { name: true, city: true } } },
+          take: 1,
+        },
+        _count: { select: { readConfirmations: true } },
+      },
+      orderBy: [{ status: "asc" }, { fullName: "asc" }],
+    });
+
+    return {
+      totalDocs,
+      contractors: people.map((p) => ({
+        id: p.id,
+        fullName: p.fullName,
+        email: p.email,
+        phone: p.phone,
+        title: p.title,
+        status: p.status,
+        contractSignedAt: p.contractSignedAt,
+        selfDeclarationAt: p.selfDeclarationAt,
+        location: p.profileAssignments[0]?.location ?? null,
+        confirmedDocs: p._count.readConfirmations,
+      })),
+    };
+  }),
+
+  // HR/ADMIN: marker kontrakt eller egenerklæring som mottatt/ikke mottatt.
+  setContractorDoc: hrProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        field: z.enum(["contractSignedAt", "selfDeclarationAt"]),
+        received: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.profile.update({
+        where: { id: input.id },
+        data: { [input.field]: input.received ? new Date() : null },
+      });
+    }),
 
   // Alle innloggede: ansattkatalog (kun trygge felter, kun aktive)
   directory: profileProcedure

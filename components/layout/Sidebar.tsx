@@ -9,7 +9,7 @@ import {
   ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2,
   Activity, BookOpen, Clock, Shield, AlertTriangle, GraduationCap,
   FlaskConical, ClipboardList, MessageSquare, FileWarning, FileText,
-  KeyRound, ChevronDown, Receipt,
+  KeyRound, ChevronDown, Receipt, Briefcase,
 } from "lucide-react";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { cn } from "@/lib/utils";
@@ -97,6 +97,7 @@ export const navGroups: NavGroup[] = [
     items: [
       { href: "/ansatte",               label: "Ansatte",          icon: Users,         roles: ["ADMIN", "HR"] },
       { href: "/ansatte/import",        label: "Importer ansatte", icon: Users,         roles: ["ADMIN", "HR"] },
+      { href: "/oppdragstakere",        label: "Oppdragstakere",   icon: Briefcase,     roles: ["ADMIN", "HR"] },
       { href: "/admin/avdelinger",      label: "Avdelinger",       icon: Building2,     roles: ["ADMIN", "HR"] },
       { href: "/lokasjoner",            label: "Lokasjoner",       icon: MapPin,        roles: ["ADMIN", "HR"] },
       { href: "/kontrakter",            label: "Kontrakter",       icon: FileText,      roles: ["ADMIN", "HR"] },

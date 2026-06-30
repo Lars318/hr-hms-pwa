@@ -320,6 +320,10 @@ model Profile {
   // næringsdrivende/oppdragstaker). Styrer ikke tilgang (det gjør role), men
   // skiller juridisk og brukes til å skjule ansatt-spesifikke HR-funksjoner.
   employmentType String        @default("EMPLOYEE")
+  // For selvstendig næringsdrivende: dato for signert oppdragsavtale og mottatt
+  // egenerklæring. Brukes i oppdragstaker-oversikten.
+  contractSignedAt   DateTime?
+  selfDeclarationAt  DateTime?
   title          String?
   phone          String?
   avatarUrl      String?

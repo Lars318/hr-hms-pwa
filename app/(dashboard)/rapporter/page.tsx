@@ -1,4 +1,6 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { MapPin, ChevronRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { RapporterClient } from "@/features/reports/RapporterClient";
@@ -31,6 +33,20 @@ export default async function RapporterPage() {
             : "Rapporter og CSV-eksport for hele organisasjonen."}
         </p>
       </div>
+
+      <Link
+        href="/rapporter/hvem-jobber-hvor"
+        className="flex items-center gap-3 rounded-2xl border bg-card p-4 hover:shadow-sm transition-shadow"
+      >
+        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+          <MapPin className="h-5 w-5 text-primary" />
+        </div>
+        <div className="min-w-0">
+          <p className="font-semibold text-sm">Hvem jobber hvor</p>
+          <p className="text-xs text-muted-foreground">Ansatte og selvstendige per lokasjon og avdeling · CSV/PDF</p>
+        </div>
+        <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-auto" />
+      </Link>
 
       <RapporterClient viewerRole={profile.role} departments={departments} />
     </div>

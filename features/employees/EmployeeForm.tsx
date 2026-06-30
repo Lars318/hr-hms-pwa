@@ -16,8 +16,10 @@ const editSchema = z.object({
   fullName: z.string().min(2, "Navn må ha minst 2 tegn").max(100),
   title: z.string().max(100).optional(),
   phone: z.string().max(30).optional(),
+  employeeNumber: z.string().max(40).optional(),
   role: z.enum(["ADMIN", "HR", "MANAGER", "EMPLOYEE"]),
   status: z.enum(["ACTIVE", "INACTIVE"]),
+  employmentType: z.enum(["EMPLOYEE", "SELF_EMPLOYED"]),
   departmentId: z.string().optional(),
   managerId: z.string().optional(),
 });
@@ -58,8 +60,10 @@ export function EmployeeForm({ profile, departments, allProfiles = [], mode }: E
       fullName: profile?.fullName ?? "",
       title: profile?.title ?? "",
       phone: profile?.phone ?? "",
+      employeeNumber: profile?.employeeNumber ?? "",
       role: profile?.role ?? "EMPLOYEE",
       status: profile?.status ?? "ACTIVE",
+      employmentType: (profile?.employmentType as "EMPLOYEE" | "SELF_EMPLOYED") ?? "EMPLOYEE",
       departmentId: profile?.departmentId ?? "",
       managerId: profile?.managerId ?? "",
     },
@@ -73,8 +77,10 @@ export function EmployeeForm({ profile, departments, allProfiles = [], mode }: E
       fullName: "",
       title: "",
       phone: "",
+      employeeNumber: "",
       role: "EMPLOYEE",
       status: "ACTIVE",
+      employmentType: "EMPLOYEE",
       departmentId: "",
     },
   });
@@ -107,9 +113,16 @@ export function EmployeeForm({ profile, departments, allProfiles = [], mode }: E
     };
 
     if (mode === "edit" && profile) {
-      await updateMutation.mutateAsync({ id: profile.id, ...clean });
+      await updateMutation.mutateAsync({
+        id: profile.id,
+        ...clean,
+        employeeNumber: values.employeeNumber || null,
+      });
     } else {
-      await createMutation.mutateAsync(clean);
+      // profile.create tar ikke imot tilknytningsform/ansattnr — fjern dem.
+      const { employmentType: _et, employeeNumber: _en, ...createClean } = clean;
+      void _et; void _en;
+      await createMutation.mutateAsync(createClean);
     }
   }
 
@@ -150,9 +163,26 @@ export function EmployeeForm({ profile, departments, allProfiles = [], mode }: E
         <Input id="title" placeholder="f.eks. Personalsjef" {...register("title")} />
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1">
+          <Label htmlFor="phone">Telefon</Label>
+          <Input id="phone" type="tel" {...register("phone")} />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="employeeNumber">Ansattnummer</Label>
+          <Input id="employeeNumber" {...register("employeeNumber")} />
+        </div>
+      </div>
+
       <div className="space-y-1">
-        <Label htmlFor="phone">Telefon</Label>
-        <Input id="phone" type="tel" {...register("phone")} />
+        <Label htmlFor="employmentType">Tilknytningsform *</Label>
+        <Select id="employmentType" {...register("employmentType")}>
+          <option value="EMPLOYEE">Ansatt</option>
+          <option value="SELF_EMPLOYED">Selvstendig næringsdrivende</option>
+        </Select>
+        <p className="text-xs text-muted-foreground">
+          Selvstendige får ikke tilgang til fravær, overtid og medarbeidersamtaler.
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
