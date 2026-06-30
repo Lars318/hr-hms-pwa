@@ -10,7 +10,7 @@ export const assistantRouter = router({
         currentPath: z.string().optional(),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       return ask(input.message, ctx.profile.role);
     }),
 });

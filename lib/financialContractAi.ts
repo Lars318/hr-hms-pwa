@@ -1,6 +1,6 @@
-// Server-only – AI-ekstraksjon av økonomikontrakter via Anthropic.
+// Server-only – AI-ekstraksjon av økonomikontrakter via OpenAI.
 // Kalles ALDRI fra klient. Returnerer tomt objekt hvis funksjonen er av
-// eller hvis @anthropic-ai/sdk ikke er installert.
+// eller hvis openai-pakken ikke er installert.
 
 export type ExtractedFinancialContract = {
   name?: string;
@@ -20,22 +20,28 @@ export type ExtractedFinancialContract = {
   warnings?: string[];
 };
 
-const MODEL = "claude-sonnet-4-6";
+const MODEL = process.env.OPENAI_CONTRACT_MODEL ?? "gpt-4o";
 
 const SYSTEM_PROMPT = `Du er en assistent som leser norske økonomi- og leiekontrakter (PDF) og trekker ut nøkkeldata.
 Returner KUN gyldig JSON som matcher det angitte skjemaet. Ikke gjett – la felt være utelatt hvis de ikke står i dokumentet.
 Datoer skal være ISO-8601 (YYYY-MM-DD). Beløp skal være tall i NOK uten tusenskille eller valutategn.
 Sett "confidence" til hvor sikker du er totalt, og legg eventuelle forbehold i "warnings".`;
 
+const USER_PROMPT = `Trekk ut kontraktdata og returner JSON med disse feltene (alle valgfrie):
+name, supplierName, type (en av RENT, LEASE, HUSLEIE, SERVICE_AGREEMENT, SUBSCRIPTION, INSURANCE, SUPPLIER, OTHER),
+locationName, startDate, endDate, monthlyAmount, annualAmount, totalValue, areaSqm, noticePeriodMonths,
+renewalOption (boolean), summary, confidence (high|medium|low), warnings (array of string).
+Svar kun med JSON, ingen forklaring.`;
+
 export function isFinancialContractAiEnabled(): boolean {
   return (
     process.env.FINANCIAL_CONTRACT_AI_ENABLED === "true" &&
-    !!process.env.ANTHROPIC_API_KEY
+    !!process.env.OPENAI_API_KEY
   );
 }
 
 /**
- * Leser en PDF (base64) og kaller Anthropic for å trekke ut kontraktdata.
+ * Leser en PDF (base64) og kaller OpenAI for å trekke ut kontraktdata.
  * @param pdfBase64 base64-kodet PDF-innhold
  */
 export async function extractFinancialContract(
@@ -43,76 +49,52 @@ export async function extractFinancialContract(
 ): Promise<ExtractedFinancialContract> {
   if (!isFinancialContractAiEnabled()) return {};
 
-  // Dynamisk import (lastes kun når AI er på), men med statisk modulnavn slik
-  // at Next/Vercel sin fil-tracer inkluderer pakken i serverless-bundelen.
-  type AnthropicCtor = new (opts: { apiKey?: string }) => {
-    messages: {
-      create: (args: unknown) => Promise<{
-        content: Array<{ type: string; text?: string }>;
-      }>;
-    };
-  };
-  let Anthropic: AnthropicCtor;
+  let OpenAI: typeof import("openai").default;
   try {
-    const mod = (await import("@anthropic-ai/sdk")) as unknown as { default: AnthropicCtor };
-    Anthropic = mod.default;
+    OpenAI = (await import("openai")).default;
   } catch {
-    return { warnings: ["AI-pakken (@anthropic-ai/sdk) kunne ikke lastes."] };
+    return { warnings: ["AI-pakken (openai) kunne ikke lastes."] };
   }
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   try {
-    const response = await client.messages.create({
+    const response = await client.chat.completions.create({
       model: MODEL,
+      response_format: { type: "json_object" },
       max_tokens: 2000,
-      system: SYSTEM_PROMPT,
       messages: [
+        { role: "system", content: SYSTEM_PROMPT },
         {
           role: "user",
           content: [
             {
-              type: "document",
-              source: {
-                type: "base64",
-                media_type: "application/pdf",
-                data: pdfBase64,
+              // PDF som fil-innhold (støttes av gpt-4o-modellene).
+              type: "file",
+              file: {
+                filename: "kontrakt.pdf",
+                file_data: `data:application/pdf;base64,${pdfBase64}`,
               },
             },
-            {
-              type: "text",
-              text: `Trekk ut kontraktdata og returner JSON med disse feltene (alle valgfrie):
-name, supplierName, type (en av RENT, LEASE, HUSLEIE, SERVICE_AGREEMENT, SUBSCRIPTION, INSURANCE, SUPPLIER, OTHER),
-locationName, startDate, endDate, monthlyAmount, annualAmount, totalValue, areaSqm, noticePeriodMonths,
-renewalOption (boolean), summary, confidence (high|medium|low), warnings (array of string).
-Svar kun med JSON, ingen forklaring.`,
-            },
-          ],
+            { type: "text", text: USER_PROMPT },
+          ] as unknown as never,
         },
       ],
     });
 
-    const textBlock = response.content.find(
-      (b) => b.type === "text" && typeof b.text === "string"
-    );
-    if (!textBlock || typeof textBlock.text !== "string") {
-      return { warnings: ["AI ga ikke noe svar."] };
-    }
+    const raw = response.choices[0]?.message?.content?.trim();
+    if (!raw) return { warnings: ["AI ga ikke noe svar."] };
 
-    const raw = textBlock.text.trim();
     const jsonText = raw
       .replace(/^```(?:json)?\s*/i, "")
       .replace(/\s*```$/i, "")
       .trim();
 
-    const parsed = JSON.parse(jsonText) as ExtractedFinancialContract;
-    return parsed;
+    return JSON.parse(jsonText) as ExtractedFinancialContract;
   } catch (err) {
     return {
       warnings: [
-        `AI-ekstraksjon feilet: ${
-          err instanceof Error ? err.message : "ukjent feil"
-        }`,
+        `AI-ekstraksjon feilet: ${err instanceof Error ? err.message : "ukjent feil"}`,
       ],
     };
   }
