@@ -38,8 +38,9 @@ FELT-VEILEDNING:
 - monthlyAmount = den faste månedlige avgiften (f.eks. "Månedsavgift", "Kr X per måned", "leasingbeløp pr mnd"). IKKE regn dette ut fra total.
 - totalValue = oppgitt total kjøpesum/avtalesum hvis den står (f.eks. "Kjøpesummen … totalt på kr 60 000").
 - durationMonths = avtaleperioden i antall måneder. Let bredt: "Periode", "Avtaleperiode", "Leieperiode", "Finansieringsperiode", "Bindingstid", "Varighet". Står det i ÅR, gang med 12 (f.eks. "5 år" → 60). Står det "X måneder", bruk X.
-- startDate = oppgitt startdato. (endDate trenger du ikke regne ut – systemet beregner sluttdato fra startDate + durationMonths.)
+- startDate = avtalens egen "Start dato"/"Startdato"-verdi. IKKE bruk signeringsdato ("Oslo, dato", "Sted, dato", dato ved underskrift) — det er en annen dato. Les måneden nøyaktig (01.12 = desember, ikke november).
 - endDate = ta med KUN hvis en eksplisitt sluttdato står i dokumentet.
+- MERK: Mange avtaler har en datablokk med "Start dato:", "Periode:" og "Månedsavgift mnd 1-X:". Les disse linjene ordrett og nøyaktig.
 - locationName = leverings-/leveranseadresse eller senter/lokasjon nevnt i avtalen (f.eks. "Puls Kantor AS").
 - noticePeriodMonths = oppsigelsestid i hele måneder. Let etter "oppsigelsestid", "oppsigelse", "X måneders oppsigelse", "si opp … X måneder".
 - supplierName = leverandøren/utleier (ikke kunden).
