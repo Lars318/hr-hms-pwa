@@ -22,16 +22,30 @@ export type ExtractedFinancialContract = {
 
 const MODEL = process.env.OPENAI_CONTRACT_MODEL ?? "gpt-4o";
 
-const SYSTEM_PROMPT = `Du er en assistent som leser norske økonomi- og leiekontrakter (PDF) og trekker ut nøkkeldata.
-Returner KUN gyldig JSON som matcher det angitte skjemaet. Ikke gjett – la felt være utelatt hvis de ikke står i dokumentet.
-Datoer skal være ISO-8601 (YYYY-MM-DD). Beløp skal være tall i NOK uten tusenskille eller valutategn.
-Sett "confidence" til hvor sikker du er totalt, og legg eventuelle forbehold i "warnings".`;
+const SYSTEM_PROMPT = `Du er en nøyaktig assistent som leser norske økonomi- og leiekontrakter (PDF) og trekker ut nøkkeldata.
+Returner KUN gyldig JSON som matcher skjemaet.
 
-const USER_PROMPT = `Trekk ut kontraktdata og returner JSON med disse feltene (alle valgfrie):
+ABSOLUTTE REGLER:
+- Bruk KUN verdier som står ORDRETT i dokumentet. ALDRI gjett, regn ut, estimer eller fyll inn plausible tall.
+- Hvis en verdi ikke står eksplisitt, skal feltet UTELATES (ikke sett 0 eller en antakelse).
+- Beløp skrives som rene tall i NOK uten tusenskille/valuta: "Kr 1 275,- eks. Mva" → 1275. "kr 60 000,-" → 60000.
+- Datoer i ISO-8601 (YYYY-MM-DD).
+
+FELT-VEILEDNING:
+- monthlyAmount = den faste månedlige avgiften (f.eks. "Månedsavgift", "Kr X per måned", "leasingbeløp pr mnd"). IKKE regn dette ut fra total.
+- totalValue = oppgitt total kjøpesum/avtalesum hvis den står (f.eks. "Kjøpesummen … totalt på kr 60 000").
+- annualAmount = kun hvis et årlig beløp står eksplisitt. Ikke regn månedlig × 12 selv.
+- endDate = beregn KUN hvis startdato OG periode i måneder begge står (f.eks. start 01.12.2023 + "60 måneder" → 2028-12-01). Ellers utelat.
+- noticePeriodMonths = oppsigelsestid i hele måneder hvis oppgitt.
+- supplierName = leverandøren/utleier (ikke kunden).
+
+Sett "confidence" lavt hvis du er usikker, og forklar usikkerhet i "warnings". Det er bedre å utelate et felt enn å gjette.`;
+
+const USER_PROMPT = `Les hele dokumentet nøye og trekk ut kontraktdata. Returner JSON med disse feltene (alle valgfrie – utelat det som ikke står ordrett):
 name, supplierName, type (en av RENT, LEASE, HUSLEIE, SERVICE_AGREEMENT, SUBSCRIPTION, INSURANCE, SUPPLIER, OTHER),
 locationName, startDate, endDate, monthlyAmount, annualAmount, totalValue, areaSqm, noticePeriodMonths,
 renewalOption (boolean), summary, confidence (high|medium|low), warnings (array of string).
-Svar kun med JSON, ingen forklaring.`;
+Svar kun med JSON.`;
 
 export function isFinancialContractAiEnabled(): boolean {
   return (
@@ -62,6 +76,7 @@ export async function extractFinancialContract(
     const response = await client.chat.completions.create({
       model: MODEL,
       response_format: { type: "json_object" },
+      temperature: 0,
       max_tokens: 2000,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
