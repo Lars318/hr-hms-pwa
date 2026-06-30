@@ -322,8 +322,10 @@ model Profile {
   employmentType String        @default("EMPLOYEE")
   // For selvstendig næringsdrivende: dato for signert oppdragsavtale og mottatt
   // egenerklæring. Brukes i oppdragstaker-oversikten.
-  contractSignedAt   DateTime?
-  selfDeclarationAt  DateTime?
+  contractSignedAt        DateTime?
+  selfDeclarationAt       DateTime?
+  contractFilePath        String?   // opplastet oppdragsavtale (privat storage)
+  selfDeclarationFilePath String?   // opplastet egenerklæring (privat storage)
   title          String?
   phone          String?
   avatarUrl      String?

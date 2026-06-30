@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { randomUUID } from "node:crypto";
+import { createId } from "@paralleldrive/cuid2";
 import { router, profileProcedure, hrProcedure } from "@/server/trpc/trpc";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, FINANCIAL_CONTRACTS_BUCKET, sanitizeFileName } from "@/lib/supabase/admin";
 
 const profileUpdateSchema = z.object({
   fullName: z.string().min(2, "Navn må ha minst 2 tegn").max(100),
@@ -40,6 +41,8 @@ export const profileRouter = router({
         status: true,
         contractSignedAt: true,
         selfDeclarationAt: true,
+        contractFilePath: true,
+        selfDeclarationFilePath: true,
         profileAssignments: {
           where: { isPrimary: true, endDate: null },
           select: { location: { select: { name: true, city: true } } },
@@ -61,11 +64,74 @@ export const profileRouter = router({
         status: p.status,
         contractSignedAt: p.contractSignedAt,
         selfDeclarationAt: p.selfDeclarationAt,
+        hasContractFile: !!p.contractFilePath,
+        hasSelfDeclarationFile: !!p.selfDeclarationFilePath,
         location: p.profileAssignments[0]?.location ?? null,
         confirmedDocs: p._count.readConfirmations,
       })),
     };
   }),
+
+  // HR/ADMIN: signert opplastings-URL for oppdragsavtale/egenerklæring.
+  getContractorUploadUrl: hrProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        kind: z.enum(["contract", "selfDeclaration"]),
+        fileName: z.string().min(1).max(255),
+        sizeBytes: z.number().int().positive().max(20 * 1024 * 1024, { message: "Maks 20 MB" }),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const safe = sanitizeFileName(input.fileName);
+      const filePath = `contractor/${input.id}/${input.kind}/${createId()}-${safe}`;
+      const admin = createAdminClient();
+      const { data, error } = await admin.storage
+        .from(FINANCIAL_CONTRACTS_BUCKET)
+        .createSignedUploadUrl(filePath, { upsert: false });
+      if (error || !data) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error?.message ?? "Kunne ikke opprette opplastings-URL." });
+      }
+      return { signedUrl: data.signedUrl, token: data.token, filePath };
+    }),
+
+  // HR/ADMIN: lagre filsti etter opplasting + sett dato som mottatt.
+  setContractorFile: hrProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        kind: z.enum(["contract", "selfDeclaration"]),
+        filePath: z.string().min(1).max(500),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const now = new Date();
+      const data =
+        input.kind === "contract"
+          ? { contractFilePath: input.filePath, contractSignedAt: now }
+          : { selfDeclarationFilePath: input.filePath, selfDeclarationAt: now };
+      return ctx.db.profile.update({ where: { id: input.id }, data });
+    }),
+
+  // HR/ADMIN: signert nedlastings-URL for opplastet dokument.
+  getContractorFileUrl: hrProcedure
+    .input(z.object({ id: z.string(), kind: z.enum(["contract", "selfDeclaration"]) }))
+    .mutation(async ({ ctx, input }) => {
+      const p = await ctx.db.profile.findUnique({
+        where: { id: input.id },
+        select: { contractFilePath: true, selfDeclarationFilePath: true },
+      });
+      const path = input.kind === "contract" ? p?.contractFilePath : p?.selfDeclarationFilePath;
+      if (!path) throw new TRPCError({ code: "NOT_FOUND", message: "Ingen fil lastet opp." });
+      const admin = createAdminClient();
+      const { data, error } = await admin.storage
+        .from(FINANCIAL_CONTRACTS_BUCKET)
+        .createSignedUrl(path, 300);
+      if (error || !data) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error?.message ?? "Kunne ikke generere nedlastings-URL." });
+      }
+      return { signedUrl: data.signedUrl };
+    }),
 
   // HR/ADMIN: marker kontrakt eller egenerklæring som mottatt/ikke mottatt.
   setContractorDoc: hrProcedure
@@ -77,9 +143,14 @@ export const profileRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // Når man avmarkerer, fjern også eventuell opplastet fil.
+      const fileField = input.field === "contractSignedAt" ? "contractFilePath" : "selfDeclarationFilePath";
       return ctx.db.profile.update({
         where: { id: input.id },
-        data: { [input.field]: input.received ? new Date() : null },
+        data: {
+          [input.field]: input.received ? new Date() : null,
+          ...(input.received ? {} : { [fileField]: null }),
+        },
       });
     }),
 
