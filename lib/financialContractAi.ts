@@ -81,6 +81,19 @@ export async function extractFinancialContract(
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+  // Trekk ut tekstlaget fra PDF-en. Maskinlesbar tekst gir langt mer presis og
+  // deterministisk ekstraksjon enn visuell lesing av en skannet/bilde-PDF.
+  let pdfText = "";
+  try {
+    const { PDFParse } = await import("pdf-parse");
+    const parser = new PDFParse({ data: Buffer.from(pdfBase64, "base64") });
+    const result = await parser.getText();
+    pdfText = (result.text ?? "").trim();
+  } catch {
+    // Faller tilbake til visuell lesing nedenfor.
+  }
+  const hasText = pdfText.length > 120;
+
   try {
     const response = await client.chat.completions.create({
       model: MODEL,
@@ -89,20 +102,25 @@ export async function extractFinancialContract(
       max_tokens: 2000,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: [
-            {
-              // PDF som fil-innhold (støttes av gpt-4o-modellene).
-              type: "file",
-              file: {
-                filename: "kontrakt.pdf",
-                file_data: `data:application/pdf;base64,${pdfBase64}`,
-              },
+        hasText
+          ? {
+              role: "user",
+              content: `${USER_PROMPT}\n\nKONTRAKTTEKST (trukket ut fra PDF):\n"""\n${pdfText}\n"""`,
+            }
+          : {
+              role: "user",
+              content: [
+                {
+                  // Fallback: send PDF visuelt hvis tekstlaget mangler (skannet).
+                  type: "file",
+                  file: {
+                    filename: "kontrakt.pdf",
+                    file_data: `data:application/pdf;base64,${pdfBase64}`,
+                  },
+                },
+                { type: "text", text: USER_PROMPT },
+              ] as unknown as never,
             },
-            { type: "text", text: USER_PROMPT },
-          ] as unknown as never,
-        },
       ],
     });
 
