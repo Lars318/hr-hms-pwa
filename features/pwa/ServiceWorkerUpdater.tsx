@@ -1,30 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 
 /**
  * Oppdager når en ny service worker (= ny app-versjon) er klar, og laster
- * siden på nytt slik at brukeren får siste kode uten å måtte drepe PWA-en.
+ * siden på nytt slik at brukeren får siste kode uten å logge ut/inn.
  *
- * To deler:
- *  1. `controllerchange` → ny SW har tatt kontroll (skipWaiting er på i
- *     next.config). Vi laster da automatisk én gang, beskyttet mot loop.
- *  2. `updatefound` → viser en diskret stripe slik at brukeren vet hva som
- *     skjer, og kan trykke for å oppdatere umiddelbart.
- *
- * I tillegg sjekkes det periodisk + ved fokus om det finnes en ny versjon,
- * slik at en app som står åpen lenge også fanger opp nye deployer.
+ * Nøkkelen er å sjekke etter oppdatering OFTE:
+ *  - ved hver side-navigasjon i appen (usePathname)
+ *  - hvert 2. minutt
+ *  - når appen får fokus igjen
+ * Når en ny SW aktiveres (skipWaiting er på) fyrer `controllerchange`, og vi
+ * laster automatisk én gang. En stripe vises også som fallback/varsel.
  */
 export function ServiceWorkerUpdater() {
   const [updateReady, setUpdateReady] = useState(false);
+  const regRef = useRef<ServiceWorkerRegistration | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
 
     let reloading = false;
-
-    // 1. Ny SW har tatt kontroll → last på nytt (kun én gang).
     const onControllerChange = () => {
       if (reloading) return;
       reloading = true;
@@ -32,16 +31,12 @@ export function ServiceWorkerUpdater() {
     };
     navigator.serviceWorker.addEventListener("controllerchange", onControllerChange);
 
-    let registration: ServiceWorkerRegistration | undefined;
-
     navigator.serviceWorker.ready.then((reg) => {
-      registration = reg;
+      regRef.current = reg;
 
-      // 2. Følg med på nye workers som installeres.
       const trackInstalling = (worker: ServiceWorker | null) => {
         if (!worker) return;
         worker.addEventListener("statechange", () => {
-          // "installed" + en aktiv controller = oppdatering (ikke første gang).
           if (worker.state === "installed" && navigator.serviceWorker.controller) {
             setUpdateReady(true);
           }
@@ -51,13 +46,13 @@ export function ServiceWorkerUpdater() {
       if (reg.waiting && navigator.serviceWorker.controller) setUpdateReady(true);
       trackInstalling(reg.installing);
       reg.addEventListener("updatefound", () => trackInstalling(reg.installing));
+      reg.update().catch(() => {});
     });
 
-    // 3. Sjekk etter ny versjon jevnlig og når appen får fokus igjen.
-    const checkForUpdate = () => registration?.update().catch(() => {});
-    const interval = setInterval(checkForUpdate, 60 * 60 * 1000); // hver time
+    const check = () => regRef.current?.update().catch(() => {});
+    const interval = setInterval(check, 2 * 60 * 1000); // hvert 2. minutt
     const onVisible = () => {
-      if (document.visibilityState === "visible") checkForUpdate();
+      if (document.visibilityState === "visible") check();
     };
     document.addEventListener("visibilitychange", onVisible);
 
@@ -68,9 +63,12 @@ export function ServiceWorkerUpdater() {
     };
   }, []);
 
+  // Sjekk etter ny versjon ved hver navigasjon i appen.
+  useEffect(() => {
+    regRef.current?.update().catch(() => {});
+  }, [pathname]);
+
   function applyUpdate() {
-    // Be ventende SW om å aktivere. Med skipWaiting:true skjer dette uansett,
-    // men vi trigger reload direkte for umiddelbar effekt.
     navigator.serviceWorker.getRegistration().then((reg) => {
       reg?.waiting?.postMessage({ type: "SKIP_WAITING" });
       window.location.reload();
