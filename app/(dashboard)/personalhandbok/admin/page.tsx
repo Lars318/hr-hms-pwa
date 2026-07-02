@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { HandbookAdminTable } from "@/features/handbook/HandbookAdminTable";
+import { HandbookPdf } from "@/features/handbook/HandbookPdf";
 import { HandbookPublishButton } from "@/features/handbook/HandbookPublishButton";
 import { HandbookReadStatus } from "@/features/handbook/HandbookReadStatus";
 
@@ -40,6 +41,12 @@ export default async function PersonalhandbokAdminPage() {
           </Link>
         </Button>
       </div>
+
+      {/* Opplastet PDF */}
+      <section className="space-y-3">
+        <h2 className="text-base font-semibold">Last opp håndbok (PDF)</h2>
+        <HandbookPdf canEdit />
+      </section>
 
       {/* Kapitteloversikt */}
       <section className="space-y-3">

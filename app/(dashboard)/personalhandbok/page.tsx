@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { HandbookNav } from "@/features/handbook/HandbookNav";
 import { HandbookReadBanner } from "@/features/handbook/HandbookReadBanner";
+import { HandbookPdf } from "@/features/handbook/HandbookPdf";
 import { BookOpen } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -54,6 +55,9 @@ export default async function PersonalhandbokPage() {
           </Link>
         )}
       </div>
+
+      {/* Opplastet PDF-håndbok (vises hvis den finnes) */}
+      <HandbookPdf />
 
       {/* Lesebanner — klientside */}
       {latestVersion && <HandbookReadBanner />}

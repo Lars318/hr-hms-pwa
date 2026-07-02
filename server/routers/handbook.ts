@@ -1,9 +1,62 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
+import { createId } from "@paralleldrive/cuid2";
 import { router, profileProcedure, hrProcedure } from "@/server/trpc/trpc";
 import { notifyAllActive } from "@/lib/notifications";
+import { createAdminClient, FINANCIAL_CONTRACTS_BUCKET, sanitizeFileName } from "@/lib/supabase/admin";
 
 export const handbookRouter = router({
+  // ── Opplastet personalhåndbok (PDF) ──────────────────────────────────────
+  currentDocument: profileProcedure.query(async ({ ctx }) => {
+    return ctx.db.handbookDocument.findFirst({ orderBy: { createdAt: "desc" } });
+  }),
+
+  getDocumentUploadUrl: hrProcedure
+    .input(
+      z.object({
+        fileName: z.string().min(1).max(255),
+        sizeBytes: z.number().int().positive().max(30 * 1024 * 1024, { message: "Maks 30 MB" }),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const safe = sanitizeFileName(input.fileName);
+      const filePath = `handbook/${createId()}-${safe}`;
+      const admin = createAdminClient();
+      const { data, error } = await admin.storage
+        .from(FINANCIAL_CONTRACTS_BUCKET)
+        .createSignedUploadUrl(filePath, { upsert: false });
+      if (error || !data) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error?.message ?? "Kunne ikke opprette opplastings-URL." });
+      }
+      return { signedUrl: data.signedUrl, token: data.token, filePath };
+    }),
+
+  saveDocument: hrProcedure
+    .input(z.object({ fileName: z.string().min(1).max(255), filePath: z.string().min(1).max(500), sizeBytes: z.number().int().positive() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.handbookDocument.create({
+        data: { fileName: input.fileName, filePath: input.filePath, sizeBytes: input.sizeBytes, uploadedById: ctx.profile.id },
+      });
+    }),
+
+  getDocumentUrl: profileProcedure.mutation(async ({ ctx }) => {
+    const doc = await ctx.db.handbookDocument.findFirst({ orderBy: { createdAt: "desc" } });
+    if (!doc) throw new TRPCError({ code: "NOT_FOUND", message: "Ingen personalhåndbok lastet opp." });
+    const admin = createAdminClient();
+    const { data, error } = await admin.storage.from(FINANCIAL_CONTRACTS_BUCKET).createSignedUrl(doc.filePath, 300);
+    if (error || !data) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error?.message ?? "Kunne ikke lage nedlastings-URL." });
+    }
+    return { signedUrl: data.signedUrl, fileName: doc.fileName };
+  }),
+
+  deleteDocument: hrProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.handbookDocument.delete({ where: { id: input.id } });
+      return { success: true };
+    }),
+
   // ── Liste alle kategorier med seksjoner ──────────────────────────────────
   listCategories: profileProcedure.query(async ({ ctx }) => {
     return ctx.db.handbookCategory.findMany({

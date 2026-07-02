@@ -38,7 +38,7 @@ export function LeaveListClient({ viewerRole }: LeaveListClientProps) {
       {isLoading ? (
         <><div className="md:hidden"><ListCardSkeleton count={4} /></div><div className="hidden md:block"><TableSkeleton rows={5} cols={5} /></div></>
       ) : (
-        <LeaveRequestTable requests={requests} showEmployee={showEmployee} />
+        <LeaveRequestTable requests={requests} showEmployee={showEmployee} canAdminDelete={viewerRole === "ADMIN"} />
       )}
       <p className="text-xs text-muted-foreground">{requests.length} søknad{requests.length !== 1 ? "er" : ""}</p>
     </div>

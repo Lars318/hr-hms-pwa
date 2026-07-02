@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { router, profileProcedure } from "@/server/trpc/trpc";
+import { router, profileProcedure, adminProcedure } from "@/server/trpc/trpc";
 import { assertNotContractor } from "@/server/trpc/guards";
 import {
   createNotification,
@@ -556,6 +556,33 @@ export const leaveRequestRouter = router({
       }
 
       return updated;
+    }),
+
+  // ADMIN: slett en fraværssøknad permanent, uansett status (også godkjent
+  // egenmelding/ferie). Brukes til å rydde feilregistreringer.
+  adminDelete: adminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { profile, db } = ctx;
+      const req = await db.leaveRequest.findUnique({
+        where: { id: input.id },
+        include: { employee: { select: { fullName: true } } },
+      });
+      if (!req) throw new TRPCError({ code: "NOT_FOUND", message: "Fravær ikke funnet." });
+
+      await db.leaveRequest.delete({ where: { id: input.id } });
+
+      await db.auditLog.create({
+        data: {
+          entityType: "LeaveRequest",
+          entityId: req.id,
+          action: "LEAVE_REQUEST_ADMIN_DELETED",
+          actorId: profile.id,
+          metadata: { type: req.type, status: req.status, employee: req.employee.fullName },
+        },
+      });
+
+      return { success: true };
     }),
 });
 

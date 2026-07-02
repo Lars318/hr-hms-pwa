@@ -4,6 +4,7 @@ import { nb } from "date-fns/locale";
 import { ChevronRight } from "lucide-react";
 import { LeaveRequestStatusBadge } from "./LeaveRequestStatusBadge";
 import { LeaveRequestTypeBadge } from "./LeaveRequestTypeBadge";
+import { AdminDeleteLeaveButton } from "./AdminDeleteLeaveButton";
 import type { LeaveRequestStatus, LeaveRequestType } from "@prisma/client";
 
 interface LeaveRow {
@@ -20,9 +21,10 @@ interface LeaveRow {
 interface LeaveRequestTableProps {
   requests: LeaveRow[];
   showEmployee?: boolean;
+  canAdminDelete?: boolean;
 }
 
-export function LeaveRequestTable({ requests, showEmployee = false }: LeaveRequestTableProps) {
+export function LeaveRequestTable({ requests, showEmployee = false, canAdminDelete = false }: LeaveRequestTableProps) {
   if (requests.length === 0) {
     return (
       <div className="rounded-md border">
@@ -48,7 +50,10 @@ export function LeaveRequestTable({ requests, showEmployee = false }: LeaveReque
                     <LeaveRequestStatusBadge status={r.status} />
                   </div>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 mt-1" />
+                <div className="flex items-center gap-1 shrink-0 mt-1">
+                  {canAdminDelete && <AdminDeleteLeaveButton requestId={r.id} />}
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </div>
               </div>
               <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground min-w-0">
                 <span>
@@ -77,6 +82,7 @@ export function LeaveRequestTable({ requests, showEmployee = false }: LeaveReque
               <th className="px-4 py-3 text-left font-medium">Dager</th>
               <th className="px-4 py-3 text-left font-medium">Status</th>
               <th className="px-4 py-3 text-left font-medium">Avdeling</th>
+              {canAdminDelete && <th className="px-4 py-3 w-10" />}
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -102,6 +108,11 @@ export function LeaveRequestTable({ requests, showEmployee = false }: LeaveReque
                 <td className="px-4 py-3 text-muted-foreground">
                   {r.department?.name ?? "—"}
                 </td>
+                {canAdminDelete && (
+                  <td className="px-4 py-3">
+                    <AdminDeleteLeaveButton requestId={r.id} />
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

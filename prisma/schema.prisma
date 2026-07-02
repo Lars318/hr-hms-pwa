@@ -769,6 +769,18 @@ model HandbookVersion {
   @@index([publishedById])
 }
 
+// Opplastet personalhåndbok (PDF) — alternativ/tillegg til seksjonsbasert.
+model HandbookDocument {
+  id           String   @id @default(cuid())
+  fileName     String
+  filePath     String
+  sizeBytes    Int
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model HandbookAcknowledgement {
   id             String   @id @default(cuid())
   acknowledgedAt DateTime @default(now())
