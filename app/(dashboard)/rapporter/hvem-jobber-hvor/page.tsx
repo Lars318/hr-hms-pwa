@@ -68,6 +68,16 @@ export default async function HvemJobberHvorPage() {
         />
       </div>
 
+      {sortedGroups.length === 0 && (
+        <div className="rounded-2xl border bg-card p-10 text-center space-y-1">
+          <Users className="h-10 w-10 text-muted-foreground/40 mx-auto mb-2" />
+          <p className="font-medium">Ingen ansatte å vise ennå</p>
+          <p className="text-sm text-muted-foreground">
+            Importer eller opprett ansatte, og knytt dem til en lokasjon — så dukker de opp her.
+          </p>
+        </div>
+      )}
+
       <div className="space-y-5">
         {sortedGroups.map((g) => (
           <div key={g.name} className="rounded-2xl border bg-card overflow-hidden">

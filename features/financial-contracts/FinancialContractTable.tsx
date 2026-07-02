@@ -104,9 +104,12 @@ export function FinancialContractTable({
             <tr>
               <td
                 colSpan={7}
-                className="px-4 py-10 text-center text-muted-foreground"
+                className="px-4 py-12 text-center"
               >
-                Ingen kontrakter funnet.
+                <p className="text-sm font-medium text-foreground">Ingen kontrakter ennå</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Trykk «Ny kontrakt» øverst for å registrere den første — eller last opp en PDF og la AI fylle ut feltene.
+                </p>
               </td>
             </tr>
           ) : (
