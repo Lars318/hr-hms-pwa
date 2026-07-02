@@ -90,6 +90,8 @@ export function NewFinancialContractDialog({
   const [uploading, setUploading] = useState(false);
   const [extracting, setExtracting] = useState(false);
   const [aiWarnings, setAiWarnings] = useState<string[]>([]);
+  const [aiConfidence, setAiConfidence] = useState<"high" | "medium" | "low" | null>(null);
+  const [aiFilled, setAiFilled] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const getUploadUrl = trpc.financialContract.getUploadUrl.useMutation();
@@ -109,6 +111,8 @@ export function NewFinancialContractDialog({
     setUploadedPath(undefined);
     setUploadedFile(undefined);
     setAiWarnings([]);
+    setAiConfidence(null);
+    setAiFilled(false);
     setError(null);
   }
 
@@ -199,6 +203,10 @@ export function NewFinancialContractDialog({
       if (ex.warnings?.length) setAiWarnings(ex.warnings);
       else if (Object.keys(ex).length === 0)
         setAiWarnings(["AI-ekstraksjon er ikke aktivert på serveren."]);
+      if (Object.keys(ex).length > 0) {
+        setAiFilled(true);
+        setAiConfidence(ex.confidence ?? null);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "AI-ekstraksjon feilet.");
     } finally {
@@ -318,6 +326,25 @@ export function NewFinancialContractDialog({
                 <li key={i}>{w}</li>
               ))}
             </ul>
+          )}
+          {aiFilled && (
+            <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/5 p-2.5 text-xs">
+              <Sparkles className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <p className="font-medium text-foreground">
+                  Kontroller feltene før du lagrer.
+                </p>
+                <p className="text-muted-foreground">
+                  AI-en kan lese enkeltverdier feil{aiConfidence && (
+                    <> — sikkerhet: <span className={
+                      aiConfidence === "high" ? "text-green-600 font-medium"
+                      : aiConfidence === "medium" ? "text-amber-600 font-medium"
+                      : "text-red-600 font-medium"
+                    }>{aiConfidence === "high" ? "høy" : aiConfidence === "medium" ? "middels" : "lav"}</span></>
+                  )}.
+                </p>
+              </div>
+            </div>
           )}
         </div>
 
