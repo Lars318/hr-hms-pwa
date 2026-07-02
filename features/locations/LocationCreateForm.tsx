@@ -13,6 +13,7 @@ export function LocationCreateForm() {
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [organizationName, setOrganizationName] = useState("");
+  const [staffed, setStaffed] = useState(true);
   const [error, setError] = useState("");
 
   const create = trpc.location.create.useMutation();
@@ -26,6 +27,7 @@ export function LocationCreateForm() {
         address: address || undefined,
         city: city || undefined,
         organizationName: organizationName || undefined,
+        staffed,
       });
       router.push(`/lokasjoner/${loc.id}`);
       router.refresh();
@@ -54,6 +56,31 @@ export function LocationCreateForm() {
             <Label htmlFor="city">By</Label>
             <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ski" />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Bemanning</Label>
+          <div className="flex gap-2">
+            {[
+              { v: true, label: "Bemannet", desc: "Har egne ansatte" },
+              { v: false, label: "Ubemannet", desc: "Ingen fast bemanning / kun selvstendige" },
+            ].map((opt) => (
+              <button
+                key={String(opt.v)}
+                type="button"
+                onClick={() => setStaffed(opt.v)}
+                className={`flex-1 text-left rounded-xl border p-3 transition-colors ${
+                  staffed === opt.v ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                }`}
+              >
+                <p className="text-sm font-medium">{opt.label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{opt.desc}</p>
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Ubemannede lokasjoner krever ikke verneombud/HMS-ansvarlig på samme måte.
+          </p>
         </div>
       </div>
 

@@ -226,6 +226,9 @@ model Location {
   city             String?
   country          String  @default("Norge")
   organizationName String?
+  // Bemannet = har egne ansatte. Ubemannet = kun selvstendige/ingen fast
+  // bemanning (trenger f.eks. ikke verneombud/HMS-ansvarlig på samme måte).
+  staffed          Boolean @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

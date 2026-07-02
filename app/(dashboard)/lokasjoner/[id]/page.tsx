@@ -60,7 +60,14 @@ export default async function LokasjonDetailPage({ params }: { params: { id: str
             <MapPin className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">{location.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold tracking-tight">{location.name}</h1>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                location.staffed ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"
+              }`}>
+                {location.staffed ? "Bemannet" : "Ubemannet"}
+              </span>
+            </div>
             {location.city && (
               <p className="text-sm text-muted-foreground">
                 {location.address ? `${location.address}, ` : ""}{location.city}
@@ -82,6 +89,11 @@ export default async function LokasjonDetailPage({ params }: { params: { id: str
       <div className="rounded-2xl border bg-card divide-y">
         <div className="px-4 py-3">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Nøkkelpersoner</p>
+          {!location.staffed && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Ubemannet lokasjon — verneombud/HMS-ansvarlig er ikke påkrevd.
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-3 px-4 py-3.5 min-h-[56px]">
           <Shield className="h-4 w-4 text-muted-foreground shrink-0" />

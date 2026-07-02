@@ -74,6 +74,7 @@ export const locationRouter = router({
         city: z.string().optional(),
         country: z.string().optional(),
         organizationName: z.string().optional(),
+        staffed: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -89,6 +90,7 @@ export const locationRouter = router({
         city: z.string().optional(),
         country: z.string().optional(),
         organizationName: z.string().optional(),
+        staffed: z.boolean().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {

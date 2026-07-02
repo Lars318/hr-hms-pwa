@@ -76,7 +76,14 @@ export default async function LokasjonerPage() {
               </div>
 
               <div>
-                <p className="font-semibold">{loc.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold">{loc.name}</p>
+                  {!loc.staffed && (
+                    <span className="rounded-full bg-muted text-muted-foreground px-2 py-0.5 text-[10px] font-medium">
+                      Ubemannet
+                    </span>
+                  )}
+                </div>
                 {loc.city && <p className="text-sm text-muted-foreground">{loc.address ? `${loc.address}, ` : ""}{loc.city}</p>}
               </div>
 

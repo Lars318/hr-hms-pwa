@@ -21,6 +21,7 @@ interface LocationProps {
   city: string | null;
   country: string;
   organizationName: string | null;
+  staffed: boolean;
   safetyRepresentativeId: string | null;
   hseManagerId: string | null;
   safetyRepresentative: { id: string; fullName: string } | null;
@@ -38,6 +39,7 @@ export function LocationEditForm({ location, profiles }: Props) {
   const [address, setAddress] = useState(location.address ?? "");
   const [city, setCity] = useState(location.city ?? "");
   const [organizationName, setOrganizationName] = useState(location.organizationName ?? "");
+  const [staffed, setStaffed] = useState(location.staffed);
   const [safetyRepId, setSafetyRepId] = useState(location.safetyRepresentativeId ?? "");
   const [hseManagerId, setHseManagerId] = useState(location.hseManagerId ?? "");
   const [error, setError] = useState("");
@@ -51,7 +53,7 @@ export function LocationEditForm({ location, profiles }: Props) {
     setError("");
     try {
       await Promise.all([
-        update.mutateAsync({ id: location.id, name, address: address || undefined, city: city || undefined, organizationName: organizationName || undefined }),
+        update.mutateAsync({ id: location.id, name, address: address || undefined, city: city || undefined, organizationName: organizationName || undefined, staffed }),
         setSafetyRep.mutateAsync({ locationId: location.id, profileId: safetyRepId || null }),
         setHseMgr.mutateAsync({ locationId: location.id, profileId: hseManagerId || null }),
       ]);
@@ -85,10 +87,37 @@ export function LocationEditForm({ location, profiles }: Props) {
             <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ski" />
           </div>
         </div>
+
+        <div className="space-y-2">
+          <Label>Bemanning</Label>
+          <div className="flex gap-2">
+            {[
+              { v: true, label: "Bemannet", desc: "Har egne ansatte" },
+              { v: false, label: "Ubemannet", desc: "Ingen fast bemanning / kun selvstendige" },
+            ].map((opt) => (
+              <button
+                key={String(opt.v)}
+                type="button"
+                onClick={() => setStaffed(opt.v)}
+                className={`flex-1 text-left rounded-xl border p-3 transition-colors ${
+                  staffed === opt.v ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                }`}
+              >
+                <p className="text-sm font-medium">{opt.label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{opt.desc}</p>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="space-y-4 rounded-2xl border bg-card p-5">
         <p className="text-sm font-semibold">Nøkkelpersoner</p>
+        {!staffed && (
+          <p className="text-xs text-muted-foreground -mt-2">
+            Ubemannet lokasjon — verneombud/HMS-ansvarlig er valgfritt.
+          </p>
+        )}
         <div className="space-y-2">
           <Label htmlFor="safetyRep">Verneombud</Label>
           <select
