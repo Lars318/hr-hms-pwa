@@ -44,7 +44,7 @@ export function QuickEgenmelding() {
       className="w-full h-12 text-base gap-2 bg-accent hover:bg-accent/90 text-accent-foreground"
     >
       <HeartPulse className="h-5 w-5" />
-      {mutation.isPending ? "Registrerer…" : "Jeg er syk i dag"}
+      {mutation.isPending ? "Registrerer…" : "Egenmelding"}
     </Button>
   );
 }
