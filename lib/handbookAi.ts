@@ -15,20 +15,24 @@ export interface StructuredHandbook {
   warnings?: string[];
 }
 
-const MODEL = process.env.OPENAI_HANDBOOK_MODEL ?? "gpt-4o";
+const MODEL = process.env.OPENAI_HANDBOOK_MODEL ?? "gpt-4.1";
 
-const SYSTEM_PROMPT = `Du strukturerer en norsk personalhåndbok fra et dokument til kapitler og seksjoner for et intranett.
+const SYSTEM_PROMPT = `Du deler en norsk personalhåndbok inn i kapitler og seksjoner for et intranett.
 Returner KUN gyldig JSON: { "chapters": [ { "title": string, "description"?: string, "sections": [ { "title": string, "content": string } ] } ] }.
 
-Regler:
-- Del innholdet i logiske KAPITLER (f.eks. "Arbeidstid", "Ferie og fravær", "HMS", "Lønn", "Personalgoder").
-- Hvert kapittel har SEKSJONER med en tittel og innhold.
-- "content" skal være ren tekst / enkel markdown (avsnitt, punktlister med "- "). IKKE finn opp innhold – bruk KUN det som står i dokumentet, men rydd opp i formatering og fjern sidetall/topptekst/bunntekst.
-- Behold formuleringene mest mulig ordrett; du strukturerer, ikke omskriver.
-- Utelat rene forsider, innholdsfortegnelser og signaturfelter.
-- Bevar rekkefølgen fra dokumentet.`;
+ABSOLUTT VIKTIGST — ORDRETT GJENGIVELSE:
+- Gjengi teksten HELT ORDRETT, tegn for tegn, slik den står i dokumentet. IKKE omskriv, oppsummer, forkort, forbedre eller oversett.
+- IKKE gjett eller finn på noe. Er noe uleselig, skriv "[uleselig]" i stedet for å gjette.
+- Behold opprinnelig OPPSETT: samme overskrifter, avsnitt, rekkefølge, nummerering og punktlister som i PDF-en. Bruk markdown kun for å gjenskape det opprinnelige oppsettet (overskrifter, "- " for punkter, tall for nummererte lister).
+- Ikke legg til eller fjern innhold. Eneste unntak: rene gjentatte topptekster/bunntekster og sidetall (f.eks. firmanavn/adresse i sidefot) som ikke er en del av selve håndbokteksten, kan utelates.
 
-const USER_PROMPT = `Strukturer denne personalhåndboken til kapitler og seksjoner. Svar kun med JSON.`;
+STRUKTURERING (kun inndeling — ikke endring av tekst):
+- Bruk dokumentets EGNE overskrifter til å definere kapitler og seksjoner. Ikke finn på nye titler; bruk overskriftene som står der.
+- "title" for kapittel/seksjon = overskriften slik den står i dokumentet.
+- "content" = all brødtekst under den overskriften, ordrett.
+- Bevar den opprinnelige rekkefølgen nøyaktig.`;
+
+const USER_PROMPT = `Del denne personalhåndboken inn i kapitler og seksjoner basert på dokumentets egne overskrifter, og gjengi all tekst ORDRETT med samme oppsett. Svar kun med JSON.`;
 
 export function isHandbookAiEnabled(): boolean {
   return !!process.env.OPENAI_API_KEY;
@@ -60,8 +64,8 @@ export async function structureHandbook(pdfBase64: string): Promise<StructuredHa
     const response = await client.chat.completions.create({
       model: MODEL,
       response_format: { type: "json_object" },
-      temperature: 0.2,
-      max_tokens: 8000,
+      temperature: 0,
+      max_tokens: 16000,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         hasText
