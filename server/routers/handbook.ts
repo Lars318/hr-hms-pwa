@@ -4,6 +4,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { router, profileProcedure, hrProcedure } from "@/server/trpc/trpc";
 import { notifyAllActive } from "@/lib/notifications";
 import { createAdminClient, FINANCIAL_CONTRACTS_BUCKET, sanitizeFileName } from "@/lib/supabase/admin";
+import { structureHandbook } from "@/lib/handbookAi";
 
 export const handbookRouter = router({
   // ── Opplastet personalhåndbok (PDF) ──────────────────────────────────────
@@ -55,6 +56,54 @@ export const handbookRouter = router({
     .mutation(async ({ ctx, input }) => {
       await ctx.db.handbookDocument.delete({ where: { id: input.id } });
       return { success: true };
+    }),
+
+  // Les opplastet PDF med AI og bygg kapitler + seksjoner i appen.
+  importFromPdf: hrProcedure
+    .input(z.object({ filePath: z.string().min(1).max(500), replaceExisting: z.boolean().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      const admin = createAdminClient();
+      const { data, error } = await admin.storage.from(FINANCIAL_CONTRACTS_BUCKET).download(input.filePath);
+      if (error || !data) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Kunne ikke lese PDF: ${error?.message ?? "ukjent"}` });
+      }
+      const base64 = Buffer.from(await data.arrayBuffer()).toString("base64");
+      const structured = await structureHandbook(base64);
+      if (!structured.chapters.length) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: structured.warnings?.join(" ") || "AI klarte ikke å strukturere håndboken.",
+        });
+      }
+
+      // Erstatt eksisterende innhold hvis valgt (sletter seksjoner før kategorier
+      // pga. fremmednøkkel).
+      if (input.replaceExisting) {
+        await ctx.db.handbookSection.deleteMany({});
+        await ctx.db.handbookCategory.deleteMany({});
+      }
+
+      let chapters = 0;
+      let sections = 0;
+      for (let ci = 0; ci < structured.chapters.length; ci++) {
+        const ch = structured.chapters[ci];
+        if (!ch.title?.trim()) continue;
+        const cat = await ctx.db.handbookCategory.create({
+          data: { title: ch.title.trim().slice(0, 200), description: ch.description?.trim()?.slice(0, 500) || null, order: ci },
+        });
+        chapters++;
+        const secs = ch.sections ?? [];
+        for (let si = 0; si < secs.length; si++) {
+          const s = secs[si];
+          if (!s.title?.trim() || !s.content?.trim()) continue;
+          await ctx.db.handbookSection.create({
+            data: { categoryId: cat.id, title: s.title.trim().slice(0, 200), content: s.content.trim(), order: si },
+          });
+          sections++;
+        }
+      }
+
+      return { chapters, sections, warnings: structured.warnings ?? [] };
     }),
 
   // ── Liste alle kategorier med seksjoner ──────────────────────────────────

@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
-import { FileText, Upload, Download, Trash2, Loader2 } from "lucide-react";
+import { FileText, Upload, Download, Trash2, Loader2, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { nb } from "date-fns/locale";
 
@@ -12,6 +12,16 @@ export function HandbookPdf({ canEdit = false }: { canEdit?: boolean }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [replaceExisting, setReplaceExisting] = useState(true);
+  const [importResult, setImportResult] = useState<string | null>(null);
+
+  const importPdf = trpc.handbook.importFromPdf.useMutation({
+    onSuccess: (r) => {
+      setImportResult(`Opprettet ${r.chapters} kapitler og ${r.sections} seksjoner.`);
+      utils.handbook.listCategories.invalidate();
+    },
+    onError: (e) => setError(e.message),
+  });
 
   const { data: doc, isLoading } = trpc.handbook.currentDocument.useQuery();
   const getUploadUrl = trpc.handbook.getDocumentUploadUrl.useMutation();
@@ -96,6 +106,30 @@ export function HandbookPdf({ canEdit = false }: { canEdit?: boolean }) {
           </Button>
         )}
       </div>
+
+      {/* AI-generering av kapitler/seksjoner fra PDF-en */}
+      {canEdit && doc && (
+        <div className="rounded-xl border bg-muted/20 p-3 space-y-2">
+          <p className="text-sm font-medium">Bygg håndboken i appen med AI</p>
+          <p className="text-xs text-muted-foreground">
+            AI leser PDF-en og lager kapitler og seksjoner du kan redigere etterpå.
+          </p>
+          <label className="flex items-center gap-2 text-xs">
+            <input type="checkbox" checked={replaceExisting}
+              onChange={(e) => setReplaceExisting(e.target.checked)}
+              className="h-3.5 w-3.5 rounded border-input" />
+            Erstatt eksisterende kapitler (anbefalt ved import)
+          </label>
+          <Button size="sm" disabled={importPdf.isPending}
+            onClick={() => { setImportResult(null); setError(null); importPdf.mutate({ filePath: doc.filePath, replaceExisting }); }}>
+            {importPdf.isPending
+              ? <><Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> Genererer… (kan ta et minutt)</>
+              : <><Sparkles className="h-4 w-4 mr-1.5" /> Generer kapitler med AI</>}
+          </Button>
+          {importResult && <p className="text-xs text-green-600">{importResult}</p>}
+        </div>
+      )}
+
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
