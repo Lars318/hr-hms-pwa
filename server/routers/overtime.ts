@@ -233,9 +233,9 @@ export const overtimeRouter = router({
     .input(z.object({ id: z.string(), note: z.string().max(500).optional() }))
     .mutation(async ({ ctx, input }) => {
       const { profile, db } = ctx;
-      const isHrAdmin = profile.role === "ADMIN" || profile.role === "HR";
-      const isManager = profile.role === "MANAGER";
-      if (!isHrAdmin && !isManager) throw new TRPCError({ code: "FORBIDDEN" });
+      // Overtid behandles av leder eller administrator — ikke HR.
+      const canApprove = profile.role === "ADMIN" || profile.role === "MANAGER";
+      if (!canApprove) throw new TRPCError({ code: "FORBIDDEN", message: "Kun leder eller administrator kan behandle overtid." });
 
       const entry = await db.overtimeEntry.findUnique({
         where: { id: input.id },
@@ -274,9 +274,9 @@ export const overtimeRouter = router({
     .input(z.object({ id: z.string(), note: z.string().min(1).max(500) }))
     .mutation(async ({ ctx, input }) => {
       const { profile, db } = ctx;
-      const isHrAdmin = profile.role === "ADMIN" || profile.role === "HR";
-      const isManager = profile.role === "MANAGER";
-      if (!isHrAdmin && !isManager) throw new TRPCError({ code: "FORBIDDEN" });
+      // Overtid behandles av leder eller administrator — ikke HR.
+      const canApprove = profile.role === "ADMIN" || profile.role === "MANAGER";
+      if (!canApprove) throw new TRPCError({ code: "FORBIDDEN", message: "Kun leder eller administrator kan behandle overtid." });
 
       const entry = await db.overtimeEntry.findUnique({ where: { id: input.id } });
       if (!entry) throw new TRPCError({ code: "NOT_FOUND" });

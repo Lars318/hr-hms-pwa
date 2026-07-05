@@ -29,10 +29,13 @@ interface QuickAction {
 function getQuickActions(role: Role): QuickAction[] {
   if (role === "MANAGER" || role === "HR" || role === "ADMIN") {
     return [
-      { label: "Nytt avvik",       href: "/avvik/ny",               icon: ShieldAlert, primary: true },
-      { label: "Ansatte",          href: "/ansatte",                icon: Users },
-      { label: "Godkjenn overtid", href: "/overtid/godkjenning",   icon: Clock },
-      { label: "Rapporter",        href: "/rapporter",             icon: BarChart2 },
+      { label: "Nytt avvik", href: "/avvik/ny", icon: ShieldAlert, primary: true },
+      { label: "Ansatte",    href: "/ansatte",  icon: Users },
+      // Overtid behandles av leder/administrator — ikke HR.
+      ...(role === "MANAGER" || role === "ADMIN"
+        ? [{ label: "Godkjenn overtid", href: "/overtid/godkjenning", icon: Clock }]
+        : []),
+      { label: "Rapporter",  href: "/rapporter", icon: BarChart2 },
     ];
   }
 

@@ -22,8 +22,19 @@ const profileUpdateSchema = z.object({
 });
 
 export const profileRouter = router({
-  // Innlogget bruker henter sin egen profil
-  me: profileProcedure.query(({ ctx }) => ctx.profile),
+  // Innlogget bruker henter sin egen profil (med primær lokasjon).
+  me: profileProcedure.query(async ({ ctx }) => {
+    return ctx.db.profile.findUnique({
+      where: { id: ctx.profile.id },
+      include: {
+        profileAssignments: {
+          where: { isPrimary: true, endDate: null },
+          select: { location: { select: { id: true, name: true, city: true } } },
+          take: 1,
+        },
+      },
+    });
+  }),
 
   // HR/ADMIN: oversikt over selvstendig næringsdrivende (oppdragstakere) med
   // kontrakt-/egenerklæring-status og HMS-dokumentbekreftelser.

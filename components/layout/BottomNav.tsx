@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, ShieldAlert, Plus, LogOut, X, Menu, UserCircle, ChevronDown,
+  CalendarDays, Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -91,6 +92,14 @@ function DrawerLink({
 export function BottomNav({ role, isContractor }: BottomNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [fabOpen, setFabOpen] = useState(false);
+
+  // Valg i «+»-menyen. Fravær/overtid skjules for selvstendig næringsdrivende.
+  const fabActions = [
+    { href: "/avvik/ny", label: "Nytt avvik", icon: ShieldAlert },
+    ...(!isContractor ? [{ href: "/fravaer/ny", label: "Ny fraværssøknad", icon: CalendarDays }] : []),
+    ...(!isContractor ? [{ href: "/overtid/ny", label: "Ny overtid", icon: Clock }] : []),
+  ];
 
   const isActive = (href: string) =>
     pathname === href || (href !== "/dashboard" && pathname.startsWith(href + "/"));
@@ -183,6 +192,28 @@ export function BottomNav({ role, isContractor }: BottomNavProps) {
         </div>
       </div>
 
+      {/* ── «+»-meny ─────────────────────────────────────────────────────── */}
+      {fabOpen && (
+        <>
+          <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setFabOpen(false)} aria-hidden="true" />
+          <div className="lg:hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-50 w-60 rounded-2xl border bg-card p-2 shadow-xl">
+            {fabActions.map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setFabOpen(false)}
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-muted transition-colors"
+              >
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Icon className="h-4 w-4 text-primary" />
+                </div>
+                <span className="text-sm font-medium">{label}</span>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+
       {/* ── Navigasjonslinje ─────────────────────────────────────────────── */}
       <nav className="lg:hidden fixed bottom-0 inset-x-0 z-50 border-t bg-card safe-area-inset-bottom">
         <div className="flex items-center justify-around h-16 px-2">
@@ -211,17 +242,22 @@ export function BottomNav({ role, isContractor }: BottomNavProps) {
             <span className="text-[10px] font-medium">Avvik</span>
           </Link>
 
-          {/* Ny avvik — primærknapp */}
-          <Link
-            href="/avvik/ny"
+          {/* Ny — åpner meny med valg */}
+          <button
+            type="button"
+            onClick={() => setFabOpen((v) => !v)}
             className="flex flex-col items-center gap-0.5 -mt-4"
-            aria-label="Nytt avvik"
+            aria-label="Ny …"
+            aria-expanded={fabOpen}
           >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
+            <span className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform",
+              fabOpen && "rotate-45"
+            )}>
               <Plus className="h-6 w-6" />
             </span>
             <span className="text-[10px] font-medium text-muted-foreground mt-0.5">Ny</span>
-          </Link>
+          </button>
 
           {/* Min profil */}
           <Link

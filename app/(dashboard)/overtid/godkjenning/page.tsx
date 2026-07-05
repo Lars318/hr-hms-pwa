@@ -13,7 +13,8 @@ export default async function OvertidGodkjenningPage() {
   const profile = await db.profile.findUnique({ where: { supabaseUserId: user.id } });
   if (!profile) redirect("/ingen-tilgang");
 
-  const canApprove = ["ADMIN", "HR", "MANAGER"].includes(profile.role);
+  // Overtid godkjennes av leder/administrator — ikke HR.
+  const canApprove = ["ADMIN", "MANAGER"].includes(profile.role);
   if (!canApprove) redirect("/overtid");
 
   return (
