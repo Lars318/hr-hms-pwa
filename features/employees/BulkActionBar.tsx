@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
-import { Loader2, X, Check } from "lucide-react";
+import { Loader2, X, Check, Mail } from "lucide-react";
 import type { Department, Location } from "@prisma/client";
 
 interface Props {
@@ -27,12 +27,21 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
 
   const effectiveTitle = titleSelect === "__custom__" ? customTitle.trim() : titleSelect;
 
+  const [inviteResult, setInviteResult] = useState<{ sent: number; errors: number } | null>(null);
+
   const bulk = trpc.profile.bulkUpdate.useMutation({
     onSuccess: () => {
       utils.profile.list.invalidate();
       utils.department.list.invalidate();
       reset();
       onDone();
+    },
+  });
+
+  const invite = trpc.profile.invite.useMutation({
+    onSuccess: (r) => {
+      setInviteResult({ sent: r.sent, errors: r.errors });
+      utils.profile.list.invalidate();
     },
   });
 
@@ -127,9 +136,26 @@ export function BulkActionBar({ selectedIds, departments, locations, onDone, onC
           {bulk.isPending ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Check className="h-4 w-4 mr-1.5" />}
           Bruk på {selectedIds.length}
         </Button>
+
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-9"
+          disabled={invite.isPending}
+          onClick={() => { setInviteResult(null); invite.mutate({ ids: selectedIds }); }}
+        >
+          {invite.isPending ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : <Mail className="h-4 w-4 mr-1.5" />}
+          Send invitasjon
+        </Button>
       </div>
 
       {bulk.error && <p className="text-sm text-destructive">{bulk.error.message}</p>}
+      {invite.error && <p className="text-sm text-destructive">{invite.error.message}</p>}
+      {inviteResult && (
+        <p className="text-sm text-green-600">
+          Invitasjon sendt til {inviteResult.sent}{inviteResult.errors > 0 ? ` (${inviteResult.errors} feilet)` : ""}.
+        </p>
+      )}
     </div>
   );
 }

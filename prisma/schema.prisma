@@ -329,6 +329,7 @@ model Profile {
   selfDeclarationAt       DateTime?
   contractFilePath        String?   // opplastet oppdragsavtale (privat storage)
   selfDeclarationFilePath String?   // opplastet egenerklæring (privat storage)
+  invitedAt               DateTime? // når invitasjons-e-post sist ble sendt
   title          String?
   phone          String?
   avatarUrl      String?
