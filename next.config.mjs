@@ -105,7 +105,8 @@ const cspDirectives = [
   // Next.js requires unsafe-inline for hydration scripts in App Router
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  // Bilder: egne + Supabase storage (avatarer) + dicebear-fallback.
+  `img-src 'self' data: blob: https://${supabaseHost} https://api.dicebear.com`,
   "font-src 'self'",
   // Supabase (REST, realtime, auth, storage)
   `connect-src 'self' https://${supabaseHost} wss://${supabaseHost}`,

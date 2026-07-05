@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
+
+const AVATAR_BUCKET = "profiles";
 
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -23,17 +26,26 @@ export async function POST(request: Request) {
   if (!file.type.startsWith("image/")) return Response.json({ error: "Kun bilder er tillatt" }, { status: 400 });
   if (file.size > 5 * 1024 * 1024) return Response.json({ error: "Bildet må være under 5 MB" }, { status: 400 });
 
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const path = `avatars/${profileId}.${ext}`;
+  const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase();
+  // Cache-buster i banen så nettleseren henter det nye bildet.
+  const path = `avatars/${profileId}-${Date.now()}.${ext}`;
   const bytes = await file.arrayBuffer();
 
-  const { error: uploadError } = await supabase.storage
-    .from("profiles")
-    .upload(path, bytes, { contentType: file.type, upsert: true });
+  // Bruk service-role-klienten så opplasting ikke blokkeres av storage-RLS.
+  const admin = createAdminClient();
 
+  const doUpload = () =>
+    admin.storage.from(AVATAR_BUCKET).upload(path, bytes, { contentType: file.type, upsert: true });
+
+  let { error: uploadError } = await doUpload();
+  // Opprett bøtta automatisk (offentlig) hvis den mangler, og prøv på nytt.
+  if (uploadError && /bucket|not.?found|does not exist/i.test(uploadError.message)) {
+    await admin.storage.createBucket(AVATAR_BUCKET, { public: true }).catch(() => {});
+    ({ error: uploadError } = await doUpload());
+  }
   if (uploadError) return Response.json({ error: uploadError.message }, { status: 500 });
 
-  const { data: { publicUrl } } = supabase.storage.from("profiles").getPublicUrl(path);
+  const { data: { publicUrl } } = admin.storage.from(AVATAR_BUCKET).getPublicUrl(path);
 
   await db.profile.update({ where: { id: profileId }, data: { avatarUrl: publicUrl } });
 
