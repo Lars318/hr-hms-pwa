@@ -7,6 +7,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Ekskluder også PWA-filer (service worker + workbox) så de serveres direkte
+    // som JS og ikke omdirigeres til /login — ellers kan ikke appen installeres.
+    "/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|sw.js|workbox-|worker-|fallback-|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
