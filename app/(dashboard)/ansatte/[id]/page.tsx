@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { Button } from "@/components/ui/button";
 import { ProfileTabs } from "@/features/employees/ProfileTabs";
+import { OnboardingChecklist } from "@/features/employees/OnboardingChecklist";
+import { CertificationSection } from "@/features/employees/CertificationSection";
 
 interface Props {
   params: { id: string };
@@ -26,7 +28,7 @@ export default async function AnsattDetaljPage({ params }: Props) {
 
   if (!isHrAdmin && !isOwnProfile) redirect("/ingen-tilgang");
 
-  const [profile, enrollments, documents, assignments] = await Promise.all([
+  const [profile, enrollments, documents, assignments, latestHandbook] = await Promise.all([
     db.profile.findUnique({
       where: { id: params.id },
       include: {
@@ -56,9 +58,21 @@ export default async function AnsattDetaljPage({ params }: Props) {
       },
       orderBy: [{ isPrimary: "desc" }, { startDate: "asc" }],
     }),
+    db.handbookVersion.findFirst({
+      orderBy: { version: "desc" },
+      include: { acknowledgements: { where: { profileId: params.id }, select: { id: true } } },
+    }),
   ]);
 
   if (!profile) notFound();
+
+  const onboardingStatus = {
+    invited: profile.invitedAt !== null,
+    contractSigned: profile.contractSignedAt !== null,
+    selfDeclaration: profile.selfDeclarationAt !== null,
+    handbookRead: latestHandbook ? latestHandbook.acknowledgements.length > 0 : false,
+    isSelfEmployed: profile.employmentType === "SELF_EMPLOYED",
+  };
 
   const courses = enrollments.map((e) => ({
     id: e.id,
@@ -82,6 +96,8 @@ export default async function AnsattDetaljPage({ params }: Props) {
           <ArrowLeft className="h-4 w-4 mr-1" /> Tilbake
         </Link>
       </Button>
+
+      {isHrAdmin && <OnboardingChecklist status={onboardingStatus} />}
 
       <ProfileTabs
         profileId={profile.id}
@@ -110,6 +126,8 @@ export default async function AnsattDetaljPage({ params }: Props) {
         canEdit={isHrAdmin}
         editHref={`/ansatte/${profile.id}/rediger`}
       />
+
+      <CertificationSection profileId={profile.id} canEdit={isHrAdmin} />
     </div>
   );
 }

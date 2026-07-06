@@ -34,6 +34,7 @@ import { assistantRouter } from "./assistant";
 import { documentCategoryRouter } from "./documentCategory";
 import { internkontrollRouter } from "./internkontroll";
 import { financialContractRouter } from "./financialContract";
+import { certificationRouter } from "./certification";
 
 export const appRouter = router({
   profile: profileRouter,
@@ -71,6 +72,7 @@ export const appRouter = router({
   documentCategory: documentCategoryRouter,
   internkontroll: internkontrollRouter,
   financialContract: financialContractRouter,
+  certification: certificationRouter,
 });
 
 export type AppRouter = typeof appRouter;

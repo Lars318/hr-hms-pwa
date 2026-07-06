@@ -208,6 +208,10 @@ enum AlertType {
   FINANCIAL_CONTRACT_EXP_90
   FINANCIAL_CONTRACT_DIGEST
   INTERNKONTROLL_OVERDUE
+  CERTIFICATION_EXP_30
+  CERTIFICATION_EXP_7
+  CERTIFICATION_EXPIRED
+  INVITE_REMINDER
 }
 
 enum LeaveRequestStatus {
@@ -330,6 +334,7 @@ model Profile {
   contractFilePath        String?   // opplastet oppdragsavtale (privat storage)
   selfDeclarationFilePath String?   // opplastet egenerklæring (privat storage)
   invitedAt               DateTime? // når invitasjons-e-post sist ble sendt
+  inviteReminderAt        DateTime? // når siste automatiske invitasjons-påminnelse ble sendt
   title          String?
   phone          String?
   avatarUrl      String?
@@ -368,6 +373,7 @@ model Profile {
   pushSubscriptions        PushSubscription[]
   publishedHandbookVersions HandbookVersion[]
   handbookAcknowledgements  HandbookAcknowledgement[]
+  certifications            Certification[]
   profileAssignments   ProfileAssignment[]
   safetyRepLocations   Location[]           @relation("LocationSafetyRep")
   hseManagerLocations  Location[]           @relation("LocationHseManager")
@@ -795,6 +801,30 @@ model HandbookAcknowledgement {
   @@unique([versionId, profileId])
   @@index([versionId])
   @@index([profileId])
+}
+
+// ─── Kompetanse / sertifikater ────────────────────────────────────────────────
+// Sporer sertifikater og kurs med utløpsdato per ansatt (førstehjelp, brannvern,
+// PT-sertifisering osv.). Automatiske varsler før utløp via cron.
+model Certification {
+  id         String    @id @default(cuid())
+  name       String    // f.eks. "Førstehjelp", "Brannvernkurs", "PT-sertifisering"
+  category   String    @default("OTHER") // FIRST_AID | FIRE_SAFETY | PT | ELECTRICAL | OTHER
+  issuer     String?   // utstedende organisasjon
+  issuedAt   DateTime?
+  expiresAt  DateTime? // null = utløper ikke
+  filePath   String?   // opplastet sertifikatbevis (privat storage)
+  note       String?
+
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([profileId])
+  @@index([expiresAt])
+  @@index([category])
 }
 
 // ─── Overtid og timebank ──────────────────────────────────────────────────────

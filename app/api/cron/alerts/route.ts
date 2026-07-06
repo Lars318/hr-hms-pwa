@@ -12,7 +12,7 @@ export async function GET(req: Request) {
 
   const now = new Date();
   const year = now.getFullYear();
-  const results = { probation: 0, training: 0, birthday: 0, contract: 0, vernerunde: 0, incidentEscalation: 0, internkontroll: 0 };
+  const results = { probation: 0, training: 0, birthday: 0, contract: 0, vernerunde: 0, incidentEscalation: 0, internkontroll: 0, certification: 0 };
 
   // ── 1. Prøvetid utløper innen 14 dager ───────────────────────────────────
   const probationWindow = new Date(now);
@@ -403,6 +403,65 @@ export async function GET(req: Request) {
     }
     await db.sentAlert.create({ data: { type: "INTERNKONTROLL_OVERDUE", entityId, year } });
     results.internkontroll++;
+  }
+
+  // ── 8. Sertifikater utløper (30 dager, 7 dager, utløpt) ───────────────────
+  const certIn30 = new Date(now);
+  certIn30.setDate(certIn30.getDate() + 30);
+
+  const certs = await db.certification.findMany({
+    where: { expiresAt: { not: null, lte: certIn30 }, profile: { status: "ACTIVE" } },
+    include: { profile: { select: { id: true, fullName: true } } },
+  });
+
+  for (const cert of certs) {
+    const daysLeft = Math.ceil((cert.expiresAt!.getTime() - now.getTime()) / 86_400_000);
+    const alertType =
+      daysLeft < 0 ? "CERTIFICATION_EXPIRED" : daysLeft <= 7 ? "CERTIFICATION_EXP_7" : "CERTIFICATION_EXP_30";
+
+    const already = await db.sentAlert.findUnique({
+      where: { type_entityId_year: { type: alertType, entityId: cert.id, year } },
+    });
+    if (already) continue;
+
+    const phrase =
+      daysLeft < 0
+        ? `utløp for ${Math.abs(daysLeft)} dag${Math.abs(daysLeft) !== 1 ? "er" : ""} siden`
+        : `utløper om ${daysLeft} dag${daysLeft !== 1 ? "er" : ""}`;
+
+    // Varsle den ansatte
+    await db.notification.create({
+      data: {
+        recipientId: cert.profileId, type: "SYSTEM",
+        title: "Sertifikat utløper snart",
+        message: `Sertifikatet «${cert.name}» ${phrase}.`,
+        linkUrl: `/ansatte/${cert.profileId}`,
+      },
+    });
+    await sendPushToProfile(db, cert.profileId, {
+      title: "Sertifikat utløper",
+      body: `«${cert.name}» ${phrase}.`,
+      url: `/ansatte/${cert.profileId}`,
+    });
+
+    // Varsle HR/ADMIN
+    const hrProfiles = await db.profile.findMany({
+      where: { status: "ACTIVE", role: { in: ["ADMIN", "HR"] } },
+      select: { id: true },
+    });
+    for (const hr of hrProfiles) {
+      await db.notification.create({
+        data: {
+          recipientId: hr.id, type: "SYSTEM",
+          title: "Ansatts sertifikat utløper",
+          message: `${cert.profile.fullName}: «${cert.name}» ${phrase}.`,
+          linkUrl: `/rapporter/kompetanse`,
+        },
+      });
+    }
+
+    await db.sentAlert.create({ data: { type: alertType, entityId: cert.id, year } });
+    results.certification++;
   }
 
   return NextResponse.json({ ok: true, sent: results });
