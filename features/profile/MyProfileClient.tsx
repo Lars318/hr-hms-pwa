@@ -10,6 +10,7 @@ import {
   Sun, Moon, Loader2, Fingerprint, Tag,
 } from "lucide-react";
 import { AvatarUpload } from "@/features/profile/AvatarUpload";
+import { MyOverview } from "@/features/profile/MyOverview";
 import { PasskeySetup } from "@/features/auth/PasskeySetup";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -268,6 +269,9 @@ export function MyProfileClient({ email }: { email: string }) {
 
       {/* ── Seksjoner ── */}
       <div className="px-4 pb-10 flex flex-col gap-3">
+
+        {/* Min oversikt: saldo, dokumenter, sertifikater */}
+        {!editing && <MyOverview profileId={profile.id} />}
 
         {/* Jobb */}
         <div>

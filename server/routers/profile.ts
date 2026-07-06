@@ -39,6 +39,58 @@ export const profileRouter = router({
     });
   }),
 
+  // Innlogget bruker: samlet «Min side»-oversikt (kontrakt-/håndbokstatus).
+  myOverview: profileProcedure.query(async ({ ctx }) => {
+    const me = await ctx.db.profile.findUnique({
+      where: { id: ctx.profile.id },
+      select: {
+        contractSignedAt: true,
+        selfDeclarationAt: true,
+        contractFilePath: true,
+        selfDeclarationFilePath: true,
+        employmentType: true,
+      },
+    });
+
+    const latestHandbook = await ctx.db.handbookVersion.findFirst({
+      orderBy: { version: "desc" },
+      include: { acknowledgements: { where: { profileId: ctx.profile.id }, select: { id: true } } },
+    });
+
+    return {
+      contractSignedAt: me?.contractSignedAt ?? null,
+      selfDeclarationAt: me?.selfDeclarationAt ?? null,
+      hasContractFile: !!me?.contractFilePath,
+      hasSelfDeclarationFile: !!me?.selfDeclarationFilePath,
+      employmentType: me?.employmentType ?? "EMPLOYEE",
+      handbook: {
+        version: latestHandbook?.version ?? null,
+        read: latestHandbook ? latestHandbook.acknowledgements.length > 0 : false,
+      },
+      payrollUrl: process.env.NEXT_PUBLIC_PAYROLL_URL ?? null,
+    };
+  }),
+
+  // Innlogget bruker: signert nedlastings-URL for egne dokumenter.
+  myFileUrl: profileProcedure
+    .input(z.object({ kind: z.enum(["contract", "selfDeclaration"]) }))
+    .mutation(async ({ ctx, input }) => {
+      const p = await ctx.db.profile.findUnique({
+        where: { id: ctx.profile.id },
+        select: { contractFilePath: true, selfDeclarationFilePath: true },
+      });
+      const path = input.kind === "contract" ? p?.contractFilePath : p?.selfDeclarationFilePath;
+      if (!path) throw new TRPCError({ code: "NOT_FOUND", message: "Ingen fil lastet opp." });
+      const admin = createAdminClient();
+      const { data, error } = await admin.storage
+        .from(FINANCIAL_CONTRACTS_BUCKET)
+        .createSignedUrl(path, 300);
+      if (error || !data) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: error?.message ?? "Kunne ikke generere nedlastings-URL." });
+      }
+      return { signedUrl: data.signedUrl };
+    }),
+
   // HR/ADMIN: send invitasjons-e-post der den ansatte setter passord.
   invite: hrProcedure
     .input(z.object({ ids: z.array(z.string()).min(1).max(200) }))
