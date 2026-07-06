@@ -109,6 +109,11 @@ export function EmployeeTable({ employees, selectedIds, onToggle, onToggleAll }:
                         Selvstendig
                       </span>
                     )}
+                    {!emp.invitedAt && emp.status === "ACTIVE" && (
+                      <span className="inline-flex items-center rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-medium whitespace-nowrap">
+                        Ikke invitert
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-3">

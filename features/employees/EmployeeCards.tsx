@@ -16,6 +16,7 @@ type EmployeeWithRelations = {
   role: string;
   status: string;
   employmentType: string;
+  invitedAt: Date | null;
   employedAt: Date;
   department: { name: string } | null;
   profileAssignments: { location: { id: string; name: string; city: string | null } | null }[];
@@ -104,6 +105,11 @@ export function EmployeeCards({ employees }: EmployeeCardsProps) {
                   {emp.employmentType === "SELF_EMPLOYED" && (
                     <span className="rounded-full bg-orange-100 text-orange-700 px-2 py-0.5 text-[10px] font-medium whitespace-nowrap">
                       Selvstendig
+                    </span>
+                  )}
+                  {!emp.invitedAt && emp.status === "ACTIVE" && (
+                    <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-medium whitespace-nowrap">
+                      Ikke invitert
                     </span>
                   )}
                 </div>

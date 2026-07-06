@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
+import { isTestSwitcherEnabled } from "@/lib/testSwitcher";
 
 export async function GET(req: NextRequest) {
   const email = req.nextUrl.searchParams.get("email");
   if (!email) return NextResponse.json({ error: "Mangler email" }, { status: 400 });
 
-  if (process.env.ENABLE_TEST_SWITCHER !== "true") {
+  if (!isTestSwitcherEnabled()) {
     return NextResponse.json({ error: "Ikke tilgjengelig" }, { status: 403 });
   }
 

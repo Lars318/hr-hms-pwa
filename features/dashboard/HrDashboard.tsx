@@ -72,6 +72,14 @@ export function HrDashboard({ name, data }: Props) {
           variant={handbook.unreadCount > 0 ? "warning" : "success"}
           description="Aktive ansatte"
         />
+        <MetricCard
+          title="Ikke invitert ennå"
+          value={employees?.notInvited ?? 0}
+          href="/ansatte?notInvited=1"
+          icon={Users}
+          variant={(employees?.notInvited ?? 0) > 0 ? "warning" : "success"}
+          description="Aktive uten invitasjon"
+        />
       </DashboardSection>
 
       {/* Dokumenter */}

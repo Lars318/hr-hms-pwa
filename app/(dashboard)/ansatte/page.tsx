@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
@@ -38,7 +39,9 @@ export default async function AnsattePage() {
         </Button>
       </div>
 
-      <EmployeeListClient departments={departments} locations={locations} />
+      <Suspense fallback={null}>
+        <EmployeeListClient departments={departments} locations={locations} />
+      </Suspense>
     </div>
   );
 }

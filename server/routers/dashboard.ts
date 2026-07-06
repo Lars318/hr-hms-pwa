@@ -521,12 +521,14 @@ export const dashboardRouter = router({
     // ── HR/ADMIN only: employee stats ──────────────────────────────────────
     let employeeStats: {
       totalActive: number;
+      notInvited: number;
       byDepartment: { departmentId: string | null; department: { name: string } | null; _count: { id: number } }[];
     } | null = null;
 
     if (isHrAdmin) {
-      const [totalActive, byDepartment] = await Promise.all([
+      const [totalActive, notInvited, byDepartment] = await Promise.all([
         db.profile.count({ where: { status: "ACTIVE" } }),
+        db.profile.count({ where: { status: "ACTIVE", invitedAt: null } }),
         db.profile.groupBy({
           by: ["departmentId"],
           where: { status: "ACTIVE" },
@@ -541,6 +543,7 @@ export const dashboardRouter = router({
 
       employeeStats = {
         totalActive,
+        notInvited,
         byDepartment: byDepartment.map((r) => ({
           ...r,
           department: r.departmentId ? (deptMap.get(r.departmentId) ?? null) : null,

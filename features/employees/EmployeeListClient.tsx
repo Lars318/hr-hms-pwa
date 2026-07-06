@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { EmployeeFilters } from "./EmployeeFilters";
 import { EmployeeCards } from "./EmployeeCards";
 import { EmployeeTable } from "./EmployeeTable";
 import { BulkActionBar } from "./BulkActionBar";
+import { ExportButton } from "./ExportButton";
 import type { Department, Location } from "@prisma/client";
 import { ListCardSkeleton, TableSkeleton } from "@/components/ui/skeleton";
 
@@ -15,6 +17,7 @@ interface EmployeeListClientProps {
 }
 
 export function EmployeeListClient({ departments, locations }: EmployeeListClientProps) {
+  const searchParams = useSearchParams();
   const [filters, setFilters] = useState({
     search: "",
     role: "",
@@ -23,6 +26,7 @@ export function EmployeeListClient({ departments, locations }: EmployeeListClien
     locationId: "",
     title: "",
     employmentType: "",
+    notInvited: searchParams.get("notInvited") === "1",
   });
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -34,6 +38,7 @@ export function EmployeeListClient({ departments, locations }: EmployeeListClien
     locationId: filters.locationId || undefined,
     title: filters.title || undefined,
     employmentType: (filters.employmentType as "EMPLOYEE" | "SELF_EMPLOYED") || undefined,
+    notInvited: filters.notInvited || undefined,
   });
 
   function toggle(id: string) {
@@ -88,7 +93,10 @@ export function EmployeeListClient({ departments, locations }: EmployeeListClien
           />
         </>
       )}
-      <p className="text-xs text-muted-foreground">{employees.length} ansatte</p>
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">{employees.length} ansatte</p>
+        <ExportButton rows={employees as Parameters<typeof ExportButton>[0]["rows"]} disabled={isLoading} />
+      </div>
     </div>
   );
 }

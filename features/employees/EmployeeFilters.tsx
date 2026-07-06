@@ -12,6 +12,7 @@ interface Filters {
   locationId: string;
   title: string;
   employmentType: string;
+  notInvited: boolean;
 }
 
 interface Department { id: string; name: string }
@@ -110,6 +111,17 @@ export function EmployeeFilters({ filters, departments, locations, onChange }: E
             {chip.label}
           </button>
         ))}
+        <button
+          onClick={() => onChange({ ...filters, notInvited: !filters.notInvited })}
+          className={cn(
+            "shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
+            filters.notInvited
+              ? "bg-amber-500 text-white"
+              : "bg-muted text-muted-foreground hover:bg-muted/80"
+          )}
+        >
+          Ikke invitert
+        </button>
       </div>
 
       {/* Lokasjon-chips (alltid synlig hvis lokasjoner finnes) */}

@@ -25,7 +25,8 @@ export function TopBar({ email, role }: TopBarProps) {
       </div>
 
       <div className="flex items-center gap-3 ml-auto">
-        {process.env.NEXT_PUBLIC_ENABLE_TEST_SWITCHER === "true" && <TestUserSwitcher />}
+        {process.env.NEXT_PUBLIC_ENABLE_TEST_SWITCHER === "true" &&
+          process.env.NEXT_PUBLIC_VERCEL_ENV !== "production" && <TestUserSwitcher />}
         <PWAInstallPrompt />
         <PaletteSwitcher />
         <ThemeToggle />

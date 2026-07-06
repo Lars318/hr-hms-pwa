@@ -5,6 +5,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { router, profileProcedure, hrProcedure } from "@/server/trpc/trpc";
 import { createAdminClient, FINANCIAL_CONTRACTS_BUCKET, sanitizeFileName } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email/resend";
+import { isTestSwitcherEnabled } from "@/lib/testSwitcher";
 
 const profileUpdateSchema = z.object({
   fullName: z.string().min(2, "Navn må ha minst 2 tegn").max(100),
@@ -280,7 +281,7 @@ export const profileRouter = router({
 
   // Dev-only: hent alle profiler for testbruker-bytter (krever ENABLE_TEST_SWITCHER=true)
   devList: profileProcedure.query(async ({ ctx }) => {
-    if (process.env.ENABLE_TEST_SWITCHER !== "true") {
+    if (!isTestSwitcherEnabled()) {
       throw new TRPCError({ code: "FORBIDDEN" });
     }
     return ctx.db.profile.findMany({
@@ -300,10 +301,11 @@ export const profileRouter = router({
         locationId: z.string().optional(),
         title: z.string().optional(),
         employmentType: z.enum(["EMPLOYEE", "SELF_EMPLOYED"]).optional(),
+        notInvited: z.boolean().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { search, role, status, departmentId, locationId, title, employmentType } = input;
+      const { search, role, status, departmentId, locationId, title, employmentType, notInvited } = input;
       return ctx.db.profile.findMany({
         where: {
           ...(search
@@ -318,6 +320,7 @@ export const profileRouter = router({
           ...(status ? { status } : {}),
           ...(departmentId ? { departmentId } : {}),
           ...(employmentType ? { employmentType } : {}),
+          ...(notInvited ? { invitedAt: null } : {}),
           ...(title ? { title: { equals: title, mode: "insensitive" } } : {}),
           ...(locationId
             ? { profileAssignments: { some: { locationId, endDate: null } } }
