@@ -19,7 +19,7 @@ export function HomeDashboard({ role, profileId, fullName, avatarUrl, isContract
   const isLeader = !isContractor && (role === "MANAGER" || role === "HR" || role === "ADMIN");
 
   return (
-    <div className="mx-auto max-w-xl">
+    <div className="mx-auto w-full max-w-2xl lg:max-w-5xl">
       {isLeader ? (
         <LeaderHome role={role} fullName={fullName} avatarUrl={avatarUrl} />
       ) : (

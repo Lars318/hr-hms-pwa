@@ -8,6 +8,7 @@ import {
 import { trpc } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
 import { HomeHeader } from "@/features/dashboard/home/HomeHeader";
+import { AnnouncementCard, NewsRow } from "@/features/dashboard/home/NewsCards";
 
 const QUICK_ACTIONS = [
   { href: "/fravaer/ny?type=EGENMELDING", label: "Egenmelding", icon: CalendarPlus },
@@ -55,52 +56,65 @@ export function EmployeeHome({ profileId, fullName, avatarUrl }: {
         </div>
       )}
 
-      {/* Saldo */}
-      <div className="grid grid-cols-3 rounded-2xl border bg-card py-4">
-        <SaldoCell value={balance ? `${balance.ferie.daysRemaining}` : "–"} label="feriedager" border />
-        <SaldoCell value={balance ? `${balance.egenmelding.instancesRemaining}` : "–"} sub={balance ? `/${balance.egenmelding.maxInstances}` : ""} label="egenmelding" border />
-        <SaldoCell value={balance ? `${balance.omsorgsfravær.daysRemaining}` : "–"} label="omsorg" />
-      </div>
+      {/* Fersk kunngjøring (kun hvis nylig) */}
+      <AnnouncementCard />
 
-      {/* Snarveier */}
-      <div className="grid grid-cols-4 gap-3">
-        {QUICK_ACTIONS.map(({ href, label, icon: Icon }) => (
-          <Link key={label} href={href} className="flex flex-col items-center gap-2 active:scale-[0.97] transition-transform">
-            <span className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl border bg-card">
-              <Icon className="h-[22px] w-[22px] text-primary" />
-            </span>
-            <span className="text-[11px] text-muted-foreground text-center leading-tight">{label}</span>
-          </Link>
-        ))}
-      </div>
-
-      {/* Myk påminnelse: sertifikat */}
-      {expiringCert && (
-        <Link
-          href="/profil"
-          className="flex items-center gap-3 rounded-2xl border border-l-[3px] border-l-accent bg-card px-4 py-3.5 active:scale-[0.99] transition-transform"
-        >
-          <Award className="h-5 w-5 text-accent shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm">{expiringCert.name} utløper snart</p>
-            <p className="text-xs text-muted-foreground">
-              {(() => {
-                const d = differenceInCalendarDays(new Date(expiringCert.expiresAt!), new Date());
-                return d < 0 ? "Utløpt" : `${d} dager igjen`;
-              })()}
-            </p>
+      <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+        {/* Venstre kolonne */}
+        <div className="space-y-5">
+          {/* Saldo */}
+          <div className="grid grid-cols-3 rounded-2xl border bg-card py-4">
+            <SaldoCell value={balance ? `${balance.ferie.daysRemaining}` : "–"} label="feriedager" border />
+            <SaldoCell value={balance ? `${balance.egenmelding.instancesRemaining}` : "–"} sub={balance ? `/${balance.egenmelding.maxInstances}` : ""} label="egenmelding" border />
+            <SaldoCell value={balance ? `${balance.omsorgsfravær.daysRemaining}` : "–"} label="omsorg" />
           </div>
-          <ChevronRight className="h-[18px] w-[18px] text-muted-foreground/50" />
-        </Link>
-      )}
 
-      {/* Håndbok bekreftet (rolig kvittering) */}
-      {!handbookUnread && overview?.handbook.read && (
-        <div className="flex items-center gap-2 px-1 text-xs text-muted-foreground">
-          <CheckCircle2 className="h-4 w-4 text-primary" />
-          Personalhåndbok bekreftet lest
+          {/* Snarveier */}
+          <div className="grid grid-cols-4 gap-3">
+            {QUICK_ACTIONS.map(({ href, label, icon: Icon }) => (
+              <Link key={label} href={href} className="flex flex-col items-center gap-2 active:scale-[0.97] transition-transform">
+                <span className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl border bg-card">
+                  <Icon className="h-[22px] w-[22px] text-primary" />
+                </span>
+                <span className="text-[11px] text-muted-foreground text-center leading-tight">{label}</span>
+              </Link>
+            ))}
+          </div>
         </div>
-      )}
+
+        {/* Høyre kolonne */}
+        <div className="space-y-5">
+          <NewsRow />
+
+          {/* Myk påminnelse: sertifikat */}
+          {expiringCert && (
+            <Link
+              href="/profil"
+              className="flex items-center gap-3 rounded-2xl border border-l-[3px] border-l-accent bg-card px-4 py-3.5 active:scale-[0.99] transition-transform"
+            >
+              <Award className="h-5 w-5 text-accent shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm">{expiringCert.name} utløper snart</p>
+                <p className="text-xs text-muted-foreground">
+                  {(() => {
+                    const d = differenceInCalendarDays(new Date(expiringCert.expiresAt!), new Date());
+                    return d < 0 ? "Utløpt" : `${d} dager igjen`;
+                  })()}
+                </p>
+              </div>
+              <ChevronRight className="h-[18px] w-[18px] text-muted-foreground/50" />
+            </Link>
+          )}
+
+          {/* Håndbok bekreftet (rolig kvittering) */}
+          {!handbookUnread && overview?.handbook.read && (
+            <div className="flex items-center gap-2 px-1 text-xs text-muted-foreground">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              Personalhåndbok bekreftet lest
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

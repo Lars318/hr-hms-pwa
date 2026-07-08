@@ -8,6 +8,7 @@ import {
 import { trpc } from "@/lib/trpc/client";
 import { cn } from "@/lib/utils";
 import { HomeHeader } from "./HomeHeader";
+import { AnnouncementCard, NewsRow } from "./NewsCards";
 import type { Role } from "@prisma/client";
 
 const LEAVE_LABEL: Record<string, string> = {
@@ -92,80 +93,93 @@ export function LeaderHome({ role, fullName, avatarUrl }: {
         </div>
       )}
 
-      {/* Nøkkeltall */}
-      <div className="grid grid-cols-2 gap-3">
-        {isHrAdmin ? (
-          <>
-            <MetricCard label="Aktive ansatte" value={totalActive ?? "–"} icon={Users} href="/ansatte" />
-            <MetricCard label="Ikke invitert" value={notInvited ?? "–"} icon={Mail} href="/ansatte?notInvited=1" accent={(notInvited ?? 0) > 0} />
-          </>
-        ) : (
-          <>
-            <MetricCard label="Ansatte i avdeling" value={deptCount ?? "–"} icon={Users} href="/kollegaer" />
-            <MetricCard label="Åpne avvik" value={incidentsOpen} icon={ShieldAlert} href="/avvik" accent={incidentsOpen > 0} />
-          </>
-        )}
+      {/* Fersk kunngjøring (kun hvis nylig) */}
+      <AnnouncementCard />
+
+      <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+        {/* Venstre kolonne */}
+        <div className="space-y-5">
+          {/* Nøkkeltall */}
+          <div className="grid grid-cols-2 gap-3">
+            {isHrAdmin ? (
+              <>
+                <MetricCard label="Aktive ansatte" value={totalActive ?? "–"} icon={Users} href="/ansatte" />
+                <MetricCard label="Ikke invitert" value={notInvited ?? "–"} icon={Mail} href="/ansatte?notInvited=1" accent={(notInvited ?? 0) > 0} />
+              </>
+            ) : (
+              <>
+                <MetricCard label="Ansatte i avdeling" value={deptCount ?? "–"} icon={Users} href="/kollegaer" />
+                <MetricCard label="Åpne avvik" value={incidentsOpen} icon={ShieldAlert} href="/avvik" accent={incidentsOpen > 0} />
+              </>
+            )}
+          </div>
+
+          {/* Til godkjenning */}
+          {pendingTotal > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-sm font-medium">Til godkjenning</span>
+                <Link href={inboxHref} className="text-xs text-primary">Se alle</Link>
+              </div>
+              <div className="rounded-2xl border bg-card divide-y divide-border">
+                {pendingLeave.slice(0, 3).map((r) => (
+                  <ApprovalRow
+                    key={r.id}
+                    icon={Calendar}
+                    tint="bg-primary/10 text-primary"
+                    title={`${LEAVE_LABEL[r.type] ?? "Fravær"} · ${r.employee.fullName}`}
+                    sub={`${r.days} dag${r.days !== 1 ? "er" : ""}`}
+                    pending={approveLeave.isPending && approveLeave.variables?.id === r.id}
+                    onApprove={() => approveLeave.mutate({ id: r.id })}
+                  />
+                ))}
+                {canApproveOvertime && pendingOvertime.slice(0, 3).map((o) => (
+                  <ApprovalRow
+                    key={o.id}
+                    icon={Clock}
+                    tint="bg-accent/10 text-accent"
+                    title={`Overtid · ${o.employee.fullName}`}
+                    sub={`${o.hours} timer`}
+                    pending={approveOvertime.isPending && approveOvertime.variables?.id === o.id}
+                    onApprove={() => approveOvertime.mutate({ id: o.id })}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Høyre kolonne */}
+        <div className="space-y-5">
+          {/* Organisasjonshelse (kun HR/admin) */}
+          {isHrAdmin && (readPct != null || invitedPct != null) && (
+            <div>
+              <span className="text-sm font-medium px-1">Organisasjonshelse</span>
+              <div className="mt-2 rounded-2xl border bg-card p-4 space-y-4">
+                {readPct != null && <HealthBar label="Håndbok lest" pct={readPct} />}
+                {invitedPct != null && <HealthBar label="Invitert" pct={invitedPct} />}
+              </div>
+            </div>
+          )}
+
+          {/* Sertifikater utløper */}
+          {isHrAdmin && expiringCerts.length > 0 && (
+            <Link
+              href="/rapporter/kompetanse"
+              className="flex items-center gap-3 rounded-2xl border border-l-[3px] border-l-accent bg-card px-4 py-3.5"
+            >
+              <Award className="h-5 w-5 text-accent shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm">{expiringCerts.length} sertifikat{expiringCerts.length !== 1 ? "er" : ""} utløper snart</p>
+                <p className="text-xs text-muted-foreground">Se kompetansematrise</p>
+              </div>
+              <ChevronRight className="h-[18px] w-[18px] text-muted-foreground/50" />
+            </Link>
+          )}
+
+          <NewsRow />
+        </div>
       </div>
-
-      {/* Til godkjenning */}
-      {pendingTotal > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-2 px-1">
-            <span className="text-sm font-medium">Til godkjenning</span>
-            <Link href={inboxHref} className="text-xs text-primary">Se alle</Link>
-          </div>
-          <div className="rounded-2xl border bg-card divide-y divide-border">
-            {pendingLeave.slice(0, 3).map((r) => (
-              <ApprovalRow
-                key={r.id}
-                icon={Calendar}
-                tint="bg-primary/10 text-primary"
-                title={`${LEAVE_LABEL[r.type] ?? "Fravær"} · ${r.employee.fullName}`}
-                sub={`${r.days} dag${r.days !== 1 ? "er" : ""}`}
-                pending={approveLeave.isPending && approveLeave.variables?.id === r.id}
-                onApprove={() => approveLeave.mutate({ id: r.id })}
-              />
-            ))}
-            {canApproveOvertime && pendingOvertime.slice(0, 3).map((o) => (
-              <ApprovalRow
-                key={o.id}
-                icon={Clock}
-                tint="bg-accent/10 text-accent"
-                title={`Overtid · ${o.employee.fullName}`}
-                sub={`${o.hours} timer`}
-                pending={approveOvertime.isPending && approveOvertime.variables?.id === o.id}
-                onApprove={() => approveOvertime.mutate({ id: o.id })}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Organisasjonshelse (kun HR/admin) */}
-      {isHrAdmin && (readPct != null || invitedPct != null) && (
-        <div>
-          <span className="text-sm font-medium px-1">Organisasjonshelse</span>
-          <div className="mt-2 rounded-2xl border bg-card p-4 space-y-4">
-            {readPct != null && <HealthBar label="Håndbok lest" pct={readPct} />}
-            {invitedPct != null && <HealthBar label="Invitert" pct={invitedPct} />}
-          </div>
-        </div>
-      )}
-
-      {/* Sertifikater utløper */}
-      {isHrAdmin && expiringCerts.length > 0 && (
-        <Link
-          href="/rapporter/kompetanse"
-          className="flex items-center gap-3 rounded-2xl border border-l-[3px] border-l-accent bg-card px-4 py-3.5"
-        >
-          <Award className="h-5 w-5 text-accent shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm">{expiringCerts.length} sertifikat{expiringCerts.length !== 1 ? "er" : ""} utløper snart</p>
-            <p className="text-xs text-muted-foreground">Se kompetansematrise</p>
-          </div>
-          <ChevronRight className="h-[18px] w-[18px] text-muted-foreground/50" />
-        </Link>
-      )}
     </div>
   );
 }
