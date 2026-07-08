@@ -9,7 +9,7 @@ import {
   ShieldCheck, Zap, LogOut, CalendarDays, CalendarRange, BarChart2,
   Activity, BookOpen, Clock, Shield, AlertTriangle, GraduationCap,
   FlaskConical, ClipboardList, MessageSquare, FileWarning, FileText,
-  KeyRound, ChevronDown, Receipt, Briefcase,
+  KeyRound, ChevronDown, Receipt, Briefcase, Megaphone,
 } from "lucide-react";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,7 @@ export interface NavGroup {
 // Single top-level link (no group)
 export const topItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
+  { href: "/nyheter",   label: "Nyheter",   icon: Megaphone,       roles: ["ADMIN", "HR", "MANAGER", "EMPLOYEE"] },
 ];
 
 export const navGroups: NavGroup[] = [
