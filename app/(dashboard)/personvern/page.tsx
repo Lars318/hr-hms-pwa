@@ -52,7 +52,7 @@ export default async function PersonvernPage() {
             ["Varsler", "Varsler du har mottatt og om de er lest."],
             ["Aktivitetslogg", "Logg over vesentlige handlinger for sporbarhet og sikkerhet."],
           ].map(([label, desc]) => (
-            <div key={label} className="rounded-lg bg-muted/50 px-4 py-3">
+            <div key={label} className="rounded-xl bg-muted/50 px-4 py-3">
               <p className="font-medium">{label}</p>
               <p className="text-muted-foreground">{desc}</p>
             </div>
@@ -108,7 +108,7 @@ export default async function PersonvernPage() {
             ["Sletting", "Du kan be om sletting av opplysninger som ikke lenger er nødvendige."],
             ["Dataportabilitet", "Du kan be om en kopi av dine opplysninger i maskinlesbart format."],
           ].map(([label, desc]) => (
-            <div key={label} className="rounded-lg bg-muted/50 px-4 py-3">
+            <div key={label} className="rounded-xl bg-muted/50 px-4 py-3">
               <p className="font-medium">{label}</p>
               <p className="text-muted-foreground">{desc}</p>
             </div>

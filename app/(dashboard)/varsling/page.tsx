@@ -70,7 +70,7 @@ export default async function VarslingPage() {
           Alle varslingssaker behandles konfidensielt og er kun tilgjengelig for HR og administrator.
           Ledere og kollegaer ser ikke saken din med mindre du eksplisitt velger det.
         </p>
-        <div className="rounded-lg bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+        <div className="rounded-xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
           <strong>Om anonym innsending:</strong> Du kan merke saken som anonym, og navnet ditt
           vil da ikke vises i saksbildet. Merk at tekniske logger i systemet likevel kan finnes av
           administrator. <strong>Full anonym ekstern varslingskanal er ikke implementert i denne

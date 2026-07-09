@@ -42,7 +42,7 @@ export function DashboardComplianceWidget({ viewerRole }: Props) {
         <div className="rounded-2xl border bg-card p-5 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
                 <ClipboardList className="h-4 w-4 text-primary" />
               </div>
               <h3 className="font-semibold text-sm">Internkontroll</h3>
@@ -100,7 +100,7 @@ export function DashboardComplianceWidget({ viewerRole }: Props) {
         <div className="rounded-2xl border bg-card p-5 space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Receipt className="h-4 w-4 text-primary" />
               </div>
               <h3 className="font-semibold text-sm">Kontrakter som utløper</h3>

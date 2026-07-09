@@ -24,7 +24,7 @@ export function ActivityFeed() {
     return (
       <div className="space-y-2">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-12 rounded-lg bg-muted animate-pulse" />
+          <div key={i} className="h-12 rounded-xl bg-muted animate-pulse" />
         ))}
       </div>
     );

@@ -34,7 +34,7 @@ export function BelongingSection({ department, role, title, assignments }: Belon
         {activeAssignments.length > 0 ? (
           activeAssignments.map((a) => (
             <div key={a.id} className="flex items-start gap-3 px-4 py-3.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted mt-0.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-muted mt-0.5">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex-1 min-w-0">
@@ -59,7 +59,7 @@ export function BelongingSection({ department, role, title, assignments }: Belon
           <>
             {department && (
               <div className="flex items-center gap-3 px-4 py-3.5">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-muted">
                   <Building2 className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
@@ -69,7 +69,7 @@ export function BelongingSection({ department, role, title, assignments }: Belon
               </div>
             )}
             <div className="flex items-center gap-3 px-4 py-3.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-muted">
                 <Briefcase className="h-4 w-4 text-muted-foreground" />
               </div>
               <div>

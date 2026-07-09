@@ -75,7 +75,7 @@ export default async function CompliancePage() {
         </div>
         <div className="space-y-2">
           {P0_ITEMS.map((item) => (
-            <div key={item.id} className="flex items-start gap-3 rounded-lg bg-muted/40 px-3 py-2">
+            <div key={item.id} className="flex items-start gap-3 rounded-xl bg-muted/40 px-3 py-2">
               {item.done
                 ? <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
                 : <XCircle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />}
@@ -96,7 +96,7 @@ export default async function CompliancePage() {
         </div>
         <div className="space-y-2">
           {P1_ITEMS.map((item) => (
-            <div key={item.id} className="flex items-center gap-3 rounded-lg bg-muted/40 px-3 py-2">
+            <div key={item.id} className="flex items-center gap-3 rounded-xl bg-muted/40 px-3 py-2">
               <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
               <p className="text-sm">{item.id}: {item.text}</p>
             </div>
@@ -140,7 +140,7 @@ export default async function CompliancePage() {
             { label: "Rettighetsforespørsel-prosedyre", path: "docs/pilot/DATA_SUBJECT_REQUEST_PROCEDURE.md", desc: "Innsyn, retting, sletting og eksport", done: false },
             { label: "Pilot Readiness Checklist", path: "docs/pilot/PILOT_READINESS_CHECKLIST.md", desc: "Komplett go/no-go-sjekkliste", done: false },
           ].map(({ label, path, desc, done }) => (
-            <div key={path} className="rounded-lg bg-muted/40 px-4 py-3 flex items-start gap-3">
+            <div key={path} className="rounded-xl bg-muted/40 px-4 py-3 flex items-start gap-3">
               {done
                 ? <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
                 : <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />}
@@ -166,7 +166,7 @@ export default async function CompliancePage() {
             { label: "Compliance backlog", path: "docs/COMPLIANCE_BACKLOG.md", desc: "P0/P1/P2-prioritert liste over tiltak" },
             { label: "Personvern og GDPR", path: "docs/PRIVACY_AND_GDPR.md", desc: "Behandlingsgrunnlag, databehandlere, lagringstid" },
           ].map(({ label, path, desc }) => (
-            <div key={path} className="rounded-lg bg-muted/40 px-4 py-3">
+            <div key={path} className="rounded-xl bg-muted/40 px-4 py-3">
               <p className="font-medium">{label}</p>
               <p className="text-muted-foreground text-xs font-mono">{path}</p>
               <p className="text-muted-foreground text-xs">{desc}</p>

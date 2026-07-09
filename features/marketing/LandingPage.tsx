@@ -185,7 +185,7 @@ function PhoneMockup() {
             ))}
           </div>
           <div className="rounded-xl bg-white border p-2.5 flex items-center gap-2">
-            <div className="h-6 w-6 rounded-lg bg-primary/10 flex items-center justify-center">
+            <div className="h-6 w-6 rounded-xl bg-primary/10 flex items-center justify-center">
               <ClipboardList className="h-3.5 w-3.5 text-primary" />
             </div>
             <div className="min-w-0">
@@ -194,7 +194,7 @@ function PhoneMockup() {
             </div>
           </div>
           <div className="rounded-xl bg-white border p-2.5 flex items-center gap-2">
-            <div className="h-6 w-6 rounded-lg bg-primary/10 flex items-center justify-center">
+            <div className="h-6 w-6 rounded-xl bg-primary/10 flex items-center justify-center">
               <Receipt className="h-3.5 w-3.5 text-primary" />
             </div>
             <div className="min-w-0 flex-1">

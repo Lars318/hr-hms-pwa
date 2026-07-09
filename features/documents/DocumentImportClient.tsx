@@ -284,7 +284,7 @@ export function DocumentImportClient() {
 
       {/* AI-forslag banner */}
       {analysis && (
-        <div className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
+        <div className="flex items-center gap-2 rounded-xl bg-primary/5 border border-primary/20 px-3 py-2">
           <Sparkles className="h-4 w-4 text-primary shrink-0" />
           <p className="text-xs text-primary font-medium">
             AI-forslag basert på filnavnet — {analysis.confidence}% sikkerhet. Juster om nødvendig.
