@@ -51,7 +51,7 @@ export function InternkontrollAarshjul() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
           Årshjul {year}
         </h2>
         <div className="flex items-center gap-0.5">

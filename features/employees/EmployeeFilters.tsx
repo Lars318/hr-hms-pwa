@@ -159,7 +159,7 @@ export function EmployeeFilters({ filters, departments, locations, onChange }: E
       {showAdvanced && (
         <div className="rounded-2xl border bg-card p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Filtre</span>
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Filtre</span>
             {hasAdvancedFilter && (
               <button
                 onClick={() => onChange({ ...filters, departmentId: "", locationId: "", status: "", employmentType: "" })}

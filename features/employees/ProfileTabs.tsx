@@ -176,7 +176,7 @@ export function ProfileTabs({
           )}
           {assignments.length > 0 && (
             <div className="pt-2 border-t space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Lokasjoner</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Lokasjoner</p>
               {assignments.map((a) => (
                 <div key={a.id} className="flex items-center gap-3">
                   <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />

@@ -275,7 +275,7 @@ export function MyProfileClient({ email }: { email: string }) {
 
         {/* Jobb */}
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">Jobb</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-1">Jobb</p>
           <div className="rounded-2xl border bg-card overflow-hidden divide-y divide-border">
             {[
               { icon: Briefcase, label: "Stilling", value: profile.title ?? "—" },
@@ -298,7 +298,7 @@ export function MyProfileClient({ email }: { email: string }) {
 
         {/* Utseende */}
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">Utseende</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-1">Utseende</p>
           <div className="rounded-2xl border bg-card px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">
@@ -312,7 +312,7 @@ export function MyProfileClient({ email }: { email: string }) {
 
         {/* Sikkerhet */}
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">Sikkerhet</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-1">Sikkerhet</p>
           <div className="rounded-2xl border bg-card overflow-hidden divide-y divide-border">
             <div className="flex items-center gap-3 px-4 py-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-muted shrink-0">

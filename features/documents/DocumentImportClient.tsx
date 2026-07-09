@@ -294,7 +294,7 @@ export function DocumentImportClient() {
 
       {/* Tittel */}
       <div className="space-y-1.5">
-        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Tittel</label>
+        <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tittel</label>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -305,7 +305,7 @@ export function DocumentImportClient() {
 
       {/* Kategori */}
       <div className="space-y-1.5">
-        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Kategori</label>
+        <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Kategori</label>
         {showCategoryPicker ? (
           <div className="space-y-2">
             <div className="flex flex-col gap-1 rounded-2xl border bg-card overflow-hidden divide-y divide-border">
@@ -358,7 +358,7 @@ export function DocumentImportClient() {
 
       {/* Tags */}
       <div className="space-y-1.5">
-        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+        <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1">
           <Tag className="h-3 w-3" /> Tags
         </label>
         <div className="flex flex-wrap gap-1.5 min-h-[32px]">
@@ -395,7 +395,7 @@ export function DocumentImportClient() {
 
       {/* Knytt til ansatt */}
       <div className="space-y-1.5">
-        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex items-center gap-1">
+        <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1">
           <User className="h-3 w-3" /> Knytt til ansatt (valgfritt)
         </label>
         {linkedProfileId ? (

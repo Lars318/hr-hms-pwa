@@ -17,7 +17,7 @@ export function AssistantSuggestedLinks({ links }: AssistantSuggestedLinksProps)
 
   return (
     <div className="mt-3 space-y-1.5">
-      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
+      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
         Snarveier
       </p>
       {links.map((l) => (

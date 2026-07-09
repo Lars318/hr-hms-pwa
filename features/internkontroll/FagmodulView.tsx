@@ -49,7 +49,7 @@ export function FagmodulView({ modul, canEdit }: { modul: Fagmodul; canEdit: boo
       {/* Områder */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Kontrollområder</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Kontrollområder</h2>
           {canEdit && (
             <Link href={nyHref} className="text-sm text-primary hover:underline flex items-center gap-1">
               <Plus className="h-3.5 w-3.5" /> Nytt område
@@ -113,7 +113,7 @@ export function FagmodulView({ modul, canEdit }: { modul: Fagmodul; canEdit: boo
 
       {/* Standard sjekkliste for modulen */}
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
           <ListChecks className="h-4 w-4" /> Standard sjekkliste
         </h2>
         <div className="rounded-2xl border bg-card divide-y">

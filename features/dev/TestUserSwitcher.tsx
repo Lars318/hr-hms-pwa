@@ -56,7 +56,7 @@ export function TestUserSwitcher() {
 
       {open && (
         <div className="absolute right-0 top-full mt-1 z-50 w-64 rounded-2xl border bg-card shadow-lg overflow-hidden">
-          <p className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b">
+          <p className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground border-b">
             Bytt til bruker
           </p>
           <div className="max-h-72 overflow-y-auto">

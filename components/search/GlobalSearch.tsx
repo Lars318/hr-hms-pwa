@@ -117,7 +117,7 @@ export function GlobalSearch({ role, placeholder = "Søk etter kollega eller sid
               {/* Kollegaer */}
               {people.length > 0 && (
                 <div>
-                  <p className="px-4 pt-3 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
+                  <p className="px-4 pt-3 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
                     Kollegaer
                   </p>
                   {people.slice(0, 5).map((p) => (
@@ -160,7 +160,7 @@ export function GlobalSearch({ role, placeholder = "Søk etter kollega eller sid
               {/* Sider */}
               {matchedRoutes.length > 0 && (
                 <div className={cn(people.length > 0 && "border-t")}>
-                  <p className="px-4 pt-3 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
+                  <p className="px-4 pt-3 pb-1 text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">
                     Sider
                   </p>
                   {matchedRoutes.map((r) => (

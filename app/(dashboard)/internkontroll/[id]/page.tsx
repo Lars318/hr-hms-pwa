@@ -57,7 +57,7 @@ export default async function InternkontrollDetaljPage({ params }: { params: { i
 
       {/* Logg */}
       <div>
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-3">Kontrollhistorikk</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Kontrollhistorikk</h2>
         {omrade.logg.length === 0 ? (
           <div className="rounded-2xl border bg-card p-6 text-center text-sm text-muted-foreground">
             Ingen kontroller registrert ennå

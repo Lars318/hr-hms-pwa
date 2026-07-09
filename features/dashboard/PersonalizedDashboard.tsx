@@ -42,7 +42,7 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms, isContrac
         {/* Nyheter */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Nyheter</h2>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Nyheter</h2>
             {canCreateAnnouncement && (
               <button
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -60,7 +60,7 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms, isContrac
 
         {/* Rollebasert innhold */}
         <section>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-3">Oversikt</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Oversikt</h2>
           {!isContractor && <LeaveBalanceCards />}
           <div className="mt-4">
             <DashboardComplianceWidget viewerRole={viewerRole} />
@@ -90,7 +90,7 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms, isContrac
 
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">Mine oppgaver</h2>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Mine oppgaver</h2>
             <Link href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">Se alle</Link>
           </div>
           <MyTasksList />

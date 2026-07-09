@@ -48,7 +48,7 @@ export function MyOverview({ profileId }: { profileId: string }) {
     <div className="flex flex-col gap-3">
       {/* Feriesaldo */}
       <div>
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">Saldo</p>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-1">Saldo</p>
         <div className="grid grid-cols-3 gap-2">
           <StatCard
             icon={CalendarDays}
@@ -73,7 +73,7 @@ export function MyOverview({ profileId }: { profileId: string }) {
 
       {/* Mine dokumenter */}
       <div>
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">Mine dokumenter</p>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-1">Mine dokumenter</p>
         <div className="rounded-2xl border bg-card overflow-hidden divide-y divide-border">
           <DocRow
             icon={FileText}
@@ -127,7 +127,7 @@ export function MyOverview({ profileId }: { profileId: string }) {
       {/* Mine sertifikater */}
       {certs.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1 px-1">Mine sertifikater</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-1">Mine sertifikater</p>
           <div className="rounded-2xl border bg-card overflow-hidden divide-y divide-border">
             {certs.map((c) => {
               const badge = certBadge(c.expiresAt);
