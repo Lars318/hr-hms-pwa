@@ -82,7 +82,7 @@ export default async function FravaerDetailPage({ params }: { params: { id: stri
       </div>
 
       {/* Details */}
-      <div className="rounded-lg border bg-card divide-y">
+      <div className="rounded-2xl border bg-card divide-y">
         <div className="grid grid-cols-2 gap-0">
           <div className="px-4 py-3">
             <p className="text-xs text-muted-foreground">Ansatt</p>

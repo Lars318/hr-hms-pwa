@@ -16,7 +16,7 @@ export function DepartmentOverviewCard({ totalActive, byDepartment }: Department
   const sorted = [...byDepartment].sort((a, b) => b._count.id - a._count.id);
 
   return (
-    <div className="rounded-lg border bg-card col-span-full">
+    <div className="rounded-2xl border bg-card col-span-full">
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-muted-foreground" />

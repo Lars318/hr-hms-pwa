@@ -28,7 +28,7 @@ export default async function HmsMalerPage() {
           <ArrowLeft className="h-4 w-4 mr-1" /> HMS-runde
         </Link>
       </Button>
-      <h1 className="text-xl font-bold">Sjekkliste-maler</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Sjekkliste-maler</h1>
       <TemplateAdmin
         templates={templates.map((t) => ({
           id: t.id,

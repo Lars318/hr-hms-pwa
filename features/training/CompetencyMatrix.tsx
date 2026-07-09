@@ -79,7 +79,7 @@ export function CompetencyMatrix({ departments }: { departments: Department[] })
         <select
           value={departmentId}
           onChange={(e) => setDepartmentId(e.target.value)}
-          className="rounded-lg border bg-card px-3 py-2 text-sm"
+          className="rounded-2xl border bg-card px-3 py-2 text-sm"
         >
           <option value="">Alle avdelinger</option>
           {departments.map((d) => (
@@ -100,7 +100,7 @@ export function CompetencyMatrix({ departments }: { departments: Department[] })
         <button
           onClick={exportCsv}
           disabled={!data}
-          className="ml-auto flex items-center gap-1.5 rounded-lg border bg-card px-3 py-2 text-sm hover:bg-muted transition-colors disabled:opacity-50"
+          className="ml-auto flex items-center gap-1.5 rounded-2xl border bg-card px-3 py-2 text-sm hover:bg-muted transition-colors disabled:opacity-50"
         >
           <Download className="h-4 w-4" />
           Eksporter CSV

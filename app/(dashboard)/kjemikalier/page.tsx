@@ -58,7 +58,7 @@ export default async function KjemikalierPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <FlaskConical className="h-6 w-6" />
             Stoffkartotek
           </h1>

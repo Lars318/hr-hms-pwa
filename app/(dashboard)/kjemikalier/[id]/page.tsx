@@ -65,7 +65,7 @@ export default async function ChemicalDetailPage({ params }: { params: { id: str
             <FlaskConical className="h-5 w-5 text-muted-foreground" />
             {chemical.status === "ARCHIVED" && <Badge variant="secondary">Arkivert</Badge>}
           </div>
-          <h1 className="text-2xl font-bold">{chemical.name}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{chemical.name}</h1>
           {chemical.supplier && (
             <p className="text-muted-foreground text-sm mt-0.5">Leverandør: {chemical.supplier}</p>
           )}

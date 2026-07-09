@@ -28,7 +28,7 @@ export default async function NyHmsRundePage() {
           <ArrowLeft className="h-4 w-4 mr-1" /> Tilbake
         </Link>
       </Button>
-      <h1 className="text-xl font-bold">Start HMS-runde</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Start HMS-runde</h1>
       <StartRundeForm
         templates={templates.map((t) => ({ id: t.id, title: t.title }))}
         locations={locations.map((l) => ({ id: l.id, name: l.name }))}

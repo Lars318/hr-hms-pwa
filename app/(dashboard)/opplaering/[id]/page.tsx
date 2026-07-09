@@ -68,7 +68,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
             <span className="text-xs text-muted-foreground">{course.category}</span>
             {course.isRequired && <Badge variant="destructive" className="text-xs">Obligatorisk</Badge>}
           </div>
-          <h1 className="text-2xl font-bold">{course.name}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{course.name}</h1>
           {course.description && (
             <p className="text-muted-foreground text-sm mt-1">{course.description}</p>
           )}
@@ -99,7 +99,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
           <p className="text-xs text-muted-foreground mt-1">Utløpt</p>
         </div>
         <div className="rounded-xl border p-4 text-center">
-          <div className="text-2xl font-bold">{enrichedRecords.length}</div>
+          <div className="text-2xl font-bold tracking-tight">{enrichedRecords.length}</div>
           <p className="text-xs text-muted-foreground mt-1">Totalt</p>
         </div>
       </div>

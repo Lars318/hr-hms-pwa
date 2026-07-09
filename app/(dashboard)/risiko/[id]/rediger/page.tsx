@@ -35,7 +35,7 @@ export default async function RedigerRisikovurderingPage({ params }: Props) {
           {" / "}
           <span>Rediger</span>
         </div>
-        <h1 className="text-2xl font-bold">Rediger risikovurdering</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Rediger risikovurdering</h1>
       </div>
       <RiskAssessmentForm mode="edit" assessment={assessment} departments={departments} />
     </div>

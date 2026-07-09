@@ -17,7 +17,7 @@ export default async function PersonvernPage() {
   return (
     <div className="max-w-3xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Personvern</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Personvern</h1>
         <p className="text-muted-foreground mt-1">
           Informasjon om hvilke opplysninger HR/HMS-portalen lagrer og hvordan de brukes.
         </p>

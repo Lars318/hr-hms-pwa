@@ -50,7 +50,7 @@ export default async function CompliancePage() {
   return (
     <div className="max-w-3xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Compliance-status</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Compliance-status</h1>
         <p className="text-muted-foreground mt-1">
           Oversikt over HMS- og GDPR-compliance for HR/HMS-portalen.
         </p>

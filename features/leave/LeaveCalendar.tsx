@@ -243,7 +243,7 @@ export function LeaveCalendar({ year, month, leaves, onPrev, onNext }: Props) {
         </div>
 
         {selectedDate && (
-          <div className="rounded-lg border bg-card p-4">
+          <div className="rounded-2xl border bg-card p-4">
             <h3 className="mb-3 font-medium">
               {format(selectedDate, "EEEE d. MMMM yyyy", { locale: nb })}
             </h3>

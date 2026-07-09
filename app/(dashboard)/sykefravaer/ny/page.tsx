@@ -32,7 +32,7 @@ export default async function NySykefravaerPage() {
         </Link>
       </Button>
       <div>
-        <h1 className="text-xl font-bold">Registrer sykefraværssak</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Registrer sykefraværssak</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Milepæler (oppfølgingsplan uke 4, dialogmøte uke 7 og 26) opprettes automatisk.
         </p>

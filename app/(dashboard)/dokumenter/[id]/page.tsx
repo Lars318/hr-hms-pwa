@@ -52,7 +52,7 @@ export default async function DokumentDetailPage({ params }: Props) {
             {" / "}
             <span>{doc.title}</span>
           </div>
-          <h1 className="text-2xl font-bold">{doc.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{doc.title}</h1>
         </div>
         {isHrAdmin && (
           <Button variant="outline" size="sm" asChild>

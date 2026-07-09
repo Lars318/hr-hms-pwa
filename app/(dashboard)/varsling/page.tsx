@@ -20,7 +20,7 @@ export default async function VarslingPage() {
   return (
     <div className="max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Varsling om kritikkverdige forhold</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Varsling om kritikkverdige forhold</h1>
         <p className="text-muted-foreground mt-1">
           Trygg intern kanal for varsling etter arbeidsmiljøloven §2A.
         </p>

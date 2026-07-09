@@ -63,7 +63,7 @@ export function RapporterClient({ viewerRole, departments }: Props) {
       </div>
 
       {/* Filters */}
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-2xl border bg-card p-4">
         <ReportFilters
           from={from}
           to={to}
@@ -77,7 +77,7 @@ export function RapporterClient({ viewerRole, departments }: Props) {
       </div>
 
       {/* Preview + export */}
-      <div className="rounded-lg border bg-card p-4 space-y-4">
+      <div className="rounded-2xl border bg-card p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-medium">
             {REPORT_TABS.find((t) => t.type === activeType)?.label}

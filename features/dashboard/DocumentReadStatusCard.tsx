@@ -19,7 +19,7 @@ export function DocumentReadStatusCard({ expiringSoon, unconfirmed }: DocumentRe
   const hasIssues = unconfirmed.length > 0 || expiringSoon > 0;
 
   return (
-    <div className={`rounded-lg border bg-card col-span-full ${hasIssues ? "border-blue-200" : ""}`}>
+    <div className={`rounded-2xl border bg-card col-span-full ${hasIssues ? "border-blue-200" : ""}`}>
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <div className="flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-muted-foreground" />

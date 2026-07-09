@@ -51,7 +51,7 @@ export default async function OnboardingAdminPage() {
     <div className="max-w-3xl space-y-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <ClipboardList className="h-6 w-6" />
             Onboarding / Offboarding
           </h1>

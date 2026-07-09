@@ -90,7 +90,7 @@ export function SickCaseDetail({ sickCase, canManage }: Props) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="rounded-lg border bg-card p-4 space-y-2">
+      <div className="rounded-2xl border bg-card p-4 space-y-2">
         <div className="flex items-start justify-between gap-2">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -147,7 +147,7 @@ export function SickCaseDetail({ sickCase, canManage }: Props) {
       </div>
 
       {/* Timeline */}
-      <div className="rounded-lg border bg-card p-4 space-y-4">
+      <div className="rounded-2xl border bg-card p-4 space-y-4">
         <h2 className="text-sm font-semibold">Milepæler</h2>
         <div className="space-y-3">
           {sickCase.steps.map((step) => {
@@ -240,7 +240,7 @@ export function SickCaseDetail({ sickCase, canManage }: Props) {
 
       {/* Close case */}
       {canManage && isActive && (
-        <div className="rounded-lg border bg-card p-4 space-y-3">
+        <div className="rounded-2xl border bg-card p-4 space-y-3">
           <h2 className="text-sm font-semibold">Lukk sak</h2>
           {!closing ? (
             <Button variant="outline" onClick={() => setClosing(true)}>

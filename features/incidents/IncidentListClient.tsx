@@ -73,7 +73,7 @@ export function IncidentListClient({ departments, viewerRole }: IncidentListClie
           placeholder="Søk i avvik…"
           value={filters.search}
           onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-          className="w-full h-10 rounded-xl border bg-card pl-9 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="w-full h-10 rounded-2xl border bg-card pl-9 pr-4 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         />
       </div>
 

@@ -157,7 +157,7 @@ export function EmployeeFilters({ filters, departments, locations, onChange }: E
 
       {/* Avanserte filtre */}
       {showAdvanced && (
-        <div className="rounded-xl border bg-card p-4 space-y-3">
+        <div className="rounded-2xl border bg-card p-4 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Filtre</span>
             {hasAdvancedFilter && (

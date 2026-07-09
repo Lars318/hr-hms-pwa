@@ -26,7 +26,7 @@ export default async function RedigerKjemikaliePage({ params }: { params: { id: 
   return (
     <div className="max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <FlaskConical className="h-6 w-6" />
           Rediger kjemikalie
         </h1>

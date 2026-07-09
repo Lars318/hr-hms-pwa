@@ -145,7 +145,7 @@ export function PersonalizedDashboard({ viewerRole, viewerName, isHms, isContrac
       {tab === "nyheter" && (
         <div className="space-y-4">
           {canCreateAnnouncement && (
-            <div className="rounded-xl border bg-card p-4 space-y-3">
+            <div className="rounded-2xl border bg-card p-4 space-y-3">
               <h3 className="text-sm font-semibold">Ny kunngjøring</h3>
               <AnnouncementForm />
             </div>

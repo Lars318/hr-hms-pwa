@@ -29,7 +29,7 @@ export default async function MineVarslingerPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Mine varslingssaker</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Mine varslingssaker</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Dine innsendte varslingssaker. Anonyme saker vises ikke her.
           </p>
@@ -55,7 +55,7 @@ export default async function MineVarslingerPage() {
             <Link
               key={c.id}
               href={`/varsling/${c.id}`}
-              className="block rounded-xl border bg-card hover:bg-accent/40 transition-colors"
+              className="block rounded-2xl border bg-card hover:bg-accent/40 transition-colors"
             >
               <div className="p-4 space-y-2">
                 <div className="flex items-start justify-between gap-2">

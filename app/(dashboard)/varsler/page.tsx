@@ -17,7 +17,7 @@ export default async function VarslerPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold">Varsler</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Varsler</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Alle varsler om avvik, tiltak, dokumenter og risikovurderinger
         </p>

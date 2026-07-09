@@ -227,13 +227,13 @@ export function DocumentImportClient() {
 
         {/* Kamera / Bilder på mobil */}
         <div className="grid grid-cols-2 gap-2">
-          <label className="flex flex-col items-center gap-2 rounded-xl border bg-card px-4 py-4 text-sm text-muted-foreground cursor-pointer hover:bg-muted/40 transition-colors">
+          <label className="flex flex-col items-center gap-2 rounded-2xl border bg-card px-4 py-4 text-sm text-muted-foreground cursor-pointer hover:bg-muted/40 transition-colors">
             <FileText className="h-5 w-5" />
             Kamera
             <input type="file" accept="image/*" capture="environment" className="sr-only"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f); }} />
           </label>
-          <label className="flex flex-col items-center gap-2 rounded-xl border bg-card px-4 py-4 text-sm text-muted-foreground cursor-pointer hover:bg-muted/40 transition-colors">
+          <label className="flex flex-col items-center gap-2 rounded-2xl border bg-card px-4 py-4 text-sm text-muted-foreground cursor-pointer hover:bg-muted/40 transition-colors">
             <FolderOpen className="h-5 w-5" />
             Bilder
             <input type="file" accept="image/*" className="sr-only"
@@ -308,7 +308,7 @@ export function DocumentImportClient() {
         <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Kategori</label>
         {showCategoryPicker ? (
           <div className="space-y-2">
-            <div className="flex flex-col gap-1 rounded-xl border bg-card overflow-hidden divide-y divide-border">
+            <div className="flex flex-col gap-1 rounded-2xl border bg-card overflow-hidden divide-y divide-border">
               {categories.map((cat) => (
                 <button
                   key={cat.id}
@@ -345,7 +345,7 @@ export function DocumentImportClient() {
         ) : (
           <button
             onClick={() => setShowCategoryPicker(true)}
-            className="w-full flex items-center gap-2 rounded-xl border bg-card px-3 py-2.5 text-sm hover:bg-muted/40 transition-colors"
+            className="w-full flex items-center gap-2 rounded-2xl border bg-card px-3 py-2.5 text-sm hover:bg-muted/40 transition-colors"
           >
             {selectedCategoryId && <span className="w-2 h-2 rounded-full shrink-0" style={{ background: categories.find(c => c.id === selectedCategoryId)?.color ?? "#888" }} />}
             <span className={selectedCategoryName ? "text-foreground" : "text-muted-foreground"}>
@@ -417,7 +417,7 @@ export function DocumentImportClient() {
               className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
             {profileSearch.length >= 2 && profiles.length > 0 && (
-              <div className="rounded-xl border bg-card overflow-hidden divide-y divide-border">
+              <div className="rounded-2xl border bg-card overflow-hidden divide-y divide-border">
                 {profiles.slice(0, 5).map((p: any) => (
                   <button
                     key={p.id}

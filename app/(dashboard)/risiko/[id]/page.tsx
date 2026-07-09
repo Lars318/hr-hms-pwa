@@ -82,7 +82,7 @@ export default async function RisikovurderingDetailPage({ params }: Props) {
             {" / "}
             <span>{assessment.title}</span>
           </div>
-          <h1 className="text-2xl font-bold">{assessment.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{assessment.title}</h1>
         </div>
         {canManage && (
           <Button variant="outline" size="sm" asChild>

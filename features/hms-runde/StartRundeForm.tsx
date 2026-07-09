@@ -35,14 +35,14 @@ export function StartRundeForm({ templates, locations }: Props) {
 
   if (!templates.length) {
     return (
-      <div className="rounded-lg border bg-card p-6 text-center text-muted-foreground">
+      <div className="rounded-2xl border bg-card p-6 text-center text-muted-foreground">
         Ingen aktive sjekkliste-maler. Be en administrator opprette en mal først.
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border bg-card p-6">
+    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border bg-card p-6">
       <div className="space-y-2">
         <Label htmlFor="template">Sjekkliste-mal</Label>
         <select

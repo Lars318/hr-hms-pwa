@@ -137,7 +137,7 @@ export function PushNotificationSettings() {
   if (support === "checking") return null;
 
   return (
-    <div className="rounded-lg border bg-card p-4 space-y-3">
+    <div className="rounded-2xl border bg-card p-4 space-y-3">
       <div className="flex items-center gap-2">
         <Bell className="h-4 w-4 text-muted-foreground" />
         <h3 className="text-sm font-semibold">Push-varsler</h3>

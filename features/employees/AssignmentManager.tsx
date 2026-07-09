@@ -93,7 +93,7 @@ export function AssignmentManager({ profileId }: AssignmentManagerProps) {
       </div>
 
       {adding && (
-        <div className="rounded-xl border bg-card p-3 space-y-3">
+        <div className="rounded-2xl border bg-card p-3 space-y-3">
           <select
             value={selectedLocation}
             onChange={(e) => setSelectedLocation(e.target.value)}

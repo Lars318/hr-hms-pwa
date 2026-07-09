@@ -24,7 +24,7 @@ export default async function NyttKursPage() {
   return (
     <div className="max-w-xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <GraduationCap className="h-6 w-6" />
           Nytt opplæringskurs
         </h1>

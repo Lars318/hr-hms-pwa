@@ -51,7 +51,7 @@ export function AnnouncementList() {
         const cat = categoryFor(a.category);
         const Icon = cat.icon;
         return (
-          <div key={a.id} className="rounded-xl border bg-card p-4 space-y-1.5">
+          <div key={a.id} className="rounded-2xl border bg-card p-4 space-y-1.5">
             <div className="flex items-start gap-2.5">
               <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", cat.chip)}>
                 <Icon className="h-4 w-4" />

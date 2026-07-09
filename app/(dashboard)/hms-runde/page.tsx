@@ -24,7 +24,7 @@ export default async function HmsRundePage() {
         <div className="flex items-center gap-3">
           <ClipboardList className="h-6 w-6 text-primary" />
           <div>
-            <h1 className="text-xl font-bold">HMS-runde</h1>
+            <h1 className="text-2xl font-bold tracking-tight">HMS-runde</h1>
             <p className="text-sm text-muted-foreground">Sjekklister og vernerunder</p>
           </div>
         </div>

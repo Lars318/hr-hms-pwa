@@ -46,7 +46,7 @@ export default async function DataRequestDetailPage({ params }: { params: { id: 
       </div>
 
       <div>
-        <h1 className="text-xl font-bold flex items-center gap-2">
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Shield className="h-5 w-5" />
           Personvernforespørsel
         </h1>

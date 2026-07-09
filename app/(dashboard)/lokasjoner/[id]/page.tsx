@@ -184,7 +184,7 @@ export default async function LokasjonDetailPage({ params }: { params: { id: str
           { label: "Tiltak", count: location._count.actions },
         ].map(({ label, count }) => (
           <div key={label} className="rounded-2xl border bg-card px-4 py-3 text-center">
-            <p className="text-2xl font-bold">{count}</p>
+            <p className="text-2xl font-bold tracking-tight">{count}</p>
             <p className="text-xs text-muted-foreground">{label}</p>
           </div>
         ))}

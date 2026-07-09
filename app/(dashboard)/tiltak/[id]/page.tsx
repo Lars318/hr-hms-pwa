@@ -49,7 +49,7 @@ export default async function TiltakDetailPage({ params }: Props) {
           {" / "}
           <span>{action.title}</span>
         </div>
-        <h1 className="text-2xl font-bold">{action.title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">{action.title}</h1>
       </div>
 
       <div className="flex flex-wrap gap-2">

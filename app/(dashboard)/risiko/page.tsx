@@ -24,7 +24,7 @@ export default async function RisikoPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Risikovurderinger</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Risikovurderinger</h1>
           <p className="text-sm text-muted-foreground mt-1">HMS-risikovurderinger med risikopunkter og tiltak</p>
         </div>
         {canCreate && (

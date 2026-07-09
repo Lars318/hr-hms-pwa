@@ -51,7 +51,7 @@ export function HmsRundeList({ isHrAdmin }: Props) {
           <Link
             key={record.id}
             href={`/hms-runde/${record.id}`}
-            className="flex items-center justify-between rounded-lg border bg-card px-4 py-3 hover:bg-accent/50 transition-colors"
+            className="flex items-center justify-between rounded-2xl border bg-card px-4 py-3 hover:bg-accent/50 transition-colors"
           >
             <div className="flex items-center gap-3 min-w-0">
               <StatusIcon className="h-4 w-4 text-muted-foreground shrink-0" />

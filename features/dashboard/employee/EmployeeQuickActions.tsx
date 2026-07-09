@@ -77,7 +77,7 @@ export function EmployeeQuickActions() {
           <Link
             key={href}
             href={href}
-            className="flex flex-col items-center gap-1.5 rounded-xl border bg-card py-3 px-2 text-center hover:bg-accent/50 transition-colors active:scale-[0.97] min-h-[44px]"
+            className="flex flex-col items-center gap-1.5 rounded-2xl border bg-card py-3 px-2 text-center hover:bg-accent/50 transition-colors active:scale-[0.97] min-h-[44px]"
           >
             <Icon className="h-4 w-4 text-muted-foreground" />
             <span className="text-[10px] font-medium text-muted-foreground leading-tight">{label}</span>

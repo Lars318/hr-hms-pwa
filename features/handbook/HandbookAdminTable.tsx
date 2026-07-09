@@ -35,7 +35,7 @@ export function HandbookAdminTable() {
   return (
     <div className="space-y-2">
       {categories.map((cat) => (
-        <div key={cat.id} className="flex items-center gap-3 rounded-xl border bg-card p-4">
+        <div key={cat.id} className="flex items-center gap-3 rounded-2xl border bg-card p-4">
           <div className="flex-1 min-w-0">
             <p className="font-medium truncate">{cat.title}</p>
             <p className="text-xs text-muted-foreground">

@@ -23,7 +23,7 @@ interface RecentIncidentsCardProps {
 export function RecentIncidentsCard({ incidents }: RecentIncidentsCardProps) {
   if (incidents.length === 0) {
     return (
-      <div className="rounded-lg border bg-card col-span-full">
+      <div className="rounded-2xl border bg-card col-span-full">
         <div className="px-4 py-3 border-b">
           <h3 className="text-sm font-semibold">Nylig rapporterte avvik</h3>
         </div>
@@ -33,7 +33,7 @@ export function RecentIncidentsCard({ incidents }: RecentIncidentsCardProps) {
   }
 
   return (
-    <div className="rounded-lg border bg-card col-span-full">
+    <div className="rounded-2xl border bg-card col-span-full">
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <h3 className="text-sm font-semibold">Nylig rapporterte avvik</h3>
         <Link href="/avvik" className="text-xs text-muted-foreground hover:underline">Se alle →</Link>

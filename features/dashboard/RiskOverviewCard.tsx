@@ -23,7 +23,7 @@ export function RiskOverviewCard({ active, reviewSoon, criticalHighItems, topAss
   const needsAttention = criticalHighItems > 0 || reviewSoon > 0;
 
   return (
-    <div className={`rounded-lg border bg-card col-span-full ${needsAttention ? "border-orange-200" : ""}`}>
+    <div className={`rounded-2xl border bg-card col-span-full ${needsAttention ? "border-orange-200" : ""}`}>
       <div className="flex items-center justify-between px-4 py-3 border-b">
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-4 w-4 text-muted-foreground" />

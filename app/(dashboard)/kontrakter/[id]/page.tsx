@@ -68,7 +68,7 @@ export default async function ContractDetailPage({ params }: { params: { id: str
 
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold flex items-center gap-2">
+          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <FileText className="h-5 w-5" />
             {c.title}
           </h1>

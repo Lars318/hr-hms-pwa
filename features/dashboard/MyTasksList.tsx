@@ -50,7 +50,7 @@ export function MyTasksList() {
             key={task.id}
             href={task.href}
             className={cn(
-              "flex items-center gap-3 rounded-xl border bg-card px-4 min-h-[52px] transition-colors hover:bg-accent",
+              "flex items-center gap-3 rounded-2xl border bg-card px-4 min-h-[52px] transition-colors hover:bg-accent",
               task.overdue && "border-destructive/40 bg-destructive/5"
             )}
           >

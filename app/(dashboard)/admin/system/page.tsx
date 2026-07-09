@@ -37,14 +37,14 @@ export default async function SystemPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold">Systemstatus</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Systemstatus</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Driftsoversikt — kun synlig for administratorer
         </p>
       </div>
 
       {/* App info */}
-      <section className="rounded-lg border bg-card p-5 space-y-3">
+      <section className="rounded-2xl border bg-card p-5 space-y-3">
         <h2 className="text-sm font-semibold">Applikasjon</h2>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <dt className="text-muted-foreground">Versjon</dt>
@@ -70,7 +70,7 @@ export default async function SystemPage() {
       </section>
 
       {/* Database */}
-      <section className="rounded-lg border bg-card p-5 space-y-3">
+      <section className="rounded-2xl border bg-card p-5 space-y-3">
         <h2 className="text-sm font-semibold">Database</h2>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <dt className="text-muted-foreground">Status</dt>
@@ -91,7 +91,7 @@ export default async function SystemPage() {
       </section>
 
       {/* Brukere og push */}
-      <section className="rounded-lg border bg-card p-5 space-y-3">
+      <section className="rounded-2xl border bg-card p-5 space-y-3">
         <h2 className="text-sm font-semibold">Brukere og varsler</h2>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
           <dt className="text-muted-foreground">Totalt antall brukere</dt>
@@ -103,7 +103,7 @@ export default async function SystemPage() {
       </section>
 
       {/* Go-live-sjekkliste */}
-      <section className="rounded-lg border bg-card p-5 space-y-4">
+      <section className="rounded-2xl border bg-card p-5 space-y-4">
         <div>
           <h2 className="text-sm font-semibold">Go-live-sjekkliste</h2>
           <p className="text-xs text-muted-foreground mt-0.5">

@@ -60,7 +60,7 @@ export default async function DataRequestsAdminPage({
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Shield className="h-6 w-6" />
           Personvernforespørsler
         </h1>

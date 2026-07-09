@@ -104,7 +104,7 @@ export function HmsRundeChecklist({ record, canEdit }: Props) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="rounded-lg border bg-card p-4 space-y-2">
+      <div className="rounded-2xl border bg-card p-4 space-y-2">
         <div className="flex items-start justify-between gap-2">
           <h1 className="text-lg font-bold">{record.title}</h1>
           <Badge variant={isCompleted ? "default" : "secondary"}>
@@ -149,7 +149,7 @@ export function HmsRundeChecklist({ record, canEdit }: Props) {
           const resp = responses[item.id];
           const isSaving = saving === item.id;
           return (
-            <div key={item.id} className="rounded-lg border bg-card p-4 space-y-3">
+            <div key={item.id} className="rounded-2xl border bg-card p-4 space-y-3">
               <div className="flex items-start gap-2">
                 <span className="text-xs font-mono text-muted-foreground mt-0.5 shrink-0 w-5">{idx + 1}.</span>
                 <div className="flex-1 min-w-0">
@@ -205,7 +205,7 @@ export function HmsRundeChecklist({ record, canEdit }: Props) {
 
       {/* Complete section */}
       {!isCompleted && canEdit && (
-        <div className="rounded-lg border bg-card p-4 space-y-3">
+        <div className="rounded-2xl border bg-card p-4 space-y-3">
           <p className="text-sm font-medium">Avslutt runden</p>
           <Textarea
             placeholder="Generelle notater (valgfritt)"
@@ -231,7 +231,7 @@ export function HmsRundeChecklist({ record, canEdit }: Props) {
       )}
 
       {isCompleted && record.notes && (
-        <div className="rounded-lg border bg-card p-4">
+        <div className="rounded-2xl border bg-card p-4">
           <p className="text-xs font-medium text-muted-foreground mb-1">Notater</p>
           <p className="text-sm">{record.notes}</p>
         </div>

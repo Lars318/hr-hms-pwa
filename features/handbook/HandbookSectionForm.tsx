@@ -100,7 +100,7 @@ export function HandbookSectionManager({ categoryId, sections }: Props) {
   return (
     <div className="space-y-2">
       {sections.map((s) => (
-        <div key={s.id} className="rounded-xl border bg-card">
+        <div key={s.id} className="rounded-2xl border bg-card">
           <div className="flex items-center gap-2 p-3">
             <button
               className="flex-1 flex items-center gap-2 text-left"

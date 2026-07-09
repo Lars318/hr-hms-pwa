@@ -26,7 +26,7 @@ export default async function NyVarslingPage() {
         <Link href="/varsling" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4">
           <ArrowLeft className="h-4 w-4" /> Tilbake til varsling
         </Link>
-        <h1 className="text-2xl font-bold">Send varsel om kritikkverdig forhold</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Send varsel om kritikkverdig forhold</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Saken behandles konfidensielt av HR og administrator.
         </p>

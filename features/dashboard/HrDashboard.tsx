@@ -116,7 +116,7 @@ export function HrDashboard({ name, data }: Props) {
       )}
 
       {/* Aktivitetsfeed */}
-      <div className="rounded-xl border bg-card">
+      <div className="rounded-2xl border bg-card">
         <div className="px-4 pt-4 pb-2">
           <h2 className="text-sm font-semibold text-foreground">Siste aktivitet</h2>
         </div>

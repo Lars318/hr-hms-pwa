@@ -49,7 +49,7 @@ export default async function MineForesporslerPage() {
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Shield className="h-6 w-6" />
           Mine personvernforespørsler
         </h1>

@@ -59,7 +59,7 @@ export function EmploymentHistory({ profileId }: Props) {
   }
 
   if (isLoading) {
-    return <div className="h-24 rounded-lg border bg-card animate-pulse" />;
+    return <div className="h-24 rounded-2xl border bg-card animate-pulse" />;
   }
 
   const current = records.find((r) => !r.effectiveTo);
@@ -68,7 +68,7 @@ export function EmploymentHistory({ profileId }: Props) {
     <div className="space-y-4">
       {/* Current */}
       {current && (
-        <div className="rounded-lg border bg-card p-4 space-y-3">
+        <div className="rounded-2xl border bg-card p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Badge variant="default" className="text-xs">Gjeldende</Badge>
             <span className="text-xs text-muted-foreground">
@@ -131,7 +131,7 @@ export function EmploymentHistory({ profileId }: Props) {
 
       {/* Add new record form */}
       {showForm ? (
-        <form onSubmit={handleSubmit} className="rounded-lg border bg-card p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="rounded-2xl border bg-card p-4 space-y-4">
           <h3 className="text-sm font-semibold">Ny lønns-/stillingsendring</h3>
 
           <div className="grid grid-cols-2 gap-3">

@@ -57,7 +57,7 @@ export default async function MineOpplaeringerPage() {
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <GraduationCap className="h-6 w-6" />
           Mine opplæringer
         </h1>

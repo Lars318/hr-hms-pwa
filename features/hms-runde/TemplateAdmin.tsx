@@ -87,7 +87,7 @@ export function TemplateAdmin({ templates }: Props) {
     <div className="space-y-4">
       {/* Existing templates */}
       {templates.map((t) => (
-        <div key={t.id} className="rounded-lg border bg-card overflow-hidden">
+        <div key={t.id} className="rounded-2xl border bg-card overflow-hidden">
           <button
             type="button"
             className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-accent/50 transition-colors"
@@ -131,7 +131,7 @@ export function TemplateAdmin({ templates }: Props) {
 
       {/* New template form */}
       {showForm ? (
-        <form onSubmit={handleSubmit} className="rounded-lg border bg-card p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="rounded-2xl border bg-card p-4 space-y-4">
           <h2 className="text-sm font-semibold">Ny mal</h2>
 
           <div className="space-y-2">

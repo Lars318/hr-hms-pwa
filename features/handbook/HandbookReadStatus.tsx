@@ -59,7 +59,7 @@ export function HandbookReadStatus() {
           ) : (
             <div className="space-y-1.5">
               {data.read.map((p) => (
-                <div key={p.id} className="flex items-center justify-between rounded-xl border bg-card p-3 text-sm">
+                <div key={p.id} className="flex items-center justify-between rounded-2xl border bg-card p-3 text-sm">
                   <span className="font-medium truncate">{p.fullName}</span>
                   <span className="text-xs text-muted-foreground shrink-0 ml-2">{p.department?.name ?? "—"}</span>
                 </div>

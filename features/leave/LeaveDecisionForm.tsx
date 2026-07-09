@@ -43,7 +43,7 @@ export function LeaveDecisionForm({ requestId, employeeName }: LeaveDecisionForm
   const isPending = approveMutation.isPending || rejectMutation.isPending;
 
   return (
-    <div className="space-y-4 rounded-lg border bg-card p-4">
+    <div className="space-y-4 rounded-2xl border bg-card p-4">
       <p className="text-sm font-medium">Behandle søknad fra {employeeName}</p>
 
       <div className="space-y-1">

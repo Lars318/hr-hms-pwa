@@ -57,7 +57,7 @@ export default async function VarslingAdminPage({ searchParams }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Varslingssaker</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Varslingssaker</h1>
         <p className="text-sm text-muted-foreground mt-1">
           {profile.role === "MANAGER"
             ? "Saker du er tildelt som saksbehandler."
@@ -76,15 +76,15 @@ export default async function VarslingAdminPage({ searchParams }: Props) {
 
       {/* Statistikk */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div className="rounded-xl border bg-card p-4">
+        <div className="rounded-2xl border bg-card p-4">
           <p className="text-xs text-muted-foreground">Totalt</p>
-          <p className="text-2xl font-bold">{cases.length}</p>
+          <p className="text-2xl font-bold tracking-tight">{cases.length}</p>
         </div>
-        <div className="rounded-xl border bg-card p-4">
+        <div className="rounded-2xl border bg-card p-4">
           <p className="text-xs text-muted-foreground">Åpne</p>
           <p className="text-2xl font-bold text-orange-600">{openCount}</p>
         </div>
-        <div className="rounded-xl border bg-card p-4 col-span-2 sm:col-span-1">
+        <div className="rounded-2xl border bg-card p-4 col-span-2 sm:col-span-1">
           <p className="text-xs text-muted-foreground">Lukket</p>
           <p className="text-2xl font-bold text-green-600">{cases.length - openCount}</p>
         </div>
@@ -104,7 +104,7 @@ export default async function VarslingAdminPage({ searchParams }: Props) {
             <Link
               key={c.id}
               href={`/varsling/${c.id}`}
-              className="block rounded-xl border bg-card hover:bg-accent/40 transition-colors"
+              className="block rounded-2xl border bg-card hover:bg-accent/40 transition-colors"
             >
               <div className="p-4 space-y-2">
                 <div className="flex items-start justify-between gap-2">

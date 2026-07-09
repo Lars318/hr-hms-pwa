@@ -30,7 +30,7 @@ export default async function RedigerDokumentPage({ params }: Props) {
           {" / "}
           <span>Rediger</span>
         </div>
-        <h1 className="text-2xl font-bold">Rediger dokument</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Rediger dokument</h1>
       </div>
 
       <DocumentForm mode="edit" document={doc} />

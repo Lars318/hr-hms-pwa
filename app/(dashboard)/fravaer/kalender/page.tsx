@@ -114,7 +114,7 @@ export default function LeaveCalendarPage() {
       </div>
 
       {/* Filters */}
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-2xl border bg-card p-4">
         <LeaveCalendarFilters
           departments={departments}
           showDeptFilter={isHrAdmin}

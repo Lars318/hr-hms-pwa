@@ -55,7 +55,7 @@ export function TestUserSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 z-50 w-64 rounded-xl border bg-card shadow-lg overflow-hidden">
+        <div className="absolute right-0 top-full mt-1 z-50 w-64 rounded-2xl border bg-card shadow-lg overflow-hidden">
           <p className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground border-b">
             Bytt til bruker
           </p>

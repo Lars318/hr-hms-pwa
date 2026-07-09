@@ -21,12 +21,12 @@ export function SickLeaveList({ viewerRole }: Props) {
   const { data: cases = [], isLoading } = trpc.sickLeave.list.useQuery({});
 
   if (isLoading) {
-    return <div className="space-y-3">{[0,1,2].map(i => <div key={i} className="h-20 rounded-lg border bg-card animate-pulse" />)}</div>;
+    return <div className="space-y-3">{[0,1,2].map(i => <div key={i} className="h-20 rounded-2xl border bg-card animate-pulse" />)}</div>;
   }
 
   if (!cases.length) {
     return (
-      <div className="rounded-lg border bg-card p-8 text-center">
+      <div className="rounded-2xl border bg-card p-8 text-center">
         <CheckCircle2 className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
         <p className="text-sm text-muted-foreground">Ingen aktive sykefraværssaker.</p>
       </div>
@@ -49,7 +49,7 @@ export function SickLeaveList({ viewerRole }: Props) {
           <Link
             key={c.id}
             href={`/sykefravaer/${c.id}`}
-            className="block rounded-lg border bg-card p-4 hover:bg-accent/50 transition-colors"
+            className="block rounded-2xl border bg-card p-4 hover:bg-accent/50 transition-colors"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
